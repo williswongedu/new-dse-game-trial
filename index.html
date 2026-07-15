@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>《機率召喚對決：DSE 數域戰記》PvP 聯機版</title>
+  <title>《機率召喚對決：DSE 數域戰記》</title>
   <!-- 引入 PeerJS 用於無伺服器 P2P 聯機 -->
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
   <style>
     /* ==========================================
-     * 1. Cyberpunk 霓虹風格樣式
+     * Cyberpunk 霓虹風格樣式 (CSS)
      * ========================================== */
     :root {
       --bg-color: #0b0c10;
@@ -34,34 +34,61 @@
       overflow: hidden;
     }
 
+    /* 頂部導航列 */
     header {
       background: linear-gradient(90deg, #1f2833, #0b0c10);
-      padding: 10px 20px;
+      padding: 5px 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 2px solid var(--accent-cyan);
       box-shadow: 0 0 15px rgba(102, 252, 241, 0.3);
+      height: 50px;
+      box-sizing: border-box;
     }
 
     header h1 {
       margin: 0;
-      font-size: 1.4rem;
+      font-size: 1.2rem;
       color: var(--accent-cyan);
       text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+    }
+
+    /* PTCG 多網頁生態導航 */
+    nav {
+      display: flex;
+      gap: 15px;
+    }
+
+    nav a {
+      color: var(--text-gray);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    nav a:hover, nav a.active {
+      color: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+      background: rgba(102, 252, 241, 0.1);
+      box-shadow: 0 0 8px rgba(102, 252, 241, 0.2);
     }
 
     .state-indicator {
       background: var(--panel-bg);
       border: 1px solid var(--accent-cyan);
-      padding: 5px 15px;
+      padding: 3px 12px;
       border-radius: 20px;
       font-weight: bold;
       color: var(--accent-cyan);
-      font-size: 0.9rem;
+      font-size: 0.8rem;
     }
 
-    /* 遊戲模式選擇介面 */
+    /* 遊戲模式選擇介面 (大廳) */
     #lobby-screen {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -75,13 +102,13 @@
     }
 
     .lobby-panel {
-      background: rgba(0,0,0,0.6);
+      background: rgba(0,0,0,0.8);
       border: 2px solid var(--accent-cyan);
       padding: 30px;
       border-radius: 12px;
-      width: 400px;
+      width: 420px;
       text-align: center;
-      box-shadow: 0 0 20px rgba(102, 252, 241, 0.3);
+      box-shadow: 0 0 25px rgba(102, 252, 241, 0.4);
     }
 
     .lobby-btn {
@@ -93,14 +120,15 @@
       font-weight: bold;
       cursor: pointer;
       border-radius: 6px;
-      margin-top: 10px;
-      font-size: 1rem;
+      margin-top: 12px;
+      font-size: 0.95rem;
+      transition: all 0.2s;
     }
 
     .lobby-btn:hover {
       background: var(--accent-cyan);
       color: #000;
-      box-shadow: 0 0 10px var(--accent-cyan);
+      box-shadow: 0 0 12px var(--accent-cyan);
     }
 
     /* 遊戲主容器 */
@@ -171,16 +199,18 @@
     }
 
     .discard-pile {
-      width: 55px;
-      height: 75px;
-      border: 1px dashed rgba(255,255,255,0.2);
+      width: 60px;
+      height: 80px;
+      border: 1.5px dashed rgba(255,255,255,0.2);
       border-radius: 6px;
-      background: rgba(0,0,0,0.4);
+      background: rgba(0,0,0,0.5);
       display: flex;
       align-items: center;
       justify-content: center;
       font-size: 0.65rem;
       color: #777;
+      text-align: center;
+      line-height: 1.2;
     }
 
     /* 卡牌排布 */
@@ -211,6 +241,10 @@
 
     .ai-card {
       border-color: var(--accent-magenta);
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
     }
 
     .card-header {
@@ -555,36 +589,44 @@
 </head>
 <body>
 
-  <!-- 🎮 聯機與模式大廳 -->
+  <!-- 頂部導航及多網頁入口 -->
+  <header>
+    <h1>🎮 機率召喚對決：DSE 數域戰記</h1>
+    <nav>
+      <a href="index.html" class="active">⚔️ 戰鬥對決</a>
+      <a href="codex.html">📚 數域圖鑑</a>
+      <a href="gacha.html">🎰 能量抽卡</a>
+    </nav>
+    <div class="state-indicator" id="turn-state-lbl">狀態: 初始化...</div>
+  </header>
+
+  <!-- 🎮 聯機與模式選擇大廳 (Lobby) -->
   <div id="lobby-screen">
     <div class="lobby-panel">
-      <h2 style="color: var(--accent-cyan); margin-bottom: 20px;">DSE 數域戰記 - 戰鬥終端</h2>
+      <h2 style="color: var(--accent-cyan); margin-bottom: 20px;">DSE 數域戰記 - 戰鬥大廳</h2>
       <button class="lobby-btn" onclick="startLocalVsAi()">🤖 挑戰 AI (單人練習)</button>
       <hr style="border: 1px solid rgba(255,255,255,0.1); margin: 20px 0;" />
       <h3 style="color: var(--accent-magenta);">🌐 雙人線上聯機對戰</h3>
-      <p style="font-size: 0.85rem; color: #888;">透過 WebRTC 免費點對點連線，免安裝跨平台對打！</p>
+      <p style="font-size: 0.85rem; color: #888;">透過 WebRTC 安全加密連線，直接網頁 PK！</p>
       <button class="lobby-btn" onclick="hostPvPGame()">🏠 創立新對戰房</button>
       <div style="margin-top: 15px;">
-        <input type="text" id="join-room-id" placeholder="請輸入對手房間密鑰..." style="padding: 10px; width: 60%; border-radius: 6px; border: 1px solid var(--accent-cyan); background:#000; color:#fff;" />
-        <button class="lobby-btn" style="width: 35%; display: inline-block; margin-top:0;" onclick="joinPvPGame()">⚡ 加入</button>
+        <input type="text" id="join-room-id" placeholder="請輸入對手房間密鑰..." style="padding: 10px; width: 55%; border-radius: 6px; border: 1px solid var(--accent-cyan); background:#000; color:#fff;" />
+        <button class="lobby-btn" style="width: 38%; display: inline-block; margin-top:0;" onclick="joinPvPGame()">⚡ 連接加入</button>
       </div>
       <div id="connection-status" style="margin-top: 15px; font-size: 0.9rem; color: var(--accent-gold);"></div>
     </div>
   </div>
 
-  <header>
-    <h1>🎮 機率召喚對決：DSE 數域戰記 (聯機版)</h1>
-    <div class="state-indicator" id="turn-state-lbl">狀態: 初始化...</div>
-  </header>
-
+  <!-- 戰場容器 -->
   <div class="game-container">
     
     <div class="battlefield">
       
-      <!-- AI / 聯機對手 戰區 -->
+      <!-- 對手戰區 (上方) -->
       <div class="field-row ai-row">
+        <!-- 對手出戰怪 (點選觸發 Inspect) -->
         <div class="card-slot">
-          <div class="card ai-card" id="ai-active-card" onclick="inspectCard('ai')">
+          <div class="card ai-card" id="ai-active-card">
             <div class="card-energy-badge" id="ai-energy">0</div>
             <div class="card-header">
               <span class="card-name" id="ai-name">對手出戰卡</span>
@@ -595,10 +637,11 @@
             <div class="card-click-tip">點擊查看詳情</div>
           </div>
         </div>
+        <!-- 生命值指示器與廢棄區 -->
         <div class="bench-and-prizes" style="flex-direction: row-reverse;">
           <div class="prize-area">
             <div class="life-hearts" id="ai-life-hearts">❤️❤️❤️</div>
-            <div class="discard-pile" id="ai-discard-pile">廢棄區: 0</div>
+            <div class="discard-pile" id="ai-discard-pile">廢棄區<br>0</div>
           </div>
           <div class="bench-area" id="ai-bench"></div>
         </div>
@@ -608,10 +651,11 @@
         VERSUS FIELD - MATHEMATICS REALM
       </div>
 
-      <!-- 玩家戰區 -->
+      <!-- 玩家戰區 (下方) -->
       <div class="field-row player-row">
+        <!-- 我的出戰怪 (點選觸發 Inspect) -->
         <div class="card-slot">
-          <div class="card" id="player-active-card" onclick="inspectCard('player')">
+          <div class="card" id="player-active-card">
             <div class="card-energy-badge" id="player-energy">0</div>
             <div class="card-header">
               <span class="card-name" id="player-name">我的戰鬥卡</span>
@@ -622,10 +666,11 @@
             <div class="card-click-tip">點擊查看詳情</div>
           </div>
         </div>
+        <!-- 生命值指示器與廢棄區 -->
         <div class="bench-and-prizes">
           <div class="prize-area">
             <div class="life-hearts" id="player-life-hearts">❤️❤️❤️</div>
-            <div class="discard-pile" id="player-discard-pile">廢棄區: 0</div>
+            <div class="discard-pile" id="player-discard-pile">廢棄區<br>0</div>
           </div>
           <div class="bench-area" id="player-bench"></div>
         </div>
@@ -635,18 +680,18 @@
 
     <!-- 控制面板 -->
     <div class="side-panel">
-      <div class="log-panel" id="log-console">
+      <div class="log-panel" id="log-console" style="padding:10px; overflow-y:auto;">
         &gt; 戰鬥日誌加載中...<br/>
       </div>
 
       <div class="control-actions">
         <button class="action-btn" id="btn-attach-energy" disabled>⚡ 附給當前卡牌 1 點能量</button>
-        <div style="font-size: 0.75rem; color: #888; text-align: center; margin-top: 2px;">
-          * 卡牌置入後即鎖定，無法手動更換 *
+        <div style="font-size: 0.72rem; color: #888; text-align: center; margin-top: 2px;">
+          * 卡牌一經放出即鎖定，不容悔改 *
         </div>
       </div>
 
-      <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold;">🧑‍💻 我的手牌：</div>
+      <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold;">🧑‍💻 我的手牌 (點選放入後備區)：</div>
       <div class="hand-container" id="player-hand"></div>
     </div>
 
@@ -664,11 +709,11 @@
     </div>
   </div>
 
-  <!-- 👁️ 卡牌詳細檢視資訊彈窗 -->
+  <!-- 👁️ 卡牌詳細數據檢視彈窗 (Flawless Event Bound) -->
   <div class="modal-overlay" id="inspect-modal">
     <div class="modal-content inspect-content">
       <div class="modal-header" style="color: var(--accent-cyan); border-color: rgba(102,252,241,0.3);">
-        <span>👁️ 卡牌詳細數據檢視</span>
+        <span>👁️ 數域卡牌詳細數據</span>
         <button onclick="closeInspectModal()" style="background:none; border:none; color:var(--accent-cyan); font-size:1.2rem; cursor:pointer;">✕</button>
       </div>
       <div class="inspect-grid">
@@ -678,91 +723,40 @@
           <div class="inspect-hp" id="inspect-card-hp">HP: 300/300</div>
           <div style="font-size:0.85rem; color:#aaa;" id="inspect-card-energy">當前能量: 0</div>
           
-          <div style="font-weight:bold; margin-top:10px; color: var(--accent-gold);">📜 DSE 技能列表（足夠能量時可直接施放）：</div>
-          <div class="inspect-skill-list" id="inspect-skills-container">
-            <!-- 技能列表 -->
-          </div>
+          <div style="font-weight:bold; margin-top:10px; color: var(--accent-gold);">📜 可施放 DSE 技能：</div>
+          <div class="inspect-skill-list" id="inspect-skills-container"></div>
           
           <div style="font-weight:bold; margin-top:10px; color: var(--accent-cyan);">🎓 DSE 核心數學公式關聯：</div>
-          <p style="font-size: 0.8rem; color: var(--text-gray); line-height: 1.4; margin:0;" id="inspect-math-desc">
-            此怪獸與 DSE 期望值 $E(X) = \sum x_i p_i$ 緊密相關。
-          </p>
+          <p style="font-size: 0.8rem; color: var(--text-gray); line-height: 1.4; margin:0;" id="inspect-math-desc"></p>
         </div>
       </div>
     </div>
   </div>
 
   <!-- ==========================================
-   * 3. 遊戲核心邏輯及聯機引擎 (JavaScript)
+   * 戰鬥狀態機與核心邏輯引擎
    * ========================================== -->
   <script>
-    const DseQuizDatabase = {
-      "Q_EXP_01": {
-        id: "Q_EXP_01",
-        topic: "DSE 期望值 (Expected Value)",
-        question: "在某抽獎活動中，中獎概率為 0.15。中獎可得獎金 $800，未中獎則需支付 $50 手續費。求參與該抽獎的期望收益是多少？",
-        options: ["$120", "$77.5", "$112.5", "$80"],
-        correctAnswerIndex: 1,
-        explanation: "期望值 = 800 * 0.15 + (-50) * (1 - 0.15) = 120 - 42.5 = $77.5。"
-      },
-      "Q_EXP_02": {
-        id: "Q_EXP_02",
-        topic: "DSE 期望值 (Expected Value)",
-        question: "擲一枚骰子，若點數為偶數可得點數的 10 倍分，若為奇數則扣 5 分。求此博弈期望得分？",
-        options: ["10分", "12.5分", "15分", "7.5分"],
-        correctAnswerIndex: 1, // 偶數 (2,4,6) 期望值: 1/6*(20+40+60) = 20分. 奇數 (1,3,5) 期望值: 3/6*(-5) = -2.5分. 總期望 = 17.5? 2,4,6點數和為12. (1/6)*(20+40+60) = 20. 奇數 1/2 * -5 = -2.5. 20 - 2.5 = 17.5. 算錯。
-        explanation: "偶數期望得分 = 1/6*(20+40+60) = 20分。奇數期望得分 = 3/6*(-5) = -2.5分。總期望值 = 20 - 2.5 = 17.5分。"
-      },
-      "Q_PROB_COND": {
-        id: "Q_PROB_COND",
-        topic: "DSE 條件概率 (Conditional Prob)",
-        question: "已知 P(A) = 0.6, P(B) = 0.5 且 P(A ∪ B) = 0.8。求條件概率 P(B | A) 的值？",
-        options: ["0.3", "0.5", "0.6", "0.8"],
-        correctAnswerIndex: 1,
-        explanation: "P(A ∩ B) = P(A) + P(B) - P(A ∪ B) = 0.6 + 0.5 - 0.8 = 0.3。則 P(B|A) = P(A ∩ B) / P(A) = 0.3 / 0.6 = 0.5。"
-      },
-      "Q_PERM_01": {
-        id: "Q_PERM_01",
-        topic: "DSE 排列數 (Permutations)",
-        question: "將 'MATHS' 這 5 個英文字母隨機排成一列。求首尾兩個字母皆為輔音的概率是多少？",
-        options: ["3/10", "3/5", "1/5", "1/2"],
-        correctAnswerIndex: 1,
-        explanation: "輔音有 M, T, H, S 共 4 個。首尾排輔音方法數 = P(4,2) = 12。中間 3 個字母隨意排 = 3! = 6。合規排列 = 12 * 6 = 72。總排列 = 5! = 120。概率 = 72 / 120 = 3/5。"
-      },
-      "Q_COMB_01": {
-        id: "Q_COMB_01",
-        topic: "DSE 組合數 (Combinations)",
-        question: "一個盒子中有 5 個紅球和 5 個白球。若從中隨機一次取出 3 個球，求恰好取出 2 個紅球和 1 個白球的組合方法有多少種？",
-        options: ["50", "120", "25", "10"],
-        correctAnswerIndex: 0,
-        explanation: "方法數 = C(5,2) * C(5,1) = 10 * 5 = 50 種。"
-      },
-      "Q_GEOM_01": {
-        id: "Q_GEOM_01",
-        topic: "DSE 幾何概率與加法 (Probability Laws)",
-        question: "一條長為 10 cm 的線段被隨機截成兩段。若其中一段長度小於 3 cm 的概率為 p，則 p 的值是多少？",
-        options: ["0.3", "0.6", "0.5", "0.4"],
-        correctAnswerIndex: 1,
-        explanation: "若一段小於 3 cm，截點必須落在離左端 3 cm 以內或離右端 3 cm 以內。有效區間長度為 3 + 3 = 6 cm。概率 = 6 / 10 = 0.6。"
-      },
-      "Q_IND_01": {
-        id: "Q_IND_01",
-        topic: "DSE 獨立事件 (Independent Events)",
-        question: "小明和小華各自解答同一道 DSE 難題，兩人能獨立解答的概率分別為 0.7 和 0.6。求該題被最少一人解答出來的概率是多少？",
-        options: ["0.42", "0.88", "0.82", "0.95"],
-        correctAnswerIndex: 1,
-        explanation: "利用餘事件計算：最少一人答出概率 = 1 - 兩人皆答不出 = 1 - (1 - 0.7) * (1 - 0.6) = 1 - 0.3 * 0.4 = 1 - 0.12 = 0.88。"
-      },
-      "Q_GENERIC": {
-        id: "Q_GENERIC",
-        topic: "DSE 機率基礎運算",
-        question: "若 P(A) = 0.4, P(B) = 0.3，且 A 和 B 為互斥事件 (Mutually Exclusive)。求 P(A ∪ B) 的概率？",
-        options: ["0.12", "0.7", "0.1", "0.5"],
-        correctAnswerIndex: 1,
-        explanation: "互斥事件的併合概率公式：P(A ∪ B) = P(A) + P(B) = 0.4 + 0.3 = 0.7。"
-      }
+    const BattleState = {
+      INITIALIZING: "INITIALIZING",
+      PLAYER_DRAW: "PLAYER_DRAW",
+      PLAYER_PREPARATION: "PLAYER_PREPARATION",
+      PLAYER_QUIZ_CHALLENGE: "PLAYER_QUIZ_CHALLENGE",
+      PLAYER_ATTACK_RESOLUTION: "PLAYER_ATTACK_RESOLUTION",
+      AI_TURN_START: "AI_TURN_START",
+      AI_PREPARATION: "AI_PREPARATION",
+      AI_QUIZ_DEFENSE: "AI_QUIZ_DEFENSE",
+      AI_ATTACK_RESOLUTION: "AI_ATTACK_RESOLUTION",
+      CHECK_KNOCKOUT: "CHECK_KNOCKOUT",
+      GAME_OVER: "GAME_OVER"
     };
 
+    const PlayerType = {
+      PLAYER: "PLAYER",
+      AI: "AI"
+    };
+
+    // 🔊 升級版 16-bit 復古合成器音效 (純 Web Audio API 實現)
     const SoundEffects = {
       audioCtx: null,
       init() {
@@ -795,7 +789,6 @@
         this.play(400, 'triangle', 0.25, 1200); 
       },
       correct() {
-        // 大和弦勝利鳴響
         this.play(523, 'sine', 0.15); 
         setTimeout(() => this.play(659, 'sine', 0.15), 100); 
         setTimeout(() => this.play(784, 'sine', 0.15), 200); 
@@ -808,7 +801,7 @@
         this.play(150, 'triangle', 0.22, 40);
       },
       death() {
-        this.play(400, 'sawtooth', 0.4, 60);
+        this.play(300, 'sawtooth', 0.45, 60);
       },
       win() {
         const notes = [523, 659, 784, 1046, 784, 1046, 1318];
@@ -818,11 +811,14 @@
       }
     };
 
+    // ==========================================
+    // ⚔️ 遊戲核心數據庫與狀態管理 (Engine Class)
+    // ==========================================
     class BattleEngine {
       constructor() {
         this.currentState = BattleState.INITIALIZING;
         this.isMultiplayer = false;
-        this.isMyTurn = true; // 聯機時的本地控制
+        this.isMyTurn = true; 
         this.player = null;
         this.ai = null;
         this.currentActiveQuestion = null;
@@ -845,10 +841,9 @@
           id, name, hp, maxHp: hp, energyAttached: 0, isKnockedOut: false, icon, skills, mathDesc
         });
 
-        // 玩家主力角色卡
         const p1 = createCard("p_dragon", "期望值真龍", 300, "🐉", [
           { id: "p_s1", name: "微光吐息", damage: 60, energyCost: 1, quizId: "Q_EXP_01", desc: "普通期望值計算，穩健的一擊。" },
-          { id: "p_s2", name: "期望真解斬", damage: 130, energyCost: 2, quizId: "Q_EXP_02", desc: "複雜概率下的期望值估算，威力極高。" }
+          { id: "p_s2", name: "期望真解斬", damage: 130, energyCost: 2, quizId: "Q_EXP_01", desc: "複雜概率下的期望值估算，威力極高。" }
         ], "期望值 E(X) 是 DSE 機率必考點。計算公式為：每個可能結果的值乘以其對應的發生概率之和。");
 
         const p2 = createCard("p_mage", "排列組合法師", 200, "🧙‍♂️", [
@@ -861,21 +856,19 @@
           { id: "p_s6", name: "條件判定破", damage: 140, energyCost: 2, quizId: "Q_PROB_COND", desc: "條件機率深度挑戰，防不勝防。" }
         ], "條件概率 P(B|A) 指在事件 A 發生的前提下，事件 B 發生的概率。公式為 P(B|A) = P(A ∩ B) / P(A)。");
 
-        // AI / 聯機對手 主力角色卡
         const a1 = createCard("ai_boss", "機率混亂魔王", 350, "😈", [
           { id: "ai_s1", name: "乘法暗黑彈", damage: 80, energyCost: 1, quizId: "Q_IND_01", desc: "獨立事件乘法規律反撲。" },
           { id: "ai_s2", name: "全分佈轟炸", damage: 150, energyCost: 2, quizId: "Q_COMB_01", desc: "巨型組合數爆破。" }
         ], "獨立事件是指兩個事件的發生互不影響。判定條件：P(A ∩ B) = P(A) * P(B)。");
 
         const a2 = createCard("ai_imp", "偏向分佈小鬼", 180, "👺", [
-          { id: "ai_s3", name: "隨機擲石", damage: 50, energyCost: 1, quizId: "Q_EXP_01", desc: "期望收益低階攻擊。" }
+          { id: "ai_s3", name: "期望擲石", damage: 50, energyCost: 1, quizId: "Q_EXP_01", desc: "期望收益低階攻擊。" }
         ], "隨機變量在 DSE 中通常呈現離散分佈，需要精準列出分佈表。");
 
         const a3 = createCard("ai_golem", "幾何硬度巨石", 250, "🪨", [
           { id: "ai_s4", name: "幾何碾壓", damage: 80, energyCost: 1, quizId: "Q_GEOM_01", desc: "長度與區域的幾何比例碾壓。" }
         ], "幾何概率與幾何長度、面積成正比。DSE 常考線段隨機截取概率。");
 
-        // 擴充卡組，防止抽空
         const playerDeck = [p1, p2, p3];
         for (let i = 1; i <= 12; i++) {
           playerDeck.push(createCard(`p_minion_${i}`, `數域信徒 Lvl.${i}`, 150, "🧙", [
@@ -917,13 +910,11 @@
         this.initDecks();
         this.transitionTo(BattleState.INITIALIZING);
 
-        // 1. 各抽 4 張牌
         for (let i = 0; i < 4; i++) {
           this.drawCard(this.player);
           this.drawCard(this.ai);
         }
 
-        // 2. 從餘下牌組分配戰場與後備
         this.player.activeCard = this.player.deck.pop();
         this.ai.activeCard = this.ai.deck.pop();
 
@@ -931,16 +922,16 @@
         this.ai.bench.push(this.ai.deck.pop());
 
         logConsole("🎮 戰場配置完畢，生命值計數開始！");
-        logConsole(`[規則] 每人有 3 點生命值 ❤️。每次有卡牌陣亡，擁有者 Life -1。歸零即敗！`);
+        logConsole(`[規則] 每人有 3 點生命值 ❤️。卡牌陣亡則 Life -1。歸零即敗！`);
 
         if (this.isMultiplayer) {
           if (role === 'host') {
             this.isMyTurn = true;
-            logConsole("🌐 聯機成功。您是主辦方，擁有先攻權！");
+            logConsole("🌐 您是主辦方，擁有先攻權！");
             this.transitionTo(BattleState.PLAYER_DRAW);
           } else {
             this.isMyTurn = false;
-            logConsole("🌐 聯機成功。您是加入方，請等待對手先攻...");
+            logConsole("🌐 您是客方，請等待對手行動...");
             this.transitionTo(BattleState.AI_TURN_START);
           }
         } else {
@@ -956,7 +947,6 @@
         switch (newState) {
           case BattleState.PLAYER_DRAW:
             if (this.isMultiplayer && !this.isMyTurn) {
-              // 若非我的回合，則跳向 AI 等待
               this.transitionTo(BattleState.AI_TURN_START);
               return;
             }
@@ -965,11 +955,10 @@
           case BattleState.AI_TURN_START:
             if (this.isMultiplayer) {
               if (this.isMyTurn) {
-                // 如果我是主辦方且是我的回合，不該進入 AI 回合
                 this.transitionTo(BattleState.PLAYER_DRAW);
                 return;
               }
-              logConsole(`\n--- 🌐 等待對方玩家思考與操作中... ---`);
+              logConsole(`\n--- 🌐 等待對方玩家操作中... ---`);
             } else {
               this.handleAiTurnStart();
             }
@@ -989,16 +978,13 @@
         return false;
       }
 
-      // ==========================================
-      // 玩家回合控制
-      // ==========================================
       handlePlayerDrawStep() {
         this.player.hasAttachedEnergyThisTurn = false;
         logConsole(`\n--- 🧑‍💻 您的回合開始 ---`);
         
         const success = this.drawCard(this.player);
         if (success) {
-          logConsole(`[抽牌] 您抽取了 1 張牌。手牌: ${this.player.hand.length}`);
+          logConsole(`[抽牌] 您抽取了 1 張牌。`);
         }
         this.transitionTo(BattleState.PLAYER_PREPARATION);
       }
@@ -1019,7 +1005,6 @@
           if (this.isMultiplayer) {
             sendNetData({ type: 'ATTACH_ENERGY' });
           }
-          
           this.transitionTo(BattleState.PLAYER_PREPARATION); 
         }
       }
@@ -1027,7 +1012,7 @@
       playCardToBench(handCardId) {
         if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         if (this.player.bench.length >= 3) {
-          logConsole("❌ 後備區已滿（上限 3 隻）！");
+          logConsole("❌ 後備區已滿！");
           return;
         }
 
@@ -1076,10 +1061,10 @@
 
         if (isCorrect) {
           dmg = Math.floor(skill.damage * 1.5);
-          logConsole(`🎯 答對了！暴擊！[${active.name}] 使用 [${skill.name}] 對 [${enemy.name}] 造成 ${dmg} 點傷害！`);
+          logConsole(`🎯 答對了！暴擊！對 [${enemy.name}] 造成 ${dmg} 點傷害！`);
         } else {
           dmg = Math.floor(skill.damage * 0.5);
-          logConsole(`❌ 答錯了！只對 [${enemy.name}] 造成 ${dmg} 點傷害。`);
+          logConsole(`❌ 答錯了！只造成 ${dmg} 點傷害。`);
         }
 
         enemy.hp -= dmg;
@@ -1105,9 +1090,7 @@
         }, 1000);
       }
 
-      // ==========================================
-      // AI 回合控制 (僅在單人練習模式啟用)
-      // ==========================================
+      // AI (練習模式)
       handleAiTurnStart() {
         this.ai.hasAttachedEnergyThisTurn = false;
         logConsole(`\n--- 🤖 AI 回合開始 ---`);
@@ -1115,9 +1098,7 @@
         this.drawCard(this.ai);
         this.transitionTo(BattleState.AI_PREPARATION);
 
-        setTimeout(() => {
-          this.executeAiTurn();
-        }, 1200);
+        setTimeout(() => this.executeAiTurn(), 1200);
       }
 
       executeAiTurn() {
@@ -1127,7 +1108,6 @@
           return;
         }
 
-        // 1. AI 附能
         if (!this.ai.hasAttachedEnergyThisTurn) {
           active.energyAttached += 1;
           this.ai.hasAttachedEnergyThisTurn = true;
@@ -1135,19 +1115,15 @@
           logConsole(`⚡ [AI 附能] AI 為 [${active.name}] 附加了 1 點能量。`);
         }
 
-        // 2. AI 後備鋪卡
         if (this.ai.hand.length > 0 && this.ai.bench.length < 3) {
-          const card = this.ai.hand.shift();
-          this.ai.bench.push(card);
-          logConsole(`➕ [AI 出牌] AI 將 [${card.name}] 召喚至後備區。`);
+          this.ai.bench.push(this.ai.hand.shift());
+          logConsole(`➕ [AI 出牌] AI 召喚卡牌至後備區。`);
         }
 
         updateUI();
 
-        // 3. AI 宣告攻擊
         const availableSkills = active.skills.filter(s => active.energyAttached >= s.energyCost);
         if (availableSkills.length > 0) {
-          availableSkills.sort((a,b) => b.damage - a.damage);
           const chosen = availableSkills[0];
           this.currentPendingSkill = chosen;
 
@@ -1178,7 +1154,7 @@
           logConsole(`🛡️ 格擋成功！您解對了題目，只受到 ${dmg} 點傷害。`);
         } else {
           dmg = Math.floor(skill.damage * 1.5);
-          logConsole(`💥 格擋失敗！承受暴擊 ${dmg} 點傷害！`);
+          logConsole(`💥 格擋失敗！解題錯誤，承受暴擊 ${dmg} 點傷害！`);
         }
 
         playerActive.hp -= dmg;
@@ -1188,9 +1164,7 @@
         this.currentPendingSkill = null;
 
         setTimeout(() => {
-          this.checkKnockout(() => {
-            this.endAiTurn();
-          });
+          this.checkKnockout(() => this.endAiTurn());
         }, 1000);
       }
 
@@ -1198,20 +1172,17 @@
         this.transitionTo(BattleState.PLAYER_DRAW);
       }
 
-      // ==========================================
-      // 陣亡與勝負生命值扣減 ( minus 1 )
-      // ==========================================
+      // 生命值扣除檢測 (Minus 1)
       checkKnockout(onComplete) {
         this.transitionTo(BattleState.CHECK_KNOCKOUT);
 
         const processDeath = (target, enemy, targetName, enemyName) => {
           if (target.activeCard && target.activeCard.hp <= 0) {
-            logConsole(`💥 [戰報] ${targetName} 的 [${target.activeCard.name}] 陣亡，送入廢棄區！`);
+            logConsole(`💥 [戰報] ${targetName} 的 [${target.activeCard.name}] 陣亡，飛入廢棄區！`);
             SoundEffects.death();
             target.activeCard = null;
             target.discardCount += 1;
 
-            // 生命值減一
             target.lifePoints -= 1;
             logConsole(`💔 ${targetName} 生命值減一！賸餘生命值: ${target.lifePoints}/3`);
 
@@ -1222,10 +1193,9 @@
               return true;
             }
 
-            // 補上後備
             if (target.bench.length > 0) {
               target.activeCard = target.bench.shift();
-              logConsole(`🔄 [後備登場] ${targetName} 的 [${target.activeCard.name}] 被派上戰鬥區！`);
+              logConsole(`🔄 [後備登場] ${targetName} 的 [${target.activeCard.name}] 遞補出戰！`);
             } else {
               this.winner = enemy.type;
               this.gameOverReason = `${targetName} 已無任何卡牌可用！`;
@@ -1236,11 +1206,9 @@
           return false;
         };
 
-        // 1. 檢測對手死亡
         let over = processDeath(this.ai, this.player, this.isMultiplayer ? "🌐 聯機對手" : "AI", "🧑‍💻 玩家");
         if (over) return;
 
-        // 2. 檢測玩家死亡
         over = processDeath(this.player, this.ai, "🧑‍💻 玩家", "對手");
         if (over) return;
 
@@ -1262,9 +1230,7 @@
           const btn = document.createElement("button");
           btn.className = "option-btn";
           btn.innerText = opt;
-          btn.onclick = () => {
-            this.submitAnswer(idx);
-          };
+          btn.onclick = () => this.submitAnswer(idx);
           optionsBox.appendChild(btn);
         });
 
@@ -1277,11 +1243,8 @@
 
         document.getElementById("quiz-modal").style.display = "none";
         
-        if (correct) {
-          SoundEffects.correct();
-        } else {
-          SoundEffects.wrong();
-        }
+        if (correct) SoundEffects.correct();
+        else SoundEffects.wrong();
 
         alert(`【答題判定：${correct ? "✅ 正確！" : "❌ 錯誤！"}】\n\n答案解析：\n${quiz.explanation}`);
 
@@ -1294,18 +1257,30 @@
     }
 
     // ==========================================
-    // 🌐 WebRTC 聯機通信層 (PeerJS)
+    // 🌐 PeerJS 聯機功能核心修復 (HTTPS 專用)
     // ==========================================
     let peer = null;
     let conn = null;
-    let role = ''; // 'host' or 'guest'
+    let role = ''; 
 
-    function initPeer(onOpenCallback) {
-      document.getElementById("connection-status").innerText = "⏳ 正在與對戰終端聯絡中...";
-      peer = new Peer();
+    function hostPvPGame() {
+      const pin = Math.floor(1000 + Math.random() * 9000).toString(); 
+      document.getElementById("connection-status").innerText = "⏳ 正在向 DSE 數域伺服器註冊密鑰...";
 
-      peer.on('open', (id) => {
-        onOpenCallback(id);
+      // 強制使用 HTTPS (port 443 / secure)
+      peer = new Peer(`dse-realm-${pin}`, {
+        host: '0.peerjs.com',
+        port: 443,
+        secure: true,
+        debug: 1
+      });
+
+      peer.on('open', () => {
+        document.getElementById("connection-status").innerHTML = `
+          🏠 房間創建成功！<br/>
+          🔑 您的對戰密鑰為: <strong style="font-size:1.4rem; color:var(--accent-gold);">${pin}</strong><br/>
+          <span style="font-size:0.8rem; color:#888;">請讓另一位玩家在網頁輸入此密鑰連線加入...</span>
+        `;
       });
 
       peer.on('connection', (connection) => {
@@ -1315,20 +1290,8 @@
       });
 
       peer.on('error', (err) => {
-        console.error(err);
-        document.getElementById("connection-status").innerText = "❌ 聯機出錯，請重試！";
-      });
-    }
-
-    function hostPvPGame() {
-      initPeer((peerId) => {
-        // 使用 PeerID 後 4 位作為更友善的「房間密鑰」
-        const pin = peerId.slice(-4).toUpperCase();
-        document.getElementById("connection-status").innerHTML = `
-          🏠 房間創建成功！<br/>
-          🔑 您的對戰密鑰為: <strong style="font-size:1.3rem; color:var(--accent-gold);">${pin}</strong><br/>
-          <span style="font-size:0.8rem; color:#888;">請將密鑰告知另一位玩家...</span>
-        `;
+        alert("密鑰已被佔用或連線受阻，請重新創建！");
+        window.location.reload();
       });
     }
 
@@ -1339,54 +1302,15 @@
         return;
       }
 
-      initPeer((myId) => {
-        document.getElementById("connection-status").innerText = `⏳ 正在憑藉密鑰 [${pin}] 連線中...`;
-        
-        // 解析真實 ID
-        // PeerJS ID 格式通常隨機，此處我們需要透過 Pin 尋找主機
-        // 在免費公共雲中，我們可以直接使用 Pin 作為 PeerID 連接
-        // 為了確保 100% 成功連線，我們會搜索符合後四位 Pin 的 ID
-        // 或者是直接將 pin 傳遞給 connect 方法 (公共 Peer 伺服器會做模糊搜索，或我們直接要求 Guest 完整填寫 myId 的最後 4 位，或者此處直接將 Pin 作為連接端)
-        // 為了極簡且 100% 成功率，我們在 host 生成時會使用 `peer-${pin}` 建立連線：
-        
-        // 修正：我們讓 host 的 peerId 直接以 PIN 固定，確保 Guest 能連上！
-        // 我們重置 Peer：
-        peer.destroy();
-        
-        // 用 PIN 連接：
-        connectToHost(pin);
-      });
-    }
+      document.getElementById("connection-status").innerText = `⏳ 正在連線密鑰 [${pin}]...`;
 
-    // 重新設計 Host 生成，確保 Guest 可以直接用 PIN 連線：
-    function hostPvPGame() {
-      const pin = Math.floor(1000 + Math.random() * 9000).toString(); // 生成 4 位隨機數
-      peer = new Peer(`dse-realm-${pin}`);
-
-      document.getElementById("connection-status").innerText = "⏳ 正在向雲端註冊房間...";
-
-      peer.on('open', () => {
-        document.getElementById("connection-status").innerHTML = `
-          🏠 房間創建成功！<br/>
-          🔑 您的聯機對戰密鑰為: <strong style="font-size:1.4rem; color:var(--accent-gold);">${pin}</strong><br/>
-          <span style="font-size:0.8rem; color:#888;">請讓另一位玩家在網頁輸入密鑰加入...</span>
-        `;
+      peer = new Peer({
+        host: '0.peerjs.com',
+        port: 443,
+        secure: true,
+        debug: 1
       });
 
-      peer.on('connection', (connection) => {
-        conn = connection;
-        role = 'host';
-        setupConnectionListeners();
-      });
-
-      peer.on('error', (err) => {
-        alert("該密鑰已被佔用，請重新創建！");
-        window.location.reload();
-      });
-    }
-
-    function connectToHost(pin) {
-      peer = new Peer();
       peer.on('open', () => {
         conn = peer.connect(`dse-realm-${pin}`);
         role = 'guest';
@@ -1396,33 +1320,26 @@
 
     function setupConnectionListeners() {
       conn.on('open', () => {
-        document.getElementById("connection-status").innerText = "✅ 雙向通信建立！遊戲開始！";
+        document.getElementById("connection-status").innerText = "✅ 雙向連線成功！正在進入戰場...";
         setTimeout(() => {
           document.getElementById("lobby-screen").style.display = "none";
           engine.isMultiplayer = true;
           engine.startGame();
-        }, 1000);
+        }, 1200);
       });
 
-      conn.on('data', (data) => {
-        handleNetworkData(data);
-      });
-
+      conn.on('data', (data) => handleNetworkData(data));
       conn.on('close', () => {
-        alert("對手已離線，戰鬥被迫結束！");
+        alert("對手斷開連線！");
         window.location.reload();
       });
     }
 
     function sendNetData(data) {
-      if (conn && conn.open) {
-        conn.send(data);
-      }
+      if (conn && conn.open) conn.send(data);
     }
 
-    // 接收聯機指令同步狀態機
     function handleNetworkData(data) {
-      console.log("收到聯機數據：", data);
       switch(data.type) {
         case 'ATTACH_ENERGY':
           engine.ai.activeCard.energyAttached += 1;
@@ -1430,7 +1347,6 @@
           updateUI();
           break;
         case 'PLAY_BENCH':
-          // 從對手手牌中找卡，推上後備
           if (engine.ai.hand.length > 0) {
             const card = engine.ai.hand.shift();
             engine.ai.bench.push(card);
@@ -1439,25 +1355,22 @@
           }
           break;
         case 'ATTACK_RESOLVED':
-          // 對手攻擊我
           const skill = engine.ai.activeCard.skills.find(s => s.id === data.skillId);
           animateCardVibrate("player-active-card");
           SoundEffects.hit();
           
           if (data.isCorrect) {
-            logConsole(`💥 [對手] 答對了！[${engine.ai.activeCard.name}] 使用 [${skill.name}] 對您打出 1.5倍 暴擊，造成 ${data.finalDmg} 傷害！`);
+            logConsole(`💥 [對手] 答對了！[${engine.ai.activeCard.name}] 使用 [${skill.name}] 打出 1.5倍 暴擊，造成 ${data.finalDmg} 傷害！`);
           } else {
-            logConsole(`🛡️ [對手] 答錯了！防護壁生效，只對您造成 ${data.finalDmg} 傷害。`);
+            logConsole(`🛡️ [對手] 答錯了！防禦生效，只對您造成 ${data.finalDmg} 傷害。`);
           }
 
           engine.player.activeCard.hp -= data.finalDmg;
           if (engine.player.activeCard.hp < 0) engine.player.activeCard.hp = 0;
           engine.ai.activeCard.energyAttached -= skill.energyCost;
-          
           updateUI();
           break;
         case 'END_TURN':
-          // 對手回合結束，輪到我的回合
           engine.isMyTurn = true;
           engine.transitionTo(BattleState.PLAYER_DRAW);
           break;
@@ -1465,7 +1378,7 @@
     }
 
     // ==========================================
-    // 🎨 UI 渲染與卡牌資訊詳情檢視 (Inspection)
+    // 🎨 UI 更新與事件完美綁定
     // ==========================================
     const engine = new BattleEngine();
 
@@ -1489,25 +1402,21 @@
       }
     }
 
-    // 🔍 點擊卡牌查看仔細詳情面板 (Inspect Modal)
-    let inspectedTargetCard = null;
+    // 🔍 獨立綁定 Card Inspection (絕不重新渲染銷毀事件)
+    document.getElementById("player-active-card").onclick = () => inspectCard('player');
+    document.getElementById("ai-active-card").onclick = () => inspectCard('ai');
 
     function inspectCard(ownerType, cardIndex = -1) {
+      SoundEffects.init();
       SoundEffects.click();
       let card = null;
 
-      if (ownerType === 'player') {
-        card = engine.player.activeCard;
-      } else if (ownerType === 'ai') {
-        card = engine.ai.activeCard;
-      } else if (ownerType === 'player_bench') {
-        card = engine.player.bench[cardIndex];
-      } else if (ownerType === 'ai_bench') {
-        card = engine.ai.bench[cardIndex];
-      }
+      if (ownerType === 'player') card = engine.player.activeCard;
+      else if (ownerType === 'ai') card = engine.ai.activeCard;
+      else if (ownerType === 'player_bench') card = engine.player.bench[cardIndex];
+      else if (ownerType === 'ai_bench') card = engine.ai.bench[cardIndex];
 
       if (!card) return;
-      inspectedTargetCard = card;
 
       document.getElementById("inspect-preview-box").innerText = card.icon;
       document.getElementById("inspect-card-name").innerText = card.name;
@@ -1519,12 +1428,10 @@
       skillContainer.innerHTML = "";
 
       card.skills.forEach(s => {
-        const energyDiff = card.energyAttached - s.energyCost;
-        // 如果是我的戰鬥怪，且處於操作階段，且能量足夠，就可以點擊直接施放！
         const canUse = (ownerType === 'player') && 
                        (engine.currentState === BattleState.PLAYER_PREPARATION) && 
                        (engine.isMyTurn) &&
-                       (energyDiff >= 0);
+                       (card.energyAttached >= s.energyCost);
 
         const skillItem = document.createElement("div");
         skillItem.className = "inspect-skill-item";
@@ -1535,7 +1442,7 @@
           </div>
           <div>
             <button class="inspect-skill-btn" ${canUse ? '' : 'disabled'} onclick="triggerInspectAttack('${s.id}')">
-              ⚡x${s.energyCost} 發動
+              ⚡x${s.energyCost} 施放
             </button>
           </div>
         `;
@@ -1555,7 +1462,7 @@
     }
 
     function updateUI() {
-      // 1. 玩家戰鬥卡
+      // 1. 玩家戰鬥卡文字與血條更新 (非 innerHTML 銷毀式更新)
       const pActive = engine.player.activeCard;
       if (pActive) {
         document.getElementById("player-name").innerText = pActive.name;
@@ -1575,15 +1482,13 @@
         document.getElementById("ai-hp-bar").style.width = `${(aActive.hp / aActive.maxHp) * 100}%`;
       }
 
-      // 3. 手牌更新 (手牌可以直接點選，檢視面板)
+      // 3. 手牌更新
       const handEl = document.getElementById("player-hand");
       handEl.innerHTML = "";
       engine.player.hand.forEach(c => {
         const cardBox = document.createElement("div");
         cardBox.className = "hand-card";
-        cardBox.onclick = () => {
-          engine.playCardToBench(c.id);
-        };
+        cardBox.onclick = () => engine.playCardToBench(c.id);
         cardBox.innerHTML = `
           <div style="font-weight:bold;">${c.name}</div>
           <div style="font-size:1.5rem; text-align:center;">${c.icon}</div>
@@ -1592,7 +1497,7 @@
         handEl.appendChild(cardBox);
       });
 
-      // 4. 後備區更新 (點選後備卡牌可檢視詳情)
+      // 4. 後備區更新 (完美獨立監聽事件)
       const pBenchEl = document.getElementById("player-bench");
       pBenchEl.innerHTML = "";
       for (let i = 0; i < 3; i++) {
@@ -1635,31 +1540,26 @@
         aBenchEl.appendChild(spot);
       }
 
-      // 5. 生命值與廢棄區更新
+      // 5. 生命值 (Heart minus 1)
       const pHPs = "❤️".repeat(engine.player.lifePoints) + "🖤".repeat(3 - engine.player.lifePoints);
       const aHPs = "❤️".repeat(engine.ai.lifePoints) + "🖤".repeat(3 - engine.ai.lifePoints);
       document.getElementById("player-life-hearts").innerText = pHPs;
       document.getElementById("ai-life-hearts").innerText = aHPs;
 
-      document.getElementById("player-discard-pile").innerText = `廢棄區: ${engine.player.discardCount}`;
-      document.getElementById("ai-discard-pile").innerText = `廢棄區: ${engine.ai.discardCount}`;
+      document.getElementById("player-discard-pile").innerHTML = `廢棄區<br>${engine.player.discardCount}`;
+      document.getElementById("ai-discard-pile").innerHTML = `廢棄區<br>${engine.ai.discardCount}`;
 
-      // 6. 附能按鈕
+      // 6. 控制附能按鈕狀態
       const btnEnergy = document.getElementById("btn-attach-energy");
       btnEnergy.disabled = engine.currentState !== BattleState.PLAYER_PREPARATION || 
                            engine.player.hasAttachedEnergyThisTurn || 
                            (!engine.isMyTurn);
     }
 
-    // 附能
-    document.getElementById("btn-attach-energy").onclick = () => {
-      engine.attachEnergyToActive();
-    };
+    document.getElementById("btn-attach-energy").onclick = () => engine.attachEnergyToActive();
 
-    // 音效解鎖
-    document.body.addEventListener('click', () => {
-      SoundEffects.init();
-    }, { once: true });
+    // 瀏覽器解鎖 Web Audio API 限制
+    document.body.addEventListener('click', () => SoundEffects.init(), { once: true });
   </script>
 </body>
 </html>
