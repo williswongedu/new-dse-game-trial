@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>《機率召喚對決：DSE 數域戰記》</title>
+  <title>《機率召喚對決：DSE 數域戰記》終極優化版</title>
   <style>
     /* ==========================================
-     * 1. 全局 Cyberpunk 霓虹風格樣式 (CSS)
+     * 1. Cyberpunk 霓虹風格樣式
      * ========================================== */
     :root {
       --bg-color: #0b0c10;
@@ -32,7 +32,6 @@
       overflow: hidden;
     }
 
-    /* 頂部狀態欄 */
     header {
       background: linear-gradient(90deg, #1f2833, #0b0c10);
       padding: 10px 20px;
@@ -60,7 +59,6 @@
       box-shadow: 0 0 8px rgba(102, 252, 241, 0.2);
     }
 
-    /* 主戰鬥區域 */
     .game-container {
       display: flex;
       flex: 1;
@@ -71,7 +69,6 @@
       gap: 15px;
     }
 
-    /* 戰場板塊 */
     .battlefield {
       flex: 3;
       display: flex;
@@ -84,12 +81,11 @@
       box-sizing: border-box;
     }
 
-    /* 對決兩方區域 */
     .field-row {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      height: 43%;
+      height: 44%;
       border-radius: 8px;
       padding: 10px;
       box-sizing: border-box;
@@ -103,10 +99,9 @@
     .ai-row {
       background: rgba(255, 0, 127, 0.05);
       border-right: 4px solid var(--accent-magenta);
-      flex-direction: row-reverse; /* AI 鏡像布局 */
+      flex-direction: row-reverse;
     }
 
-    /* 控制台與資訊板塊 */
     .side-panel {
       flex: 1.2;
       display: flex;
@@ -115,7 +110,6 @@
       box-sizing: border-box;
     }
 
-    /* 卡牌容器與基本樣式 */
     .card-slot {
       display: flex;
       flex-direction: column;
@@ -126,10 +120,10 @@
     }
 
     .card {
-      width: 170px;
-      height: 240px;
+      width: 175px;
+      height: 245px;
       background: linear-gradient(135deg, #1f2833, #0b0c10);
-      border: 2px solid var(--accent-cyan);
+      border: 2.5px solid var(--accent-cyan);
       border-radius: 12px;
       position: relative;
       box-shadow: 0 5px 15px rgba(0,0,0,0.5);
@@ -153,7 +147,6 @@
       box-shadow: 0 8px 25px rgba(255, 0, 127, 0.4);
     }
 
-    /* 卡牌細節 */
     .card-header {
       display: flex;
       justify-content: space-between;
@@ -202,9 +195,9 @@
       justify-content: center;
       box-shadow: 0 0 8px rgba(255, 204, 0, 0.8);
       font-size: 0.85rem;
+      z-index: 10;
     }
 
-    /* 卡牌技能 */
     .card-skills {
       display: flex;
       flex-direction: column;
@@ -236,7 +229,6 @@
       cursor: not-allowed;
     }
 
-    /* 後備區與獎賞卡 */
     .bench-and-prizes {
       display: flex;
       gap: 15px;
@@ -305,7 +297,6 @@
       box-shadow: 0 2px 5px rgba(0,0,0,0.3);
     }
 
-    /* 手牌區 (底層控制板塊) */
     .hand-container {
       background: var(--panel-bg);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -341,7 +332,6 @@
       box-shadow: 0 5px 12px var(--accent-cyan);
     }
 
-    /* 戰鬥日誌 (Terminal) */
     .log-panel {
       background: #020204;
       border: 1px solid #333;
@@ -356,7 +346,6 @@
       box-shadow: inset 0 0 10px rgba(0,0,0,0.8);
     }
 
-    /* 大操縱面板 */
     .control-actions {
       background: var(--panel-bg);
       border-radius: 8px;
@@ -391,9 +380,6 @@
       background: #111;
     }
 
-    /* ==========================================
-     * 2. 阻斷型 DSE 數學答題彈窗 (Modal UI)
-     * ========================================== */
     .modal-overlay {
       position: absolute;
       top: 0;
@@ -462,21 +448,19 @@
       box-shadow: 0 0 8px var(--accent-cyan);
     }
 
-    /* 震動與傷害動畫效果 */
     @keyframes vibrate {
       0% { transform: translate(0, 0); }
-      20% { transform: translate(-5px, 5px); }
-      40% { transform: translate(5px, -5px); }
-      60% { transform: translate(-5px, -5px); }
-      80% { transform: translate(5px, 5px); }
+      20% { transform: translate(-6px, 6px); }
+      40% { transform: translate(6px, -6px); }
+      60% { transform: translate(-6px, -6px); }
+      80% { transform: translate(6px, 6px); }
       100% { transform: translate(0, 0); }
     }
 
     .vibrating {
-      animation: vibrate 0.15s ease-in-out infinite;
+      animation: vibrate 0.12s ease-in-out infinite;
     }
 
-    /* HP 條 */
     .hp-bar-container {
       width: 100%;
       height: 8px;
@@ -496,84 +480,65 @@
 </head>
 <body>
 
-  <!-- 頂部導航 -->
   <header>
-    <h1>🎮 機率召喚對決：DSE 數域戰記</h1>
-    <div class="state-indicator" id="turn-state-lbl">初始化中...</div>
+    <h1>🎮 機率召喚對決：DSE 數域戰記 (終極優化版)</h1>
+    <div class="state-indicator" id="turn-state-lbl">狀態: 初始化...</div>
   </header>
 
-  <!-- 遊戲主容器 -->
   <div class="game-container">
     
-    <!-- 戰場 (左 3 欄) -->
     <div class="battlefield">
       
-      <!-- 1. AI 戰鬥區域 (上方) -->
+      <!-- AI 戰區 -->
       <div class="field-row ai-row">
-        <!-- 戰鬥卡 -->
         <div class="card-slot">
           <div class="card ai-card" id="ai-active-card">
-            <!-- 動態 JavaScript 渲染 -->
-            <div class="card-energy-badge">0</div>
+            <div class="card-energy-badge" id="ai-energy">0</div>
             <div class="card-header">
-              <span class="card-name">AI 出戰卡</span>
-              <span class="card-hp">HP 0/0</span>
+              <span class="card-name" id="ai-name">AI 出戰卡</span>
+              <span class="card-hp" id="ai-hp">HP 0/0</span>
             </div>
-            <div class="card-image-box">😈</div>
-            <div class="hp-bar-container"><div class="hp-bar-fill"></div></div>
+            <div class="card-image-box" id="ai-icon">😈</div>
+            <div class="hp-bar-container"><div class="hp-bar-fill" id="ai-hp-bar"></div></div>
           </div>
         </div>
-        <!-- 後備區與獎賞卡 -->
         <div class="bench-and-prizes" style="flex-direction: row-reverse;">
-          <div class="prize-area" id="ai-prizes">
-            <!-- 獎賞卡 -->
-          </div>
-          <div class="bench-area" id="ai-bench">
-            <!-- AI 後備 -->
-          </div>
+          <div class="prize-area" id="ai-prizes"></div>
+          <div class="bench-area" id="ai-bench"></div>
         </div>
       </div>
 
-      <!-- 中界線與對決標記 -->
       <div style="text-align: center; font-size: 0.8rem; color: #555; border-top: 1px dashed rgba(255,255,255,0.1); margin: 5px 0;">
         VERSUS FIELD - MATHEMATICS REALM
       </div>
 
-      <!-- 2. 玩家戰鬥區域 (下方) -->
+      <!-- 玩家戰區 -->
       <div class="field-row player-row">
-        <!-- 戰鬥卡 -->
         <div class="card-slot">
           <div class="card" id="player-active-card">
-            <div class="card-energy-badge">0</div>
+            <div class="card-energy-badge" id="player-energy">0</div>
             <div class="card-header">
-              <span class="card-name">我的戰鬥卡</span>
-              <span class="card-hp">HP 0/0</span>
+              <span class="card-name" id="player-name">我的戰鬥卡</span>
+              <span class="card-hp" id="player-hp">HP 0/0</span>
             </div>
-            <div class="card-image-box">🐉</div>
-            <div class="hp-bar-container"><div class="hp-bar-fill"></div></div>
+            <div class="card-image-box" id="player-icon">🐉</div>
+            <div class="hp-bar-container"><div class="hp-bar-fill" id="player-hp-bar"></div></div>
           </div>
         </div>
-        <!-- 後備區與獎賞卡 -->
         <div class="bench-and-prizes">
-          <div class="prize-area" id="player-prizes">
-            <!-- 獎賞卡 -->
-          </div>
-          <div class="bench-area" id="player-bench">
-            <!-- 玩家後備 -->
-          </div>
+          <div class="prize-area" id="player-prizes"></div>
+          <div class="bench-area" id="player-bench"></div>
         </div>
       </div>
 
     </div>
 
-    <!-- 操縱面板 (右 1.2 欄) -->
+    <!-- 控制面板 -->
     <div class="side-panel">
-      <!-- 戰鬥記錄器 -->
       <div class="log-panel" id="log-console">
-        &gt; 數域戰鬥日誌加載中...<br/>
+        &gt; 戰鬥日誌加載中...<br/>
       </div>
 
-      <!-- 操縱按鈕 -->
       <div class="control-actions">
         <button class="action-btn" id="btn-attach-energy" disabled>⚡ 附給當前卡牌 1 點能量</button>
         <div style="font-size: 0.75rem; color: #888; text-align: center; margin-top: 2px;">
@@ -581,16 +546,12 @@
         </div>
       </div>
 
-      <!-- 手牌區 -->
-      <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold;">🧑‍💻 我的手牌（點選後備放置）：</div>
-      <div class="hand-container" id="player-hand">
-        <!-- 手牌 -->
-      </div>
+      <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold;">🧑‍💻 我的手牌（點選卡牌放置到後備區）：</div>
+      <div class="hand-container" id="player-hand"></div>
     </div>
 
   </div>
 
-  <!-- DSE 阻斷型挑戰彈窗 (Modal Overlay) -->
   <div class="modal-overlay" id="quiz-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -600,17 +561,12 @@
       <div class="modal-question" id="quiz-text">
         讀取題目中...
       </div>
-      <div class="options-grid" id="quiz-options">
-        <button class="option-btn">選項 A</button>
-        <button class="option-btn">選項 B</button>
-        <button class="option-btn">選項 C</button>
-        <button class="option-btn">選項 D</button>
-      </div>
+      <div class="options-grid" id="quiz-options"></div>
     </div>
   </div>
 
   <!-- ==========================================
-   * 3. 戰鬥狀態機與核心邏輯引擎 (JavaScript)
+   * 2. 戰鬥狀態機與核心邏輯引擎
    * ========================================== -->
   <script>
     // 遊戲狀態常量
@@ -633,8 +589,57 @@
       AI: "AI"
     };
 
+    // 🔊 原生 Web Audio API 8-bit 音效生成器 (無須加載外部音效資源)
+    const SoundEffects = {
+      audioCtx: null,
+      init() {
+        if (!this.audioCtx) {
+          this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      },
+      play(freq, type, duration) {
+        this.init();
+        if (this.audioCtx.state === 'suspended') {
+          this.audioCtx.resume();
+        }
+        const osc = this.audioCtx.createOscillator();
+        const gain = this.audioCtx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, this.audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, this.audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(this.audioCtx.destination);
+        osc.start();
+        osc.stop(this.audioCtx.currentTime + duration);
+      },
+      click() { this.play(600, 'sine', 0.05); },
+      energy() { 
+        this.play(800, 'triangle', 0.15); 
+        setTimeout(() => this.play(1200, 'triangle', 0.2), 100);
+      },
+      correct() {
+        this.play(523.25, 'sine', 0.1); 
+        setTimeout(() => this.play(659.25, 'sine', 0.1), 100); 
+        setTimeout(() => this.play(783.99, 'sine', 0.2), 200); 
+      },
+      wrong() {
+        this.play(220, 'sawtooth', 0.25); 
+        setTimeout(() => this.play(170, 'sawtooth', 0.3), 150);
+      },
+      hit() {
+        this.play(140, 'triangle', 0.25);
+      },
+      win() {
+        const notes = [523, 587, 659, 698, 783, 880, 987, 1046];
+        notes.forEach((n, i) => {
+          setTimeout(() => this.play(n, 'sine', 0.15), i * 120);
+        });
+      }
+    };
+
     // ==========================================
-    // 📚 擴充 DSE 數學題庫 (涵蓋所有核心主題)
+    // 📚 擴充 DSE 數學題庫
     // ==========================================
     const DseQuizDatabase = {
       "Q_EXP_01": {
@@ -642,7 +647,7 @@
         topic: "DSE 期望值 (Expected Value)",
         question: "在某抽獎活動中，中獎概率為 0.15。中獎可得獎金 $800，未中獎則需支付 $50 手續費。求參與該抽獎的期望收益是多少？",
         options: ["$120", "$77.5", "$112.5", "$80"],
-        correctAnswerIndex: 1, // 800 * 0.15 + (-50) * 0.85 = 120 - 42.5 = 77.5
+        correctAnswerIndex: 1,
         explanation: "期望值 = 800 * 0.15 + (-50) * (1 - 0.15) = 120 - 42.5 = $77.5。"
       },
       "Q_PROB_COND": {
@@ -650,7 +655,7 @@
         topic: "DSE 條件概率 (Conditional Prob)",
         question: "已知 P(A) = 0.6, P(B) = 0.5 且 A 與 B 的併合概率 P(A ∪ B) = 0.8。求條件概率 P(B | A) 的值？",
         options: ["0.3", "0.5", "0.6", "0.8"],
-        correctAnswerIndex: 1, // P(A ∩ B) = 0.6 + 0.5 - 0.8 = 0.3. P(B|A) = 0.3/0.6 = 0.5
+        correctAnswerIndex: 1,
         explanation: "P(A ∩ B) = P(A) + P(B) - P(A ∪ B) = 0.6 + 0.5 - 0.8 = 0.3。則 P(B|A) = P(A ∩ B) / P(A) = 0.3 / 0.6 = 0.5。"
       },
       "Q_PERM_01": {
@@ -658,7 +663,7 @@
         topic: "DSE 排列數 (Permutations)",
         question: "將 'MATHS' 這 5 個英文字母隨機排成一列。求首尾兩個字母皆為輔音 (Consonants) 的概率是多少？",
         options: ["3/10", "3/5", "1/5", "1/2"],
-        correctAnswerIndex: 1, // Consonants: M, T, H, S (4個). Vowels: A (1個). 排首尾: P(4,2) = 12. 中間3個排 P(3,3)=6. 總共有 12*6 = 72。總排列 5! = 120. 72/120 = 3/5
+        correctAnswerIndex: 1,
         explanation: "輔音有 M, T, H, S 共 4 個。首尾排輔音方法數 = P(4,2) = 12。中間 3 個字母任意排 = 3! = 6。合規排列 = 12 * 6 = 72。總排列 = 5! = 120。概率 = 72 / 120 = 3/5。"
       },
       "Q_COMB_01": {
@@ -666,7 +671,7 @@
         topic: "DSE 組合數 (Combinations)",
         question: "一個盒子中有 5 個紅球和 5 個白球。若從中隨機一次取出 3 個球，求恰好取出 2 個紅球和 1 個白球的組合方法有多少種？",
         options: ["50", "120", "25", "10"],
-        correctAnswerIndex: 0, // C(5,2) * C(5,1) = 10 * 5 = 50
+        correctAnswerIndex: 0,
         explanation: "方法數 = C(5,2) * C(5,1) = 10 * 5 = 50 種。"
       },
       "Q_GEOM_01": {
@@ -674,7 +679,7 @@
         topic: "DSE 幾何概率與加法 (Probability Laws)",
         question: "一條長為 10 cm 的線段被隨機截成兩段。若其中一段長度小於 3 cm 的概率為 p，則 p 的值是多少？",
         options: ["0.3", "0.6", "0.5", "0.4"],
-        correctAnswerIndex: 1, // 長度小於3可以在左端(0-3)或右端(7-10)，總合區間長度 = 3 + 3 = 6cm. 6/10 = 0.6
+        correctAnswerIndex: 1,
         explanation: "若一段小於 3 cm，截點必須落在離左端 3 cm 以內或離右端 3 cm 以內。有效區間長度為 3 + 3 = 6 cm。概率 = 6 / 10 = 0.6。"
       },
       "Q_IND_01": {
@@ -682,8 +687,16 @@
         topic: "DSE 獨立事件 (Independent Events)",
         question: "小明和小華各自解答同一道 DSE 難題，兩人能獨立解答的概率分別為 0.7 和 0.6。求該題被最少一人解答出來的概率是多少？",
         options: ["0.42", "0.88", "0.82", "0.95"],
-        correctAnswerIndex: 1, // 1 - 兩人皆答不出 = 1 - (0.3 * 0.4) = 1 - 0.12 = 0.88
+        correctAnswerIndex: 1,
         explanation: "利用餘事件計算：最少一人答出概率 = 1 - 兩人皆答不出 = 1 - (1 - 0.7) * (1 - 0.6) = 1 - 0.3 * 0.4 = 1 - 0.12 = 0.88。"
+      },
+      "Q_GENERIC": {
+        id: "Q_GENERIC",
+        topic: "DSE 機率基礎運算",
+        question: "若 P(A) = 0.4, P(B) = 0.3，且 A 和 B 為互斥事件 (Mutually Exclusive)。求 P(A ∪ B) 的概率？",
+        options: ["0.12", "0.7", "0.1", "0.5"],
+        correctAnswerIndex: 1,
+        explanation: "互斥事件的併合概率公式：P(A ∪ B) = P(A) + P(B) = 0.4 + 0.3 = 0.7。"
       }
     };
 
@@ -702,37 +715,63 @@
         this.gameOverReason = "";
       }
 
-      // 初始化角色卡片與牌組
-      initDecks() {
-        const playerDeck = [
-          { id: "p_dragon", name: "期望值真龍", hp: 300, maxHp: 300, energyAttached: 0, isKnockedOut: false, icon: "🐉", skills: [
-            { id: "p_s1", name: "期望淨值斬", damage: 100, energyCost: 1, quizId: "Q_EXP_01" },
-            { id: "p_s2", name: "條件概率烈焰", damage: 160, energyCost: 2, quizId: "Q_PROB_COND" }
-          ]},
-          { id: "p_mage", name: "排列組合法師", hp: 200, maxHp: 200, energyAttached: 0, isKnockedOut: false, icon: "🧙‍♂️", skills: [
-            { id: "p_s3", name: "組合階乘暴風", damage: 90, energyCost: 1, quizId: "Q_PERM_01" }
-          ]},
-          { id: "p_stat", name: "幾何概率巨盾", hp: 250, maxHp: 250, energyAttached: 0, isKnockedOut: false, icon: "🛡️", skills: [
-            { id: "p_s4", name: "古典極限衝擊", damage: 80, energyCost: 1, quizId: "Q_GEOM_01" }
-          ]}
-        ];
+      // 洗牌
+      shuffle(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [array[i], array[j]] = [array[j], array[i]];
+        }
+        return array;
+      }
 
-        const aiDeck = [
-          { id: "ai-boss", name: "機率混亂魔王", hp: 350, maxHp: 350, energyAttached: 0, isKnockedOut: false, icon: "😈", skills: [
-            { id: "ai_s1", name: "乘法規律暗黑彈", damage: 80, energyCost: 1, quizId: "Q_IND_01" },
-            { id: "ai_s2", name: "全機率終焉轟炸", damage: 140, energyCost: 2, quizId: "Q_COMB_01" }
-          ]},
-          { id: "ai-imp", name: "偏向分布小鬼", hp: 180, maxHp: 180, energyAttached: 0, isKnockedOut: false, icon: "👺", skills: [
-            { id: "ai_s3", name: "隨機數石投擲", damage: 50, energyCost: 1, quizId: "Q_EXP_01" }
-          ]},
-          { id: "ai-golem", name: "排列硬度巨石", hp: 280, maxHp: 250, energyAttached: 0, isKnockedOut: false, icon: "🪨", skills: [
-            { id: "ai_s4", name: "分佈碾壓擊", damage: 70, energyCost: 1, quizId: "Q_GEOM_01" }
-          ]}
-        ];
+      // 初始化角色卡片與牌組 (徹底擴充，解決抽牌空缺問題)
+      initDecks() {
+        const createCard = (id, name, hp, icon, skills) => ({
+          id, name, hp, maxHp: hp, energyAttached: 0, isKnockedOut: false, icon, skills
+        });
+
+        // 玩家 3 隻強力主卡
+        const p1 = createCard("p_dragon", "期望值真龍", 300, "🐉", [
+          { id: "p_s1", name: "期望值斬", damage: 100, energyCost: 1, quizId: "Q_EXP_01" },
+          { id: "p_s2", name: "條件機率焰", damage: 160, energyCost: 2, quizId: "Q_PROB_COND" }
+        ]);
+        const p2 = createCard("p_mage", "排列組合法師", 200, "🧙‍♂️", [
+          { id: "p_s3", name: "階乘暴風", damage: 90, energyCost: 1, quizId: "Q_PERM_01" }
+        ]);
+        const p3 = createCard("p_stat", "幾何概率聖盾", 250, "🛡️", [
+          { id: "p_s4", name: "極限衝擊", damage: 80, energyCost: 1, quizId: "Q_GEOM_01" }
+        ]);
+
+        // AI 3 隻強力主卡
+        const a1 = createCard("ai_boss", "機率混亂魔王", 350, "😈", [
+          { id: "ai_s1", name: "乘法暗黑彈", damage: 80, energyCost: 1, quizId: "Q_IND_01" },
+          { id: "ai_s2", name: "終焉大爆炸", damage: 140, energyCost: 2, quizId: "Q_COMB_01" }
+        ]);
+        const a2 = createCard("ai_imp", "偏向分佈小鬼", 180, "👺", [
+          { id: "ai_s3", name: "期望擲石", damage: 50, energyCost: 1, quizId: "Q_EXP_01" }
+        ]);
+        const a3 = createCard("ai_golem", "幾何硬度巨石", 250, "🪨", [
+          { id: "ai_s4", name: "分佈碾壓", damage: 70, energyCost: 1, quizId: "Q_GEOM_01" }
+        ]);
+
+        // 構建完整 15 張卡的牌組 (防止一開局就被抽空)
+        const playerDeck = [p1, p2, p3];
+        for (let i = 1; i <= 12; i++) {
+          playerDeck.push(createCard(`p_minion_${i}`, `數域信徒 Lvl.${i}`, 150, "🧙", [
+            { id: `p_s_minion_${i}`, name: "速算拍擊", damage: 40, energyCost: 1, quizId: "Q_GENERIC" }
+          ]));
+        }
+
+        const aiDeck = [a1, a2, a3];
+        for (let i = 1; i <= 12; i++) {
+          aiDeck.push(createCard(`ai_minion_${i}`, `代數哥布林 Lvl.${i}`, 150, "👹", [
+            { id: `ai_s_minion_${i}`, name: "混亂爪擊", damage: 40, energyCost: 1, quizId: "Q_GENERIC" }
+          ]));
+        }
 
         this.player = {
           type: PlayerType.PLAYER,
-          deck: playerDeck,
+          deck: this.shuffle(playerDeck),
           hand: [],
           activeCard: null,
           bench: [],
@@ -742,7 +781,7 @@
 
         this.ai = {
           type: PlayerType.AI,
-          deck: aiDeck,
+          deck: this.shuffle(aiDeck),
           hand: [],
           activeCard: null,
           bench: [],
@@ -755,33 +794,29 @@
         this.initDecks();
         this.transitionTo(BattleState.INITIALIZING);
 
-        // 1. 抽 2 張初始手牌
-        this.drawCard(this.player);
-        this.drawCard(this.player);
-        this.drawCard(this.ai);
-        this.drawCard(this.ai);
-
-        // 2. 設置 3 張獎賞卡 (Prize Cards)
-        for (let i = 0; i < 3; i++) {
-          const pCard = this.player.deck.pop();
-          const aCard = this.ai.deck.pop();
-          if (pCard) this.player.prizeCards.push(pCard);
-          if (aCard) this.ai.prizeCards.push(aCard);
+        // 1. 雙方抽 4 張卡作為手牌
+        for (let i = 0; i < 4; i++) {
+          this.drawCard(this.player);
+          this.drawCard(this.ai);
         }
 
-        // 3. 分配出戰卡與後備卡
-        this.player.activeCard = this.player.deck.shift();
-        this.ai.activeCard = this.ai.deck.shift();
+        // 2. 設置 3 張獎賞卡
+        for (let i = 0; i < 3; i++) {
+          this.player.prizeCards.push(this.player.deck.pop());
+          this.ai.prizeCards.push(this.ai.deck.pop());
+        }
 
-        // 剩餘移至後備區
-        if (this.player.deck.length > 0) this.player.bench.push(this.player.deck.shift());
-        if (this.ai.deck.length > 0) this.ai.bench.push(this.ai.deck.shift());
+        // 3. 從賸餘牌組安全配置戰鬥出戰卡與後備卡 (確保不會在手牌或獎賞卡裡造成透支)
+        this.player.activeCard = this.player.deck.pop();
+        this.ai.activeCard = this.ai.deck.pop();
 
-        logConsole("🎮 《DSE 數域戰記》正式開局！");
-        logConsole(`[規則] 擊倒對手以取得「獎賞卡」，取得 3 張獎賞卡者獲勝。`);
-        logConsole(`[初始化] 戰鬥卡已派上場。雙方各佈置了 3 張獎賞卡。`);
+        this.player.bench.push(this.player.deck.pop());
+        this.ai.bench.push(this.ai.deck.pop());
 
-        // 4. 開始玩家回合
+        logConsole("🎮 《DSE 數域戰記》開局成功，各就各位！");
+        logConsole(`[規則] 擊倒對手以取得「獎賞卡」，取得 3 張獎賞卡者獲勝！`);
+        logConsole(`[開局] 雙方戰鬥卡已派上場。雙方各佈置了 3 張獎賞卡。`);
+
         this.transitionTo(BattleState.PLAYER_DRAW);
       }
 
@@ -797,7 +832,8 @@
             this.handleAiTurnStart();
             break;
           case BattleState.GAME_OVER:
-            logConsole(`\n🏆【遊戲結束】贏家為: ${this.winner === PlayerType.PLAYER ? "玩家" : "AI"}！`);
+            SoundEffects.win();
+            logConsole(`\n🏆【遊戲結束】贏家為: ${this.winner === PlayerType.PLAYER ? "🧑‍💻 玩家" : "🤖 AI"}！`);
             logConsole(`原因: ${this.gameOverReason}`);
             alert(`【遊戲結束】 贏家是: ${this.winner === PlayerType.PLAYER ? "🧑‍💻 玩家" : "🤖 AI"}\n原因: ${this.gameOverReason}`);
             break;
@@ -823,9 +859,7 @@
         
         const success = this.drawCard(this.player);
         if (success) {
-          logConsole(`[抽牌] 抽了 1 張牌。當前手牌數: ${this.player.hand.length}`);
-        } else {
-          logConsole(`[抽牌] 牌組已空。`);
+          logConsole(`[抽牌] 抽了 1 張牌。手牌數: ${this.player.hand.length}，剩餘牌庫: ${this.player.deck.length}`);
         }
 
         this.transitionTo(BattleState.PLAYER_PREPARATION);
@@ -839,10 +873,11 @@
         }
 
         if (this.player.activeCard) {
+          SoundEffects.energy();
           this.player.activeCard.energyAttached += 1;
           this.player.hasAttachedEnergyThisTurn = true;
-          logConsole(`⚡ [附能] 附加 1 點數學能量給 [${this.player.activeCard.name}]。`);
-          this.transitionTo(BattleState.PLAYER_PREPARATION); // 觸發 UI 更新
+          logConsole(`⚡ [附能] 附加 1 點數學能量給 [${this.player.activeCard.name}]。當前累積: ${this.player.activeCard.energyAttached}`);
+          this.transitionTo(BattleState.PLAYER_PREPARATION); 
         }
       }
 
@@ -855,6 +890,7 @@
 
         const idx = this.player.hand.findIndex(c => c.id === handCardId);
         if (idx !== -1) {
+          SoundEffects.click();
           const card = this.player.hand.splice(idx, 1)[0];
           this.player.bench.push(card);
           logConsole(`🔄 [出牌] 將 [${card.name}] 召喚至後備區。`);
@@ -869,14 +905,13 @@
         const skill = active.skills.find(s => s.id === skillId);
 
         if (active.energyAttached < skill.energyCost) {
-          logConsole(`❌ 能量不足！需要 ${skill.energyCost} 能量。`);
+          logConsole(`❌ 能量不足！發動此技能需要 ${skill.energyCost} 能量。`);
           return;
         }
 
         this.currentPendingSkill = skill;
         this.transitionTo(BattleState.PLAYER_QUIZ_CHALLENGE);
 
-        // 觸發答題彈窗
         this.showQuizModal(skill.quizId, (correct) => {
           this.resolvePlayerAttack(correct);
         });
@@ -890,13 +925,14 @@
 
         let dmg = skill.damage;
         animateCardVibrate("ai-active-card");
+        SoundEffects.hit();
 
         if (isCorrect) {
           dmg = Math.floor(skill.damage * 1.5);
           logConsole(`🎯 答對了！觸發精準暴擊！對 AI 的 [${aiActive.name}] 造成 ${dmg} 點傷害！`);
         } else {
           dmg = Math.floor(skill.damage * 0.5);
-          logConsole(`❌ 答錯了，公式偏差！只對 AI 的 [${aiActive.name}] 造成 ${dmg} 點傷害。`);
+          logConsole(`❌ 答錯了，公式偏離！只對 AI 的 [${aiActive.name}] 造成 ${dmg} 點傷害 (傷害折半)。`);
         }
 
         aiActive.hp -= dmg;
@@ -913,7 +949,7 @@
       }
 
       // ==========================================
-      // AI 回合控制 (模擬決策大腦)
+      // AI 回合控制
       // ==========================================
       handleAiTurnStart() {
         this.ai.hasAttachedEnergyThisTurn = false;
@@ -924,7 +960,7 @@
 
         setTimeout(() => {
           this.executeAiTurn();
-        }, 1500);
+        }, 1200);
       }
 
       executeAiTurn() {
@@ -938,6 +974,7 @@
         if (!this.ai.hasAttachedEnergyThisTurn) {
           active.energyAttached += 1;
           this.ai.hasAttachedEnergyThisTurn = true;
+          SoundEffects.energy();
           logConsole(`⚡ [AI 附能] AI 為 [${active.name}] 附加了 1 點能量。`);
         }
 
@@ -960,7 +997,6 @@
           logConsole(`⚔️ [AI 宣告攻擊] 準備發動 [${chosen.name}]！`);
           this.transitionTo(BattleState.AI_QUIZ_DEFENSE);
 
-          // 玩家答題進行防守減免
           this.showQuizModal(chosen.quizId, (correct) => {
             this.resolveAiAttack(correct);
           });
@@ -978,13 +1014,14 @@
 
         let dmg = skill.damage;
         animateCardVibrate("player-active-card");
+        SoundEffects.hit();
 
         if (playerDefended) {
           dmg = Math.floor(skill.damage * 0.5);
-          logConsole(`🛡️ 格擋成功！您解對了 DSE 題目，防守力爆發！只受到 ${dmg} 點傷害 (傷害折半)。`);
+          logConsole(`🛡️ 格擋成功！您解答正確並展開結界，只受到 ${dmg} 點傷害。`);
         } else {
           dmg = Math.floor(skill.damage * 1.5);
-          logConsole(`💥 格擋失敗！解題失誤未能張開結界，承受暴擊 ${dmg} 點傷害！`);
+          logConsole(`💥 格擋失敗！您解題錯誤被攻破結界，承受暴擊 ${dmg} 點傷害！`);
         }
 
         playerActive.hp -= dmg;
@@ -1015,21 +1052,20 @@
             logConsole(`💥 [戰報] ${targetName} 的 [${target.activeCard.name}] 陣亡！`);
             target.activeCard = null;
 
-            // 對手獲得獎賞卡
+            // 奪取獎賞卡
             if (enemy.prizeCards.length > 0) {
               const prize = enemy.prizeCards.pop();
               enemy.hand.push(prize);
               logConsole(`🎁 [獎賞卡] ${enemyName} 奪取了 1 張獎賞卡！剩餘獎賞卡: ${enemy.prizeCards.length}`);
             }
 
-            // 補上後備卡
+            // 補上後備
             if (target.bench.length > 0) {
               target.activeCard = target.bench.shift();
-              logConsole(`🔄 [後備補上] ${targetName} 的 [${target.activeCard.name}] 被推上戰場！`);
+              logConsole(`🔄 [後備登場] ${targetName} 的 [${target.activeCard.name}] 進入戰鬥區！`);
             } else {
-              // 輸掉
               this.winner = enemy.type;
-              this.gameOverReason = `${targetName} 的場上與後備卡牌全滅！`;
+              this.gameOverReason = `${targetName} 場上與後備卡牌全部耗盡！`;
               this.transitionTo(BattleState.GAME_OVER);
               return true;
             }
@@ -1037,7 +1073,7 @@
 
           if (enemy.prizeCards.length === 0) {
             this.winner = enemy.type;
-            this.gameOverReason = `${enemyName} 拿完了所有的 3 張獎賞卡，贏得大勝！`;
+            this.gameOverReason = `${enemyName} 先一步拿完了 3 張獎賞卡，贏得大賽！`;
             this.transitionTo(BattleState.GAME_OVER);
             return true;
           }
@@ -1045,11 +1081,9 @@
           return false;
         };
 
-        // 1. 檢測 AI
         let over = processDeath(this.ai, this.player, "AI", "🧑‍💻 玩家");
         if (over) return;
 
-        // 2. 檢測 玩家
         over = processDeath(this.player, this.ai, "🧑‍💻 玩家", "AI");
         if (over) return;
 
@@ -1057,10 +1091,10 @@
       }
 
       // ==========================================
-      // 答題系統控制
+      // 答題彈窗控制
       // ==========================================
       showQuizModal(quizId, onAnswerComplete) {
-        const quiz = DseQuizDatabase[quizId];
+        const quiz = DseQuizDatabase[quizId] || DseQuizDatabase["Q_GENERIC"];
         this.currentActiveQuestion = quiz;
         this.quizCallback = onAnswerComplete;
 
@@ -1089,8 +1123,14 @@
 
         document.getElementById("quiz-modal").style.display = "none";
         
-        // 彈窗解說答案
-        alert(`【答題判定：${correct ? "✅ 答對！" : "❌ 答錯！"}】\n\n答案解析：\n${quiz.explanation}`);
+        if (correct) {
+          SoundEffects.correct();
+        } else {
+          SoundEffects.wrong();
+        }
+
+        // 解說提示
+        alert(`【答題判定：${correct ? "✅ 正確！" : "❌ 錯誤！"}】\n\nDSE 官方答案解說：\n${quiz.explanation}`);
 
         const callback = this.quizCallback;
         this.currentActiveQuestion = null;
@@ -1103,7 +1143,7 @@
     }
 
     // ==========================================
-    // 🎨 UI 渲染與事件綁定 (Frontend Updater)
+    // 🎨 前端 UI 更新與介面驅動
     // ==========================================
     const engine = new BattleEngine();
 
@@ -1119,7 +1159,7 @@
         el.classList.add("vibrating");
         setTimeout(() => {
           el.classList.remove("vibrating");
-        }, 600);
+        }, 500);
       }
     }
 
@@ -1128,15 +1168,13 @@
       const pActive = engine.player.activeCard;
       const pCardEl = document.getElementById("player-active-card");
       if (pActive) {
-        const hpPercent = (pActive.hp / pActive.maxHp) * 100;
         pCardEl.style.display = "flex";
-        pCardEl.querySelector(".card-name").innerText = pActive.name;
-        pCardEl.querySelector(".card-hp").innerText = `HP ${pActive.hp}/${pActive.maxHp}`;
-        pCardEl.querySelector(".card-energy-badge").innerText = pActive.energyAttached;
-        pCardEl.querySelector(".hp-bar-fill").style.width = `${hpPercent}%`;
-        pCardEl.querySelector(".card-image-box").innerText = pActive.icon;
+        document.getElementById("player-name").innerText = pActive.name;
+        document.getElementById("player-hp").innerText = `HP ${pActive.hp}/${pActive.maxHp}`;
+        document.getElementById("player-energy").innerText = pActive.energyAttached;
+        document.getElementById("player-icon").innerText = pActive.icon;
+        document.getElementById("player-hp-bar").style.width = `${(pActive.hp / pActive.maxHp) * 100}%`;
 
-        // 生成技能按鈕
         let skillsHtml = '<div class="card-skills">';
         pActive.skills.forEach(s => {
           const disabled = engine.currentState !== BattleState.PLAYER_PREPARATION || pActive.energyAttached < s.energyCost;
@@ -1149,7 +1187,6 @@
         });
         skillsHtml += '</div>';
 
-        // 移除舊技能容器，附加新技能
         const existingSkills = pCardEl.querySelector(".card-skills");
         if (existingSkills) existingSkills.remove();
         pCardEl.innerHTML += skillsHtml;
@@ -1161,18 +1198,17 @@
       const aActive = engine.ai.activeCard;
       const aCardEl = document.getElementById("ai-active-card");
       if (aActive) {
-        const hpPercent = (aActive.hp / aActive.maxHp) * 100;
         aCardEl.style.display = "flex";
-        aCardEl.querySelector(".card-name").innerText = aActive.name;
-        aCardEl.querySelector(".card-hp").innerText = `HP ${aActive.hp}/${aActive.maxHp}`;
-        aCardEl.querySelector(".card-energy-badge").innerText = aActive.energyAttached;
-        aCardEl.querySelector(".hp-bar-fill").style.width = `${hpPercent}%`;
-        aCardEl.querySelector(".card-image-box").innerText = aActive.icon;
+        document.getElementById("ai-name").innerText = aActive.name;
+        document.getElementById("ai-hp").innerText = `HP ${aActive.hp}/${aActive.maxHp}`;
+        document.getElementById("ai-energy").innerText = aActive.energyAttached;
+        document.getElementById("ai-icon").innerText = aActive.icon;
+        document.getElementById("ai-hp-bar").style.width = `${(aActive.hp / aActive.maxHp) * 100}%`;
       } else {
         aCardEl.style.display = "none";
       }
 
-      // 3. 更新手牌區
+      // 3. 更新手牌
       const handEl = document.getElementById("player-hand");
       handEl.innerHTML = "";
       engine.player.hand.forEach(c => {
@@ -1247,17 +1283,22 @@
         aPrizesEl.appendChild(p);
       });
 
-      // 6. 更新功能按鈕狀態
+      // 6. 更新附能按鈕
       const btnEnergy = document.getElementById("btn-attach-energy");
       btnEnergy.disabled = engine.currentState !== BattleState.PLAYER_PREPARATION || engine.player.hasAttachedEnergyThisTurn;
     }
 
-    // 綁定附能按鈕
+    // 附能按鈕事件
     document.getElementById("btn-attach-energy").onclick = () => {
       engine.attachEnergyToActive();
     };
 
-    // 啟動
+    // 音效解鎖 (針對 iOS / 現代瀏覽器的自動播放限制)
+    document.body.addEventListener('click', () => {
+      SoundEffects.init();
+    }, { once: true });
+
+    // 啟動遊戲
     engine.startGame();
   </script>
 </body>
