@@ -3,12 +3,12 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>《機率召喚對決：DSE 數域戰記》完美聯機版</title>
+  <title>《機率召喚對決：DSE 數域戰記》</title>
   <!-- 引入 PeerJS 用於無伺服器 P2P 聯機 -->
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
   <style>
     /* ==========================================
-     * Cyberpunk 霓虹風格樣式
+     * Cyberpunk 霓虹風格樣式 (CSS)
      * ========================================== */
     :root {
       --bg-color: #0b0c10;
@@ -182,7 +182,7 @@
 
     /* 生命與廢棄區 */
     .prize-area {
-      width: 80px;
+      width: 85px;
       display: flex;
       flex-direction: column;
       gap: 8px;
@@ -210,7 +210,7 @@
       line-height: 1.2;
     }
 
-    /* 卡牌本體 */
+    /* 卡牌排布 */
     .card-slot {
       display: flex;
       flex-direction: column;
@@ -233,11 +233,16 @@
       flex-direction: column;
       padding: 10px;
       box-sizing: border-box;
-      cursor: pointer;
+      cursor: grab;
+    }
+
+    .card:active {
+      cursor: grabbing;
     }
 
     .ai-card {
       border-color: var(--accent-magenta);
+      cursor: pointer;
     }
 
     .card-header {
@@ -314,7 +319,7 @@
     .bench-spot {
       width: 65px;
       height: 90px;
-      border: 1px solid rgba(255,255,255,0.1);
+      border: 1.5px dashed rgba(255,255,255,0.15);
       border-radius: 6px;
       background: rgba(0,0,0,0.3);
       display: flex;
@@ -337,13 +342,19 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      cursor: grab;
+    }
+
+    .bench-card:active {
+      cursor: grabbing;
     }
 
     .bench-card.ai-bench {
       border-color: var(--accent-magenta);
+      cursor: pointer;
     }
 
-    /* 手牌與控制台 */
+    /* 手牌與能量拖拉 */
     .hand-container {
       background: var(--panel-bg);
       border: 1px solid rgba(255, 255, 255, 0.1);
@@ -365,7 +376,7 @@
       border-radius: 6px;
       padding: 5px;
       box-sizing: border-box;
-      cursor: pointer;
+      cursor: grab;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
@@ -374,9 +385,41 @@
       flex-shrink: 0;
     }
 
+    .hand-card:active {
+      cursor: grabbing;
+    }
+
     .hand-card:hover {
-      transform: translateY(-10px);
-      box-shadow: 0 5px 12px var(--accent-cyan);
+      transform: translateY(-5px);
+      box-shadow: 0 0 10px var(--accent-cyan);
+    }
+
+    /* 能量核發光樣式 */
+    .draggable-token {
+      background: linear-gradient(135deg, var(--accent-gold), #ff9900);
+      color: #000;
+      font-weight: bold;
+      padding: 12px 24px;
+      border-radius: 8px;
+      cursor: grab;
+      box-shadow: 0 0 15px var(--accent-gold);
+      display: inline-block;
+      text-shadow: 0 0 5px rgba(255,255,255,0.5);
+      border: 1px solid #fff;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .draggable-token:active {
+      cursor: grabbing;
+      transform: scale(0.95);
+    }
+
+    .draggable-token.disabled {
+      background: #333;
+      color: #777;
+      box-shadow: none;
+      border-color: #555;
+      cursor: not-allowed;
     }
 
     .log-panel {
@@ -599,7 +642,7 @@
       <button class="lobby-btn" onclick="startLocalVsAi()">🤖 挑戰 AI (單人練習)</button>
       <hr style="border: 1px solid rgba(255,255,255,0.1); margin: 20px 0;" />
       <h3 style="color: var(--accent-magenta);">🌐 雙人線上聯機對戰</h3>
-      <p style="font-size: 0.85rem; color: #888;">WebRTC 免伺服器 P2P 聯網對決</p>
+      <p style="font-size: 0.85rem; color: #888;">P2P 聯網對決 (支援拖拉與互換)</p>
       <button class="lobby-btn" onclick="hostPvPGame()">🏠 創立新對戰房</button>
       <div style="margin-top: 15px;">
         <input type="text" id="join-room-id" placeholder="請輸入對手房間密鑰..." style="padding: 10px; width: 55%; border-radius: 6px; border: 1px solid var(--accent-cyan); background:#000; color:#fff;" />
@@ -609,7 +652,7 @@
     </div>
   </div>
 
-  <!-- 遊戲面板 -->
+  <!-- 戰場容器 -->
   <div class="game-container">
     
     <div class="battlefield">
@@ -617,7 +660,7 @@
       <!-- 對手戰區 (上方) -->
       <div class="field-row ai-row">
         <div class="card-slot">
-          <!-- 點選卡牌僅觸發 Inspect 查看 -->
+          <!-- 對手出戰卡 -->
           <div class="card ai-card" id="ai-active-card">
             <div class="card-energy-badge" id="ai-energy">0</div>
             <div class="card-header">
@@ -634,6 +677,7 @@
             <div class="life-hearts" id="ai-life-hearts">❤️❤️❤️</div>
             <div class="discard-pile" id="ai-discard-pile">廢棄區<br>0</div>
           </div>
+          <!-- AI後備區 -->
           <div class="bench-area" id="ai-bench"></div>
         </div>
       </div>
@@ -644,9 +688,9 @@
 
       <!-- 玩家戰區 (下方) -->
       <div class="field-row player-row">
+        <!-- 玩家出戰卡 (支援手牌拖放、後備卡拖放、能量拖放、點擊Inspect) -->
         <div class="card-slot">
-          <!-- 點選卡牌僅觸發 Inspect 查看 -->
-          <div class="card" id="player-active-card">
+          <div class="card" id="player-active-card" draggable="true" ondragstart="handleActiveCardDragStart(event)" ondragover="allowDrop(event)" ondrop="handleDropOnActive(event)">
             <div class="card-energy-badge" id="player-energy">0</div>
             <div class="card-header">
               <span class="card-name" id="player-name">我的戰鬥卡</span>
@@ -654,7 +698,7 @@
             </div>
             <div class="card-image-box" id="player-icon">🐉</div>
             <div class="hp-bar-container"><div class="hp-bar-fill" id="player-hp-bar"></div></div>
-            <div class="card-click-tip">點擊查看詳情</div>
+            <div class="card-click-tip">拖曳卡牌或能量核至此</div>
           </div>
         </div>
         <div class="bench-and-prizes">
@@ -662,34 +706,37 @@
             <div class="life-hearts" id="player-life-hearts">❤️❤️❤️</div>
             <div class="discard-pile" id="player-discard-pile">廢棄區<br>0</div>
           </div>
+          <!-- 玩家後備區 (3個獨立Spot，支援手牌拖放、出戰拖放) -->
           <div class="bench-area" id="player-bench"></div>
         </div>
       </div>
 
     </div>
 
-    <!-- 操縱面板 -->
+    <!-- 控制面板 -->
     <div class="side-panel">
       <div class="log-panel" id="log-console" style="padding:10px; overflow-y:auto;">
         &gt; 戰鬥日誌加載中...<br/>
       </div>
 
-      <!-- 右側核心操作區 (完美防冒泡衝突) -->
-      <div class="control-actions">
-        <button class="action-btn" id="btn-attach-energy" disabled>⚡ 附給當前卡牌 1 點能量</button>
+      <!-- 右側核心操作區 (拖拉附能設計) -->
+      <div class="control-actions" style="align-items: center;">
+        <div style="font-size: 0.8rem; color: var(--accent-gold); font-weight: bold;">⚡ 拖曳能量核至下方怪獸附能：</div>
+        <div id="draggable-energy" class="draggable-token" draggable="true" ondragstart="handleEnergyDragStart(event)">
+          ⚡ 數學能量核
+        </div>
         
-        <!-- 當前可用技能會以按鈕形式獨立渲染在此處，完全杜絕與卡牌點擊衝突！ -->
-        <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold; margin-top: 5px; text-align: center;">⚔️ 當前卡牌可用技能：</div>
+        <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold; margin-top: 5px; text-align: center; width:100%; border-top:1px solid rgba(255,255,255,0.1); padding-top:8px;">⚔️ 施放出戰怪技能：</div>
         <div id="active-skills-control" style="display: flex; flex-direction: column; gap: 5px; width: 100%;"></div>
       </div>
 
-      <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold;">🧑‍💻 我的手牌 (點選放入後備區)：</div>
+      <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold;">🧑‍💻 我的手牌 (拖曳卡牌上場，點擊查閱詳情)：</div>
       <div class="hand-container" id="player-hand"></div>
     </div>
 
   </div>
 
-  <!-- DSE 答題挑戰彈窗 -->
+  <!-- 📚 DSE 答題挑戰彈窗 -->
   <div class="modal-overlay" id="quiz-modal">
     <div class="modal-content">
       <div class="modal-header">
@@ -726,7 +773,7 @@
   </div>
 
   <!-- ==========================================
-   * 戰鬥狀態機與核心邏輯引擎
+   * 戰鬥狀態機與核心邏輯引擎 (JavaScript)
    * ========================================== -->
   <script>
     const BattleState = {
@@ -748,7 +795,7 @@
       AI: "AI"
     };
 
-    // 🔊 雙聲道復古合成器音效 (完美解決移動端與瀏覽器相容性)
+    // 🔊 雙聲道音效
     const SoundEffects = {
       audioCtx: null,
       init() {
@@ -835,7 +882,7 @@
 
         const p1 = createCard("p_dragon", "期望值真龍", 300, "🐉", [
           { id: "p_s1", name: "微光吐息", damage: 60, energyCost: 1, quizId: "Q_EXP_01", desc: "普通期望值計算，穩健的一擊。" },
-          { id: "p_s2", name: "期望真解斬", damage: 130, energyCost: 2, quizId: "Q_EXP_01", desc: "複雜概率下的期望值估算，威力極高。" }
+          { id: "p_s2", name: "期望真解斬", damage: 130, energyCost: 2, quizId: "Q_EXP_02", desc: "複雜概率下的期望值估算，威力極高。" }
         ], "期望值 E(X) 是 DSE 機率必考點。計算公式為：每個可能結果的值乘以其對應的發生概率之和。");
 
         const p2 = createCard("p_mage", "排列組合法師", 200, "🧙‍♂️", [
@@ -845,7 +892,7 @@
 
         const p3 = createCard("p_stat", "條件機率聖盾", 250, "🛡️", [
           { id: "p_s5", name: "互斥衝擊", damage: 70, energyCost: 1, quizId: "Q_GENERIC", desc: "利用互斥加法規律迅速突襲。" },
-          { id: "p_s6", name: "條件判定破", damage: 140, energyCost: 2, quizId: "Q_PROB_COND", desc: "條件機率深度挑戰，防不防勝防。" }
+          { id: "p_s6", name: "條件判定破", damage: 140, energyCost: 2, quizId: "Q_PROB_COND", desc: "條件機率深度挑戰，防不勝防。" }
         ], "條件概率 P(B|A) 指在事件 A 發生的前提下，事件 B 發生的概率。公式為 P(B|A) = P(A ∩ B) / P(A)。");
 
         const a1 = createCard("ai_boss", "機率混亂魔王", 350, "😈", [
@@ -880,7 +927,7 @@
           deck: this.shuffle(playerDeck),
           hand: [],
           activeCard: null,
-          bench: [],
+          bench: [null, null, null], // 初始化後備區為3個空槽位
           discardCount: 0,
           lifePoints: 3,
           hasAttachedEnergyThisTurn: false
@@ -891,7 +938,7 @@
           deck: this.shuffle(aiDeck),
           hand: [],
           activeCard: null,
-          bench: [],
+          bench: [null, null, null],
           discardCount: 0,
           lifePoints: 3,
           hasAttachedEnergyThisTurn: false
@@ -910,8 +957,8 @@
         this.player.activeCard = this.player.deck.pop();
         this.ai.activeCard = this.ai.deck.pop();
 
-        this.player.bench.push(this.player.deck.pop());
-        this.ai.bench.push(this.ai.deck.pop());
+        this.player.bench[0] = this.player.deck.pop();
+        this.ai.bench[0] = this.ai.deck.pop();
 
         logConsole("🎮 戰場配置完畢，生命值計數開始！");
         logConsole(`[規則] 每人有 3 點生命值 ❤️。卡牌陣亡則 Life -1。歸零即敗！`);
@@ -919,11 +966,11 @@
         if (this.isMultiplayer) {
           if (role === 'host') {
             this.isMyTurn = true;
-            logConsole("🌐 您是主辦方，擁有先攻權！");
+            logConsole("🌐 您是先攻方！");
             this.transitionTo(BattleState.PLAYER_DRAW);
           } else {
             this.isMyTurn = false;
-            logConsole("🌐 您是客方，請等待對手行動...");
+            logConsole("🌐 您是後攻方，請等待對手...");
             this.transitionTo(BattleState.AI_TURN_START);
           }
         } else {
@@ -950,7 +997,7 @@
                 this.transitionTo(BattleState.PLAYER_DRAW);
                 return;
               }
-              logConsole(`\n--- 🌐 等待對方玩家操作中... ---`);
+              logConsole(`\n--- 🌐 等待對方操作中... ---`);
             } else {
               this.handleAiTurnStart();
             }
@@ -981,10 +1028,13 @@
         this.transitionTo(BattleState.PLAYER_PREPARATION);
       }
 
+      // ==========================================
+      // 🚀 核心優化：拖曳附能實施
+      // ==========================================
       attachEnergyToActive() {
         if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         if (this.player.hasAttachedEnergyThisTurn) {
-          logConsole("❌ 每回合限附能一次！");
+          logConsole("❌ 本回合限附能一次！");
           return;
         }
 
@@ -992,19 +1042,67 @@
           SoundEffects.energy();
           this.player.activeCard.energyAttached += 1;
           this.player.hasAttachedEnergyThisTurn = true;
-          logConsole(`⚡ [附能] 為 [${this.player.activeCard.name}] 附加 1 點能量。當前: ${this.player.activeCard.energyAttached}`);
+          logConsole(`⚡ [附能] 為出戰怪 [${this.player.activeCard.name}] 附加 1 點能量。`);
           
           if (this.isMultiplayer) {
             sendNetData({ type: 'ATTACH_ENERGY' });
           }
-          this.transitionTo(BattleState.PLAYER_PREPARATION); 
+          updateUI();
         }
       }
 
-      playCardToBench(handCardId) {
+      attachEnergyToBench(benchIndex) {
         if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
-        if (this.player.bench.length >= 3) {
-          logConsole("❌ 後備區已滿！");
+        if (this.player.hasAttachedEnergyThisTurn) {
+          logConsole("❌ 本回合限附能一次！");
+          return;
+        }
+
+        const card = this.player.bench[benchIndex];
+        if (!card) return;
+
+        SoundEffects.energy();
+        card.energyAttached += 1;
+        this.player.hasAttachedEnergyThisTurn = true;
+        logConsole(`⚡ [附能] 為後備怪 [${card.name}] 附加 1 點能量。`);
+        
+        if (this.isMultiplayer) {
+          sendNetData({ type: 'ATTACH_ENERGY_BENCH', benchIndex });
+        }
+        updateUI();
+      }
+
+      // ==========================================
+      // 🚀 核心優化：出戰卡與後備卡互換 (Swap)
+      // ==========================================
+      swapActiveWithBench(benchIndex) {
+        if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
+        
+        const active = this.player.activeCard;
+        const bCard = this.player.bench[benchIndex];
+        
+        if (!bCard && !active) return; // 兩邊都空則不處理
+
+        this.player.activeCard = bCard;
+        this.player.bench[benchIndex] = active;
+
+        logConsole(`🔄 [交換] 出戰卡與後備區第 ${benchIndex + 1} 號位成功互換！`);
+        SoundEffects.click();
+
+        if (this.isMultiplayer) {
+          sendNetData({ type: 'SWAP_ACTIVE_BENCH', benchIndex });
+        }
+        updateUI();
+      }
+
+      // ==========================================
+      // 🚀 核心優化：拖曳出牌至指定後備槽位
+      // ==========================================
+      playCardToBench(handCardId, targetBenchIdx) {
+        if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
+        
+        if (this.player.bench[targetBenchIdx] !== null) {
+          logConsole("❌ 該後備槽位已有卡牌！");
           return;
         }
 
@@ -1012,11 +1110,33 @@
         if (idx !== -1) {
           SoundEffects.click();
           const card = this.player.hand.splice(idx, 1)[0];
-          this.player.bench.push(card);
-          logConsole(`🔄 [出牌] 將 [${card.name}] 召喚至後備區並鎖定。`);
+          this.player.bench[targetBenchIdx] = card;
+          logConsole(`🔄 [出牌] 將 [${card.name}] 放至後備區第 ${targetBenchIdx + 1} 號位。`);
           
           if (this.isMultiplayer) {
-            sendNetData({ type: 'PLAY_BENCH', cardId: handCardId });
+            sendNetData({ type: 'PLAY_BENCH', cardId: handCardId, benchIndex: targetBenchIdx });
+          }
+          updateUI();
+        }
+      }
+
+      playCardToActive(handCardId) {
+        if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
+        
+        if (this.player.activeCard !== null) {
+          logConsole("❌ 出戰區已有卡牌，請拖曳至後備區空位！");
+          return;
+        }
+
+        const idx = this.player.hand.findIndex(c => c.id === handCardId);
+        if (idx !== -1) {
+          SoundEffects.click();
+          const card = this.player.hand.splice(idx, 1)[0];
+          this.player.activeCard = card;
+          logConsole(`🔄 [出牌] 將 [${card.name}] 直接放置到出戰區！`);
+          
+          if (this.isMultiplayer) {
+            sendNetData({ type: 'PLAY_ACTIVE', cardId: handCardId });
           }
           updateUI();
         }
@@ -1026,10 +1146,12 @@
         if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
 
         const active = this.player.activeCard;
+        if (!active) return;
         const skill = active.skills.find(s => s.id === skillId);
+        if (!skill) return;
 
         if (active.energyAttached < skill.energyCost) {
-          logConsole(`❌ 能量不足！`);
+          logConsole(`❌ 能量不足！發動需要 ${skill.energyCost} 能量。`);
           return;
         }
 
@@ -1056,7 +1178,7 @@
           logConsole(`🎯 答對了！暴擊！對 [${enemy.name}] 造成 ${dmg} 點傷害！`);
         } else {
           dmg = Math.floor(skill.damage * 0.5);
-          logConsole(`❌ 答錯了！只造成 ${dmg} 點傷害。`);
+          logConsole(`❌ 答錯了！只對 [${enemy.name}] 造成 ${dmg} 點傷害 (折半)。`);
         }
 
         enemy.hp -= dmg;
@@ -1082,7 +1204,7 @@
         }, 1000);
       }
 
-      // AI 回合
+      // AI (練習模式)
       handleAiTurnStart() {
         this.ai.hasAttachedEnergyThisTurn = false;
         logConsole(`\n--- 🤖 AI 回合開始 ---`);
@@ -1107,9 +1229,11 @@
           logConsole(`⚡ [AI 附能] AI 為 [${active.name}] 附加了 1 點能量。`);
         }
 
-        if (this.ai.hand.length > 0 && this.ai.bench.length < 3) {
-          this.ai.bench.push(this.ai.hand.shift());
-          logConsole(`➕ [AI 出牌] AI 召喚卡牌至後備區。`);
+        // 尋找空後備位放置
+        const emptyIdx = this.ai.bench.indexOf(null);
+        if (emptyIdx !== -1 && this.ai.hand.length > 0) {
+          this.ai.bench[emptyIdx] = this.ai.hand.shift();
+          logConsole(`➕ [AI 出牌] AI 召喚卡牌至後備區 ${emptyIdx + 1} 號位。`);
         }
 
         updateUI();
@@ -1126,7 +1250,7 @@
             this.resolveAiAttack(correct);
           });
         } else {
-          logConsole(`🤖 AI 能量不足以發動技能，結束回合。`);
+          logConsole(`🤖 AI 能量不足，結束回合。`);
           this.endAiTurn();
         }
       }
@@ -1143,10 +1267,10 @@
 
         if (playerDefended) {
           dmg = Math.floor(skill.damage * 0.5);
-          logConsole(`🛡️ 格擋成功！您解對了題目，只受到 ${dmg} 點傷害。`);
+          logConsole(`🛡️ 格擋成功！您受到 ${dmg} 點傷害。`);
         } else {
           dmg = Math.floor(skill.damage * 1.5);
-          logConsole(`💥 格擋失敗！解題錯誤，承受暴擊 ${dmg} 點傷害！`);
+          logConsole("💥 格擋失敗！承受暴擊 " + dmg + " 點傷害！");
         }
 
         playerActive.hp -= dmg;
@@ -1164,19 +1288,19 @@
         this.transitionTo(BattleState.PLAYER_DRAW);
       }
 
-      // 陣亡生命值扣減 (Minus 1)
+      // 生命值扣除檢測 (Minus 1)
       checkKnockout(onComplete) {
         this.transitionTo(BattleState.CHECK_KNOCKOUT);
 
         const processDeath = (target, enemy, targetName, enemyName) => {
           if (target.activeCard && target.activeCard.hp <= 0) {
-            logConsole(`💥 [戰報] ${targetName} 的 [${target.activeCard.name}] 陣亡，飛入廢棄區！`);
+            logConsole(`💥 [戰報] ${targetName} 的 [${target.activeCard.name}] 陣亡，送入廢棄區！`);
             SoundEffects.death();
             target.activeCard = null;
             target.discardCount += 1;
 
             target.lifePoints -= 1;
-            logConsole(`💔 ${targetName} 生命值減一！賸餘生命值: ${target.lifePoints}/3`);
+            logConsole(`💔 ${targetName} 生命值減一！源生命值: ${target.lifePoints}/3`);
 
             if (target.lifePoints <= 0) {
               this.winner = enemy.type;
@@ -1185,12 +1309,15 @@
               return true;
             }
 
-            if (target.bench.length > 0) {
-              target.activeCard = target.bench.shift();
-              logConsole(`🔄 [後備登場] ${targetName} 的 [${target.activeCard.name}] 遞補出戰！`);
+            // 自動從第一個非空後備卡遞補
+            const availableBenchIdx = target.bench.findIndex(c => c !== null);
+            if (availableBenchIdx !== -1) {
+              target.activeCard = target.bench[availableBenchIdx];
+              target.bench[availableBenchIdx] = null;
+              logConsole(`🔄 [遞補上場] ${targetName} 的 [${target.activeCard.name}] 前往出戰區！`);
             } else {
               this.winner = enemy.type;
-              this.gameOverReason = `${targetName} 已無任何卡牌可用！`;
+              this.gameOverReason = `${targetName} 戰區與後備卡牌全滅！`;
               this.transitionTo(BattleState.GAME_OVER);
               return true;
             }
@@ -1198,7 +1325,7 @@
           return false;
         };
 
-        let over = processDeath(this.ai, this.player, this.isMultiplayer ? "🌐 聯機對手" : "AI", "🧑‍💻 玩家");
+        let over = processDeath(this.ai, this.player, this.isMultiplayer ? "🌐 對手" : "AI", "🧑‍💻 玩家");
         if (over) return;
 
         over = processDeath(this.player, this.ai, "🧑‍💻 玩家", "對手");
@@ -1249,7 +1376,7 @@
     }
 
     // ==========================================
-    // 🌐 WebRTC 聯網連線核心參數 (強制 SSL 通訊)
+    // 🌐 WebRTC 聯網連線核心
     // ==========================================
     let peer = null;
     let conn = null;
@@ -1263,7 +1390,6 @@
     };
 
     function hostPvPGame() {
-      // 確保每次點擊都解鎖聲音
       SoundEffects.init();
       SoundEffects.click();
       
@@ -1315,7 +1441,7 @@
 
     function setupConnectionListeners() {
       conn.on('open', () => {
-        document.getElementById("connection-status").innerText = "✅ 雙向連線成功！進入戰場...";
+        document.getElementById("connection-status").innerText = "✅ 連線成功！正在進入戰場...";
         setTimeout(() => {
           document.getElementById("lobby-screen").style.display = "none";
           engine.isMultiplayer = true;
@@ -1338,16 +1464,39 @@
       switch(data.type) {
         case 'ATTACH_ENERGY':
           engine.ai.activeCard.energyAttached += 1;
-          logConsole(`⚡ [對手] 為 [${engine.ai.activeCard.name}] 附加了 1 點能量。`);
+          logConsole(`⚡ [對手] 為出戰怪 [${engine.ai.activeCard.name}] 附加了 1 點能量。`);
           updateUI();
+          break;
+        case 'ATTACH_ENERGY_BENCH':
+          if (engine.ai.bench[data.benchIndex]) {
+            engine.ai.bench[data.benchIndex].energyAttached += 1;
+            logConsole(`⚡ [對手] 為後備怪 [${engine.ai.bench[data.benchIndex].name}] 附加了 1 點能量。`);
+            updateUI();
+          }
           break;
         case 'PLAY_BENCH':
           if (engine.ai.hand.length > 0) {
             const card = engine.ai.hand.shift();
-            engine.ai.bench.push(card);
-            logConsole(`🔄 [對手] 將 [${card.name}] 召喚至後備區。`);
+            engine.ai.bench[data.benchIndex] = card;
+            logConsole(`🔄 [對手] 將 [${card.name}] 放至後備區第 ${data.benchIndex + 1} 號位。`);
             updateUI();
           }
+          break;
+        case 'PLAY_ACTIVE':
+          if (engine.ai.hand.length > 0) {
+            const card = engine.ai.hand.shift();
+            engine.ai.activeCard = card;
+            logConsole(`🔄 [對手] 將 [${card.name}] 直接放置到出戰區！`);
+            updateUI();
+          }
+          break;
+        case 'SWAP_ACTIVE_BENCH':
+          const active = engine.ai.activeCard;
+          const benchCard = engine.ai.bench[data.benchIndex];
+          engine.ai.activeCard = benchCard;
+          engine.ai.bench[data.benchIndex] = active;
+          logConsole(`🔄 [對手] 交換了出戰卡與後備區第 ${data.benchIndex + 1} 號位卡牌。`);
+          updateUI();
           break;
         case 'ATTACK_RESOLVED':
           const skill = engine.ai.activeCard.skills.find(s => s.id === data.skillId);
@@ -1355,9 +1504,9 @@
           SoundEffects.hit();
           
           if (data.isCorrect) {
-            logConsole(`💥 [對手] 答對了！[${engine.ai.activeCard.name}] 使用 [${skill.name}] 打出暴擊，造成 ${data.finalDmg} 傷害！`);
+            logConsole(`💥 [對手] [${engine.ai.activeCard.name}] 使用 [${skill.name}] 對您打出 1.5倍 暴擊，造成 ${data.finalDmg} 傷害！`);
           } else {
-            logConsole(`🛡️ [對手] 答錯了！只對您造成 ${data.finalDmg} 傷害。`);
+            logConsole(`🛡️ [對手] 計算失誤，只對您造成 ${data.finalDmg} 傷害。`);
           }
 
           engine.player.activeCard.hp -= data.finalDmg;
@@ -1373,7 +1522,81 @@
     }
 
     // ==========================================
-    // 🎨 UI 更新與事件完美綁定
+    // 🫳 HTML5 拖拉系統事件 (Drag & Drop Functions)
+    // ==========================================
+    function allowDrop(e) {
+      e.preventDefault();
+    }
+
+    // 拖曳開始
+    function handleHandCardDragStart(e, cardId) {
+      SoundEffects.init();
+      e.dataTransfer.setData("text/plain", cardId);
+      e.dataTransfer.setData("source", "hand");
+    }
+
+    function handleBenchCardDragStart(e, index) {
+      SoundEffects.init();
+      e.dataTransfer.setData("source", "bench");
+      e.dataTransfer.setData("benchIndex", index);
+    }
+
+    function handleActiveCardDragStart(e) {
+      SoundEffects.init();
+      e.dataTransfer.setData("source", "active");
+    }
+
+    function handleEnergyDragStart(e) {
+      SoundEffects.init();
+      e.dataTransfer.setData("source", "energy");
+    }
+
+    // 拖曳放下 (Drop) 至出戰區
+    function handleDropOnActive(e) {
+      e.preventDefault();
+      const source = e.dataTransfer.getData("source");
+
+      if (source === "hand") {
+        const cardId = e.dataTransfer.getData("text/plain");
+        engine.playCardToActive(cardId);
+      } else if (source === "bench") {
+        const benchIndex = parseInt(e.dataTransfer.getData("benchIndex"));
+        engine.swapActiveWithBench(benchIndex);
+      } else if (source === "energy") {
+        engine.attachEnergyToActive();
+      }
+    }
+
+    // 拖曳放下 至後備區第 Index 號位
+    function handleDropOnBench(e, targetBenchIdx) {
+      e.preventDefault();
+      const source = e.dataTransfer.getData("source");
+
+      if (source === "hand") {
+        const cardId = e.dataTransfer.getData("text/plain");
+        engine.playCardToBench(cardId, targetBenchIdx);
+      } else if (source === "active") {
+        // 出戰拖向後備區
+        engine.swapActiveWithBench(targetBenchIdx);
+      } else if (source === "bench") {
+        // 後備間互換位置
+        const sourceBenchIdx = parseInt(e.dataTransfer.getData("benchIndex"));
+        if (sourceBenchIdx === targetBenchIdx) return;
+        
+        const cardA = engine.player.bench[sourceBenchIdx];
+        const cardB = engine.player.bench[targetBenchIdx];
+        engine.player.bench[sourceBenchIdx] = cardB;
+        engine.player.bench[targetBenchIdx] = cardA;
+        
+        logConsole(`🔄 [交換] 後備區第 ${sourceBenchIdx+1} 號與第 ${targetBenchIdx+1} 號成功調換。`);
+        updateUI();
+      } else if (source === "energy") {
+        engine.attachEnergyToBench(targetBenchIdx);
+      }
+    }
+
+    // ==========================================
+    // 🎨 UI 渲染與卡牌查閱
     // ==========================================
     const engine = new BattleEngine();
 
@@ -1399,9 +1622,8 @@
       }
     }
 
-    // 🔍 卡牌點擊查看數據：靜態綁定，100% 不會因 UI 重構而失效
+    // 🔍 完美點擊查閱綁定 (100% 獨立不衝突)
     document.getElementById("player-active-card").addEventListener('click', (e) => {
-      // 防止事件傳遞衝突
       e.stopPropagation();
       inspectCard('player');
     });
@@ -1420,19 +1642,21 @@
       else if (ownerType === 'ai') card = engine.ai.activeCard;
       else if (ownerType === 'player_bench') card = engine.player.bench[cardIndex];
       else if (ownerType === 'ai_bench') card = engine.ai.bench[cardIndex];
+      else if (ownerType === 'hand') card = engine.player.hand[cardIndex];
 
       if (!card) return;
 
       document.getElementById("inspect-preview-box").innerText = card.icon;
       document.getElementById("inspect-card-name").innerText = card.name;
       document.getElementById("inspect-card-hp").innerText = `生命值 HP: ${card.hp}/${card.maxHp}`;
-      document.getElementById("inspect-card-energy").innerText = `當前累積數學能量: ${card.energyAttached} 點`;
+      document.getElementById("inspect-card-energy").innerText = `累積數學能量: ${card.energyAttached} 點`;
       document.getElementById("inspect-math-desc").innerText = card.mathDesc;
 
       const skillContainer = document.getElementById("inspect-skills-container");
       skillContainer.innerHTML = "";
 
       card.skills.forEach(s => {
+        // 如果是我的出戰怪，且能量夠，即可在詳情窗中直接施放！
         const canUse = (ownerType === 'player') && 
                        (engine.currentState === BattleState.PLAYER_PREPARATION) && 
                        (engine.isMyTurn) &&
@@ -1468,8 +1692,9 @@
       document.getElementById("inspect-modal").style.display = "none";
     }
 
+    // 🎨 UI 局部刷新 (保留大節點)
     function updateUI() {
-      // 1. 精準修改數值，絕不破壞監聽器
+      // 1. 玩家出戰卡更新
       const pActive = engine.player.activeCard;
       if (pActive) {
         document.getElementById("player-name").innerText = pActive.name;
@@ -1478,7 +1703,7 @@
         document.getElementById("player-icon").innerText = pActive.icon;
         document.getElementById("player-hp-bar").style.width = `${(pActive.hp / pActive.maxHp) * 100}%`;
 
-        // 🟢 2. 側邊控制台渲染技能（100% 杜絕重疊與事件衝突）
+        // 側邊控制台渲染技能
         const skillsControl = document.getElementById("active-skills-control");
         skillsControl.innerHTML = "";
         
@@ -1492,7 +1717,6 @@
           btn.style.marginTop = "3px";
           btn.innerHTML = `⚔️ ${s.name} (消耗 ⚡x${s.energyCost})`;
           
-          // 判定啟用狀態
           btn.disabled = (engine.currentState !== BattleState.PLAYER_PREPARATION) || 
                          (!engine.isMyTurn) || 
                          (pActive.energyAttached < s.energyCost);
@@ -1503,9 +1727,16 @@
           };
           skillsControl.appendChild(btn);
         });
+      } else {
+        document.getElementById("player-name").innerText = "戰區空缺";
+        document.getElementById("player-hp").innerText = "HP 0/0";
+        document.getElementById("player-energy").innerText = "0";
+        document.getElementById("player-icon").innerText = "❓";
+        document.getElementById("player-hp-bar").style.width = "0%";
+        document.getElementById("active-skills-control").innerHTML = "";
       }
 
-      // 3. 對手卡牌數值更新
+      // 2. 對手出戰卡更新
       const aActive = engine.ai.activeCard;
       if (aActive) {
         document.getElementById("ai-name").innerText = aActive.name;
@@ -1513,15 +1744,31 @@
         document.getElementById("ai-energy").innerText = aActive.energyAttached;
         document.getElementById("ai-icon").innerText = aActive.icon;
         document.getElementById("ai-hp-bar").style.width = `${(aActive.hp / aActive.maxHp) * 100}%`;
+      } else {
+        document.getElementById("ai-name").innerText = "戰區空缺";
+        document.getElementById("ai-hp").innerText = "HP 0/0";
+        document.getElementById("ai-energy").innerText = "0";
+        document.getElementById("ai-icon").innerText = "❓";
+        document.getElementById("ai-hp-bar").style.width = "0%";
       }
 
-      // 4. 手牌更新
+      // 3. 手牌更新 (支援拖曳與點擊檢視)
       const handEl = document.getElementById("player-hand");
       handEl.innerHTML = "";
-      engine.player.hand.forEach(c => {
+      engine.player.hand.forEach((c, idx) => {
         const cardBox = document.createElement("div");
         cardBox.className = "hand-card";
-        cardBox.onclick = () => engine.playCardToBench(c.id);
+        cardBox.draggable = true;
+        
+        // 綁定手牌拖曳
+        cardBox.addEventListener('dragstart', (e) => handleHandCardDragStart(e, c.id));
+        
+        // 點選只查看詳情，不再直接放出
+        cardBox.onclick = (e) => {
+          e.stopPropagation();
+          inspectCard('hand', idx);
+        };
+
         cardBox.innerHTML = `
           <div style="font-weight:bold;">${c.name}</div>
           <div style="font-size:1.5rem; text-align:center;">${c.icon}</div>
@@ -1530,50 +1777,64 @@
         handEl.appendChild(cardBox);
       });
 
-      // 5. 後備區更新 (點選後備直接檢視)
+      // 4. 玩家後備區渲染 (3個特定Spot，支援拖拉互換與附能)
       const pBenchEl = document.getElementById("player-bench");
       pBenchEl.innerHTML = "";
       for (let i = 0; i < 3; i++) {
         const spot = document.createElement("div");
         spot.className = "bench-spot";
-        if (engine.player.bench[i]) {
-          const card = engine.player.bench[i];
-          spot.onclick = () => inspectCard('player_bench', i);
-          spot.innerHTML = `
-            <div class="bench-card">
-              <span style="font-weight:bold; font-size:0.6rem;">${card.name}</span>
-              <span style="text-align:center;">${card.icon}</span>
-              <span style="color:#2ecc71; text-align:right;">${card.hp}</span>
-            </div>
+        spot.addEventListener('dragover', allowDrop);
+        spot.addEventListener('drop', (e) => handleDropOnBench(e, i));
+
+        const card = engine.player.bench[i];
+        if (card) {
+          const cardEl = document.createElement("div");
+          cardEl.className = "bench-card";
+          cardEl.draggable = true;
+          cardEl.addEventListener('dragstart', (e) => handleBenchCardDragStart(e, i));
+          cardEl.onclick = (e) => {
+            e.stopPropagation();
+            inspectCard('player_bench', i);
+          };
+          cardEl.innerHTML = `
+            <span style="font-weight:bold; font-size:0.55rem;">${card.name}</span>
+            <span style="text-align:center; font-size:1.1rem;">${card.icon}</span>
+            <span style="color:#2ecc71; text-align:right; font-size:0.55rem;">HP ${card.hp} (⚡${card.energyAttached})</span>
           `;
+          spot.appendChild(cardEl);
         } else {
-          spot.innerText = "後備空位";
+          spot.innerHTML = `<span style="font-size:0.55rem; color:#555;">空後備位</span>`;
         }
         pBenchEl.appendChild(spot);
       }
 
+      // 5. AI後備區渲染 (點選Inspect查看)
       const aBenchEl = document.getElementById("ai-bench");
       aBenchEl.innerHTML = "";
       for (let i = 0; i < 3; i++) {
         const spot = document.createElement("div");
         spot.className = "bench-spot";
-        if (engine.ai.bench[i]) {
-          const card = engine.ai.bench[i];
-          spot.onclick = () => inspectCard('ai_bench', i);
-          spot.innerHTML = `
-            <div class="bench-card ai-bench">
-              <span style="font-weight:bold; font-size:0.6rem;">${card.name}</span>
-              <span style="text-align:center;">${card.icon}</span>
-              <span style="color:#2ecc71; text-align:right;">${card.hp}</span>
-            </div>
+        const card = engine.ai.bench[i];
+        if (card) {
+          const cardEl = document.createElement("div");
+          cardEl.className = "bench-card ai-bench";
+          cardEl.onclick = (e) => {
+            e.stopPropagation();
+            inspectCard('ai_bench', i);
+          };
+          cardEl.innerHTML = `
+            <span style="font-weight:bold; font-size:0.55rem;">${card.name}</span>
+            <span style="text-align:center; font-size:1.1rem;">${card.icon}</span>
+            <span style="color:#2ecc71; text-align:right; font-size:0.55rem;">HP ${card.hp} (⚡${card.energyAttached})</span>
           `;
+          spot.appendChild(cardEl);
         } else {
-          spot.innerText = "後備空位";
+          spot.innerHTML = `<span style="font-size:0.55rem; color:#333;">空後備位</span>`;
         }
         aBenchEl.appendChild(spot);
       }
 
-      // 6. 生命與廢物
+      // 6. 生命與廢棄區
       const pHPs = "❤️".repeat(engine.player.lifePoints) + "🖤".repeat(3 - engine.player.lifePoints);
       const aHPs = "❤️".repeat(engine.ai.lifePoints) + "🖤".repeat(3 - engine.ai.lifePoints);
       document.getElementById("player-life-hearts").innerText = pHPs;
@@ -1582,16 +1843,22 @@
       document.getElementById("player-discard-pile").innerHTML = `廢棄區<br>${engine.player.discardCount}`;
       document.getElementById("ai-discard-pile").innerHTML = `廢棄區<br>${engine.ai.discardCount}`;
 
-      const btnEnergy = document.getElementById("btn-attach-energy");
-      btnEnergy.disabled = engine.currentState !== BattleState.PLAYER_PREPARATION || 
-                           engine.player.hasAttachedEnergyThisTurn || 
-                           (!engine.isMyTurn);
+      // 7. 更新能量核可用狀態 (不可用則變灰色)
+      const energyToken = document.getElementById("draggable-energy");
+      const energyDisabled = engine.currentState !== BattleState.PLAYER_PREPARATION || 
+                             engine.player.hasAttachedEnergyThisTurn || 
+                             (!engine.isMyTurn);
+      if (energyDisabled) {
+        energyToken.classList.add("disabled");
+        energyToken.setAttribute("draggable", "false");
+      } else {
+        energyToken.classList.remove("disabled");
+        energyToken.setAttribute("draggable", "true");
+      }
     }
 
-    document.getElementById("btn-attach-energy").onclick = () => engine.attachEnergyToActive();
-
-    // 點擊解鎖音效限制
-    document.addEventListener('click', () => SoundEffects.init(), { once: false });
+    // 瀏覽器音效解鎖
+    document.body.addEventListener('click', () => SoundEffects.init(), { once: true });
   </script>
 </body>
 </html>
