@@ -32,7 +32,7 @@
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
-      transition: filter 1s ease; /* 用於落敗時的灰暗濾鏡 */
+      transition: filter 1s ease;
     }
 
     body.game-lost-filter {
@@ -498,7 +498,7 @@
       box-shadow: 0 0 10px var(--accent-cyan);
     }
 
-    /* 🛑 重點美化：手動結束回合發光按鈕 (保證 100% 可見且帶有反饋動畫) */
+    /* 🛑 手動結束回合按鈕 */
     #btn-end-turn {
       background: linear-gradient(135deg, #ff0055 0%, #8b0000 100%);
       border: 2px solid var(--accent-magenta);
@@ -840,11 +840,11 @@
     <div class="state-indicator" id="turn-state-lbl">狀態: 初始化...</div>
   </header>
 
-  <!-- 🏆 遊戲終結大彈窗 (Win/Lose 物理渲染) -->
+  <!-- 🏆 遊戲終結大彈窗 -->
   <div id="endgame-overlay">
     <div class="endgame-title" id="endgame-banner-text">You are the Winner ！</div>
     <p id="endgame-sub-reason" style="font-size: 1.2rem; color: #888; margin-bottom: 40px;"></p>
-    <!-- 一鍵返回大廳 (Home) -->
+    <!-- 一鍵返回大廳 -->
     <button class="lobby-btn" style="width: 250px; font-size:1.1rem; border-color:var(--accent-gold); box-shadow: 0 0 15px var(--accent-gold);" onclick="returnToHomeLobby()">🏠 Home / 返回大廳</button>
   </div>
 
@@ -920,7 +920,7 @@
 
       <!-- 玩家戰區 (下方) -->
       <div class="field-row player-row" id="player-battle-row">
-        <!-- 玩家出戰卡 (支援手牌拖放、後備卡拖放、能量拖放、點擊Inspect) -->
+        <!-- 玩家出戰卡 -->
         <div class="card-slot">
           <div class="card" id="player-active-card" draggable="true" ondragstart="handleActiveCardDragStart(event)" ondragover="allowDrop(event)" ondrop="handleDropOnActive(event)">
             <div class="card-header">
@@ -1171,7 +1171,7 @@
       "Q_COMB_01": {
         id: "Q_COMB_01",
         topic: "DSE 組合數 (⭐⭐ 中等)",
-        question: "袋中有 5 紅球和 5 白球。摸出 3 球，求恰摸到 2 紅 1 白球的組合方法種數？",
+        question: "袋中有 5 紅球 and 5 白球。摸出 3 球，求恰摸到 2 紅 1 白球的組合方法種數？",
         options: ["50", "120", "25", "10"],
         correctIndex: 0,
         difficulty: 2,
@@ -1254,6 +1254,10 @@
         
         /* ⏰ 倒計時定時器 */
         this.quizTimerInterval = null;
+        
+        /* 🎰 牌組屬性收集庫（決定每回合可能產出的能量種類） */
+        this.playerDeckAttributes = [];
+        this.aiDeckAttributes = [];
       }
 
       shuffle(array) {
@@ -1264,10 +1268,12 @@
         return array;
       }
 
-      /* 🎰 隨機屬性能量生成算法（移除了百搭ANY，僅生成5種基礎能量） */
-      rollEnergyType() {
-        const types = ["WATER", "FIRE", "ELECTRIC", "GRASS", "DARK"];
-        return types[Math.floor(Math.random() * types.length)];
+      /* 🎰 [核心優化] 牌組屬性依存型能量生成：只從該場牌組有的卡片屬性中生成能量 */
+      rollEnergyType(attributesList) {
+        if (!attributesList || attributesList.length === 0) {
+          return "ELECTRIC"; // 預設降級容錯
+        }
+        return attributesList[Math.floor(Math.random() * attributesList.length)];
       }
 
       initDecks() {
@@ -1306,10 +1312,10 @@
           { id: "ai_s4", name: "幾何碾壓", damage: 80, energyCost: { FIRE: 1 }, desc: "長度與區域的幾何比例碾壓。" }
         ], "幾何概率與幾何長度、面積成正比。DSE 常考線段隨機截取概率。", "FIRE");
 
-        /* 自動補足其餘 12 張並指配屬性 */
+        /* 🚀 牌組構建升級：每場遊戲最多構築 20 張卡牌！ */
         const playerDeck = [p1, p2, p3];
         const attrKeys = ["WATER", "FIRE", "ELECTRIC", "GRASS", "DARK"];
-        for (let i = 1; i <= 12; i++) {
+        for (let i = 1; i <= 17; i++) {
           const randAttr = attrKeys[i % 5];
           playerDeck.push(createCard(`p_minion_${i}`, `數域信徒 Lvl.${i}`, 150, "🧙", [
             { id: `p_s_minion_${i}`, name: "速算拍擊", damage: 50, energyCost: { [randAttr]: 1 }, desc: "基礎機率運算。" }
@@ -1317,7 +1323,7 @@
         }
 
         const aiDeck = [a1, a2, a3];
-        for (let i = 1; i <= 12; i++) {
+        for (let i = 1; i <= 17; i++) {
           const randAttr = attrKeys[i % 5];
           aiDeck.push(createCard(`ai_minion_${i}`, `代數哥布林 Lvl.${i}`, 150, "👹", [
             { id: `ai_s_minion_${i}`, name: "混亂爪擊", damage: 50, energyCost: { [randAttr]: 1 }, desc: "普通干擾技能。" }
@@ -1399,9 +1405,20 @@
         this.currentState = BattleState.INITIALIZING;
         this.turnNumber = 0; 
 
-        /* 🎰 預先隨機生成開局能量 */
-        this.currentTurnEnergy = this.rollEnergyType();
-        this.nextTurnEnergy = this.rollEnergyType();
+        /* 🎰 [核心優化] 收集並建立牌組屬性庫 */
+        this.playerDeckAttributes = [...new Set(this.player.deck.map(c => c.attribute))];
+        if (this.player.activeCard) this.playerDeckAttributes.push(this.player.activeCard.attribute);
+        this.player.bench.forEach(c => { if(c) this.playerDeckAttributes.push(c.attribute); });
+        this.playerDeckAttributes = [...new Set(this.playerDeckAttributes)];
+
+        this.aiDeckAttributes = [...new Set(this.ai.deck.map(c => c.attribute))];
+        if (this.ai.activeCard) this.aiDeckAttributes.push(this.ai.activeCard.attribute);
+        this.ai.bench.forEach(c => { if(c) this.aiDeckAttributes.push(c.attribute); });
+        this.aiDeckAttributes = [...new Set(this.aiDeckAttributes)];
+
+        /* 🎰 預先隨機生成開局能量 (精準限定於牌組擁有的屬性中！) */
+        this.currentTurnEnergy = this.rollEnergyType(this.playerDeckAttributes);
+        this.nextTurnEnergy = this.rollEnergyType(this.playerDeckAttributes);
 
         for (let i = 0; i < 4; i++) {
           this.drawCard(this.player);
@@ -1463,9 +1480,9 @@
             }
             this.turnNumber += 1; 
 
-            /* 🎰 回合開始，調度能量預告 */
+            /* 🎰 回合開始，精確生成下一回合牌組所屬能量預告 */
             this.currentTurnEnergy = this.nextTurnEnergy;
-            this.nextTurnEnergy = this.rollEnergyType();
+            this.nextTurnEnergy = this.rollEnergyType(this.playerDeckAttributes);
 
             this.triggerTurnBanner();
             this.handlePlayerDrawStep();
@@ -1544,7 +1561,7 @@
         return true;
       }
 
-      /* ⚡ 能量附載：多型別字典記錄 */
+      /* ⚡ [核心優化] 萬能拖拉附能：就算卡牌屬性跟能量屬性不同也 100% 允許附載！ */
       attachEnergyToActive(energyType) {
         if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         if (this.player.hasAttachedEnergyThisTurn) {
@@ -1555,13 +1572,7 @@
         const active = this.player.activeCard;
         if (!active) return;
 
-        /* 特定屬性能量只能匹配附載，只有技能消耗中的白色ANY可以百搭 */
-        if (active.attribute !== energyType) {
-          logConsole(`❌ [附能失敗] 屬性不匹配！[${active.name}] 需要 ${Attributes[active.attribute].name} 屬性能量，您拖曳了 ${Attributes[energyType].name}！`);
-          alert(`屬性不匹配！[${active.name}] 需要 ${Attributes[active.attribute].name} 屬性能量！`);
-          return;
-        }
-
+        /* 🚀 屬性限制徹底移除：任意卡牌均可拖載任意能量！ */
         SoundEffects.energy();
         active.attachedEnergies[energyType] = (active.attachedEnergies[energyType] || 0) + 1;
         active.energyAttached = Object.values(active.attachedEnergies).reduce((sum, val) => sum + val, 0);
@@ -1585,12 +1596,7 @@
         const card = this.player.bench[benchIndex];
         if (!card) return;
 
-        if (card.attribute !== energyType) {
-          logConsole(`❌ [附能失敗] 屬性不匹配！[${card.name}] 需要 ${Attributes[card.attribute].name} 屬性能量，您拖曳了 ${Attributes[energyType].name}！`);
-          alert(`屬性不匹配！[${card.name}] 需要 ${Attributes[card.attribute].name} 屬性能量！`);
-          return;
-        }
-
+        /* 🚀 屬性限制徹底移除：任意後備怪也可拖載任意能量！ */
         SoundEffects.energy();
         card.attachedEnergies[energyType] = (card.attachedEnergies[energyType] || 0) + 1;
         card.energyAttached = Object.values(card.attachedEnergies).reduce((sum, val) => sum + val, 0);
@@ -1772,12 +1778,8 @@
           setTimeout(() => {
             const active = this.ai.activeCard;
             if (active && !this.ai.hasAttachedEnergyThisTurn) {
-              const aiRoll = this.rollEnergyType();
-              if (active.attribute === aiRoll) {
-                active.attachedEnergies[aiRoll] = (active.attachedEnergies[aiRoll] || 0) + 1;
-              } else {
-                active.attachedEnergies[active.attribute] = (active.attachedEnergies[active.attribute] || 0) + 1;
-              }
+              const aiRoll = this.rollEnergyType(this.aiDeckAttributes);
+              active.attachedEnergies[aiRoll] = (active.attachedEnergies[aiRoll] || 0) + 1;
               active.energyAttached = Object.values(active.attachedEnergies).reduce((sum, val) => sum + val, 0);
               this.ai.hasAttachedEnergyThisTurn = true;
               SoundEffects.energy();
@@ -1877,7 +1879,7 @@
         }
       }
 
-      /* 🤖 [核心修復] AI 回合結束，交還控制權時強制將 isMyTurn 設為 true */
+      /* 🤖 AI 回合結束，交還控制權時強制將 isMyTurn 設為 true */
       endAiTurn() {
         this.isMyTurn = true; 
         this.transitionTo(BattleState.PLAYER_DRAW);
@@ -1934,7 +1936,7 @@
         }
       }
 
-      /* 🚀 優化：答題隨機化、星級星等星級展示、精確倒計時限時器 */
+      /* 🚀 優化：答題隨機化、星級難度展示、精確倒計時限時器 */
       showQuizModal(quizId, onAnswerComplete) {
         const quizKeys = Object.keys(DseQuizDatabase);
         const randomQuizId = quizKeys[Math.floor(Math.random() * quizKeys.length)];
@@ -2033,7 +2035,7 @@
         }
       }
 
-      /* 🏆 結算大美化彈窗與灰暗/繽紛濾鏡 */
+      /* 🏆 結算大美化彈窗與灰暗/繽膚濾鏡 */
       triggerEndGameOverlay() {
         const overlay = document.getElementById("endgame-overlay");
         const bannerText = document.getElementById("endgame-banner-text");
@@ -2538,7 +2540,7 @@
           document.getElementById("player-icon").innerText = pActive.icon;
           document.getElementById("player-hp-bar").style.width = `${(pActive.hp / pActive.maxHp) * 100}%`;
           
-          /* 🚀 更新出戰怪底部的多屬性立體 3D 能量核 */
+          /* 🚀 更新出戰怪底部的多屬性立體 3D 能量核（精準並排，展現不同屬性色彩） */
           render3DEnergyCores("player-energy-cores", pActive.attachedEnergies);
 
           const skillsControl = document.getElementById("active-skills-control");
@@ -2598,7 +2600,7 @@
           document.getElementById("ai-icon").innerText = aActive.icon;
           document.getElementById("ai-hp-bar").style.width = `${(aActive.hp / aActive.maxHp) * 100}%`;
           
-          /* 🚀 更新對手怪底部的多屬性 3D 能量核 */
+          /* 更新對手怪底部的多屬性 3D 能量核 */
           render3DEnergyCores("ai-energy-cores", aActive.attachedEnergies);
         } else {
           document.getElementById("ai-name").innerText = "戰區空缺";
@@ -2677,7 +2679,7 @@
               inspectCard('player_bench', i);
             };
             
-            /* 🚀 後備怪獸生成 3D 多屬性能量核 */
+            /* 後備怪獸生成 3D 多屬性能量核 */
             let miniCores = "";
             for (let type in card.attachedEnergies) {
               const miniCount = card.attachedEnergies[type] || 0;
@@ -2750,7 +2752,7 @@
         document.getElementById("player-life-hearts").innerText = pHPs;
         document.getElementById("ai-life-hearts").innerText = aHPs;
 
-        /* 🚀 實體化廢棄區渲染 */
+        /* 實體化廢棄區渲染 */
         const pDiscardEl = document.getElementById("player-discard-pile");
         if (engine.player.discardPile && engine.player.discardPile.length > 0) {
           const topCard = engine.player.discardPile[engine.player.discardPile.length - 1];
@@ -2822,28 +2824,13 @@
         }
         currentSlot.appendChild(token);
 
-        /* 🛑 更新手動結束回合按鈕可用狀態 */
+        /* 更新手動結束回合按鈕狀態 */
         const btnEndTurn = document.getElementById("btn-end-turn");
         btnEndTurn.disabled = engine.currentState !== BattleState.PLAYER_PREPARATION || !engine.isMyTurn;
       } catch (err) {
-        console.error("[updateUI Error Logged]", err);
+        console.error("[updateUI Error]", err);
       }
     }
-
-    /* 🛑 手動結束我的回合按鈕綁定事件 */
-    document.getElementById("btn-end-turn").onclick = () => {
-      if (engine.currentState === BattleState.PLAYER_PREPARATION && engine.isMyTurn) {
-        SoundEffects.click();
-        logConsole("🛑 [操作] 您主動結束了您的準備回合。");
-        if (engine.isMultiplayer) {
-          engine.isMyTurn = false;
-          sendNetData({ type: 'END_TURN' });
-          engine.transitionTo(BattleState.AI_TURN_START);
-        } else {
-          engine.transitionTo(BattleState.AI_TURN_START);
-        }
-      }
-    };
 
     /* 解鎖音訊限制 */
     document.addEventListener('click', () => SoundEffects.init(), { once: false });
