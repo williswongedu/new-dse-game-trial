@@ -1073,7 +1073,6 @@
           { id: "p_s2", name: "期望真解斬", damage: 130, energyCost: 2, quizId: "Q_EXP_02", desc: "複雜概率下的期望值估算，威力極高。" }
         ], "期望值 E(X) 是 DSE 機率必考點。計算公式為：每個可能結果的值乘以其對應的發生概率之和。", "ELECTRIC");
 
-        /* 🚀 修正 p_s4 中原先致命的無 Key 屬性 "DARK" 語法錯誤！ */
         const p2 = createCard("p_mage", "排列組合法師", 200, "🧙‍♂️", [
           { id: "p_s3", name: "組合之界", damage: 80, energyCost: 1, quizId: "Q_COMB_01", desc: "使用組合 C(n,r) 發動衝擊。" },
           { id: "p_s4", name: "階乘排列斬", damage: 150, energyCost: 2, quizId: "Q_PERM_01", desc: "首尾特定排列題，答對造成毀滅性傷害。" }
@@ -1617,7 +1616,7 @@
         }
       }
 
-      /* 🤖 [核心修復] AI 回合結束，交還控制權時強制將 isMyTurn 設為 true 鎖定解鎖！ */
+      /* 🤖 [核心修復] AI 回合結束，交還控制權時強制將 isMyTurn 設為 true */
       endAiTurn() {
         this.isMyTurn = true; 
         this.transitionTo(BattleState.PLAYER_DRAW);
@@ -1712,7 +1711,7 @@
           this.quizCallback = null;
 
           if (callback) {
-            console.log("[submitAnswer] 答題成功提交，回調執行核心攻擊...");
+            console.log("[submitAnswer] 答題成功提交，回調執行攻擊...");
             callback(correct);
           }
         } catch (err) {
@@ -1806,11 +1805,11 @@
       if (conn && conn.open) conn.send(data);
     }
 
-    /* P2P 聯機數據與慢動作 Playback (完美移除 unmatched 大括號，絕不卡死) */
+    /* 🌐 核心優化修復：將每個 case 分支包裹於 {} 區塊，100% 杜絕變數宣告重複卡死！ */
     function handleNetworkData(data) {
       try {
         switch(data.type) {
-          case 'COIN_FLIP_RESULT':
+          case 'COIN_FLIP_RESULT': {
             const coinEl = document.getElementById("coin-graphic");
             coinEl.classList.add("coin-spin-anim");
             setTimeout(() => {
@@ -1821,15 +1820,17 @@
               });
             }, 1500);
             break;
+          }
 
-          case 'ATTACH_ENERGY':
+          case 'ATTACH_ENERGY': {
             flashBorderHighlight("opponent-battle-row", "highlight-flash-gold");
             engine.ai.activeCard.energyAttached += 1;
             logConsole(`⚡ [對手行動] 為出戰怪 [${engine.ai.activeCard.name}] 附加了 1 點能量。`);
             updateUI();
             break;
+          }
 
-          case 'ATTACH_ENERGY_BENCH':
+          case 'ATTACH_ENERGY_BENCH': {
             if (engine.ai.bench[data.benchIndex]) {
               flashBorderHighlight("opponent-battle-row", "highlight-flash-gold");
               engine.ai.bench[data.benchIndex].energyAttached += 1;
@@ -1837,8 +1838,9 @@
               updateUI();
             }
             break;
+          }
 
-          case 'PLAY_BENCH':
+          case 'PLAY_BENCH': {
             if (engine.ai.hand.length > 0) {
               const card = engine.ai.hand.shift();
               engine.ai.bench[data.benchIndex] = card;
@@ -1847,8 +1849,9 @@
               updateUI();
             }
             break;
+          }
 
-          case 'PLAY_ACTIVE':
+          case 'PLAY_ACTIVE': {
             if (engine.ai.hand.length > 0) {
               const card = engine.ai.hand.shift();
               engine.ai.activeCard = card;
@@ -1857,8 +1860,9 @@
               updateUI();
             }
             break;
+          }
 
-          case 'SWAP_ACTIVE_BENCH':
+          case 'SWAP_ACTIVE_BENCH': {
             const active = engine.ai.activeCard;
             const benchCard = engine.ai.bench[data.benchIndex];
             engine.ai.activeCard = benchCard;
@@ -1867,8 +1871,9 @@
             logConsole(`🔄 [對手行動] 交換了出戰卡與後備區第 ${data.benchIndex + 1} 號位卡牌。`);
             updateUI();
             break;
+          }
 
-          case 'ATTACK_RESOLVED':
+          case 'ATTACK_RESOLVED': {
             const enemyActive = engine.ai.activeCard;
             const myActive = engine.player.activeCard;
             if (!enemyActive || !myActive) return;
@@ -1879,8 +1884,6 @@
             
             myActive.hp -= data.finalDmg;
             if (myActive.hp < 0) myActive.hp = 0;
-            
-            /* 能量保留 */
             
             engine.transitionTo(BattleState.AI_ATTACK_RESOLUTION);
             
@@ -1898,11 +1901,13 @@
               }
             }, 1200);
             break;
+          }
 
-          case 'END_TURN':
+          case 'END_TURN': {
             engine.isMyTurn = true;
             engine.transitionTo(BattleState.PLAYER_DRAW);
             break;
+          }
         }
       } catch (err) {
         console.error("[P2P Data Error]", err);
