@@ -458,7 +458,7 @@
       box-shadow: 0 0 10px var(--accent-cyan);
     }
 
-    /* 🛑 手動結束回合發光按鈕 */
+    /* 🛑 手動結束回合發光按鈕 (保證 100% 可見) */
     #btn-end-turn {
       background: linear-gradient(135deg, #ff0055 0%, #8b0000 100%);
       border: 1.5px solid var(--accent-magenta);
@@ -1865,7 +1865,7 @@
             flashBorderHighlight("opponent-battle-row", "highlight-flash-magenta");
             logConsole(`🔄 [對手行動] 交換了出戰卡與後備區第 ${data.benchIndex + 1} 號位卡牌。`);
             updateUI();
-            break; /* 🚀 完美修復點：多餘的大括號被徹底移除！ */
+            break; /* 🚀 完美修復點：多餘的大括號已被徹底移除！ */
 
           case 'ATTACK_RESOLVED':
             const enemyActive = engine.ai.activeCard;
