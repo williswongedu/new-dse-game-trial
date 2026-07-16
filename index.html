@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>《機率召喚對決：DSE 數域戰記》完美版</title>
+  <title>《機率召喚對決：DSE 數域戰記》完美聯機版</title>
   <!-- 引入 PeerJS 用於無伺服器 P2P 聯機 -->
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
   <style>
@@ -204,8 +204,8 @@
     }
 
     .discard-pile {
-      width: 60px;
-      height: 80px;
+      width: 65px;
+      height: 85px;
       border: 1.5px dashed rgba(255,255,255,0.2);
       border-radius: 6px;
       background: rgba(0,0,0,0.5);
@@ -710,6 +710,15 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-size: 3rem;
+      color: #ffec8b;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+      font-weight: bold;
+      font-family: 'Georgia', serif;
+      top: 0; left: 0;
+      border: 5px double #ffec8b;
+      box-shadow: 0 0 25px rgba(218,165,32,0.8), inset 0 0 15px rgba(0,0,0,0.8);
+      box-sizing: border-box;
     }
 
     .ancient-coin-front {
@@ -844,9 +853,11 @@
     <div class="modal-content" style="text-align: center; max-width: 400px; border-color: var(--accent-cyan); box-shadow: 0 0 25px var(--accent-cyan);">
       <h2 style="color: var(--accent-cyan); margin: 0 0 10px 0;">🪙 先攻硬幣投擲</h2>
       <!-- HTML5 純 CSS 3D 黃金硬幣 -->
-      <div id="coin-graphic" class="ancient-coin">
-        <div class="ancient-coin-front">Ω</div>
-        <div class="ancient-coin-back">後</div>
+      <div style="perspective: 1000px; display: inline-block;">
+        <div id="coin-graphic" class="ancient-coin">
+          <div class="ancient-coin-front">Ω</div>
+          <div class="ancient-coin-back">後</div>
+        </div>
       </div>
       <p id="coin-status-text" style="font-size: 1.15rem; font-weight: bold; color: var(--accent-gold); margin: 10px 0;"></p>
     </div>
@@ -909,7 +920,7 @@
 
       <!-- 玩家戰區 (下方) -->
       <div class="field-row player-row" id="player-battle-row">
-        <!-- 玩家出戰卡 -->
+        <!-- 玩家出戰卡 (支援手牌拖放、後備卡拖放、能量拖放、點擊Inspect) -->
         <div class="card-slot">
           <div class="card" id="player-active-card" draggable="true" ondragstart="handleActiveCardDragStart(event)" ondragover="allowDrop(event)" ondrop="handleDropOnActive(event)">
             <div class="card-header">
@@ -937,7 +948,7 @@
 
     <!-- 控制面板 -->
     <div class="side-panel">
-      <!-- 🛑 結束回合按鈕 (最頂層外置，100% 顯眼發光，徹底移除底部 btn-attach-energy 解決 Syntax 鎖死) -->
+      <!-- 🛑 結束回合按鈕 (最頂層外置，100% 顯眼發光) -->
       <button class="action-btn" id="btn-end-turn" disabled>🛑 結束我的回合</button>
 
       <!-- ⚡ 多色 3D 屬性附能拖拉池 -->
@@ -1122,9 +1133,9 @@
         topic: "DSE 期望值 (⭐ 簡單)",
         question: "中獎概率為 0.2。中獎得 $500，不中獎得 $0。求此抽獎期望值？",
         options: ["$100", "$50", "$250", "$200"],
-        correctIndex: 0, /* 指向第一項 $100 */
-        difficulty: 1, /* ⭐ */
-        timeLimit: 60, /* 60s */
+        correctIndex: 0, 
+        difficulty: 1, 
+        timeLimit: 60, 
         explanation: "期望值 = 500 * 0.2 + 0 * 0.8 = $100。"
       },
       "Q_EXP_02": {
@@ -1133,8 +1144,8 @@
         question: "擲一枚骰子，擲得奇數得 30 分，偶數扣 10 分。求此擲骰期望分？",
         options: ["10分", "15分", "20分", "5分"],
         correctIndex: 0,
-        difficulty: 2, /* ⭐⭐ */
-        timeLimit: 75, /* 75s */
+        difficulty: 2, 
+        timeLimit: 75, 
         explanation: "奇數期望值 = 30 * 0.5 = 15。偶數期望值 = (-10) * 0.5 = -5。總期望值 = 15 - 5 = 10 分。"
       },
       "Q_PROB_COND": {
@@ -1143,8 +1154,8 @@
         question: "已知 P(A) = 0.6, P(B) = 0.5，且併合機率 P(A ∪ B) = 0.8。求條件機率 P(B | A)？",
         options: ["0.5", "0.3", "0.6", "0.8"],
         correctIndex: 0,
-        difficulty: 3, /* ⭐⭐⭐ */
-        timeLimit: 90, /* 90s */
+        difficulty: 3, 
+        timeLimit: 90, 
         explanation: "P(A ∩ B) = 0.6 + 0.5 - 0.8 = 0.3。P(B|A) = P(A ∩ B) / P(A) = 0.3 / 0.6 = 0.5。"
       },
       "Q_PERM_01": {
@@ -1160,17 +1171,27 @@
       "Q_COMB_01": {
         id: "Q_COMB_01",
         topic: "DSE 組合數 (⭐⭐ 中等)",
-        question: "袋中有 5 紅球和 5 白球。摸出 3 球，求恰摸到 2 紅 1 白球的組合方法種數？",
+        question: "袋中有 5 紅球 and 5 白球。摸出 3 球，求恰摸到 2 紅 1 白球的組合方法種數？",
         options: ["50", "120", "25", "10"],
         correctIndex: 0,
         difficulty: 2,
         timeLimit: 75,
         explanation: "組合數 = C(5,2) * C(5,1) = 10 * 5 = 50 種。"
       },
+      "Q_COMB_02": {
+        id: "Q_COMB_02",
+        topic: "DSE 組合數 (⭐⭐ 中等)",
+        question: "從 7 名男生和 5 名女生中選出 4 人組成 DSE 備考小組，若小組中必須包含最少 3 名男生，求有多少種不同的選派方法？",
+        options: ["210種", "245種", "315種", "350種"],
+        correctIndex: 0,
+        difficulty: 2,
+        timeLimit: 75,
+        explanation: "恰有3名男生: C(7,3)*C(5,1) = 35*5 = 175。恰有4名男生: C(7,4) = 35。總選法 = 175 + 35 = 210種。"
+      },
       "Q_GEOM_01": {
         id: "Q_GEOM_01",
         topic: "DSE 幾何概率 (⭐ 簡單)",
-        question: "10 cm 線段隨機剪成兩段，其中一段小於 3 cm 的概率是多少？",
+        question: "10 cm 線段隨機剪成兩段，其中一段長度小於 3 cm 的概率是多少？",
         options: ["0.6", "0.3", "0.5", "0.4"],
         correctIndex: 0,
         difficulty: 1,
@@ -1196,6 +1217,16 @@
         difficulty: 1,
         timeLimit: 60,
         explanation: "互斥事件的概率加法法則: P(A ∪ B) = P(A) + P(B) = 0.4 + 0.3 = 0.7。"
+      },
+      "Q_MUT_EXCL": {
+        id: "Q_MUT_EXCL",
+        topic: "DSE 互斥與獨立判定 (⭐ 簡單)",
+        question: "若 P(A) = 0.5, P(B) = 0.4 且 P(A ∩ B) = 0。則事件 A 與 B 的關係是？",
+        options: ["互斥事件", "互相獨立", "條件事件", "必然事件"],
+        correctIndex: 0,
+        difficulty: 1,
+        timeLimit: 60,
+        explanation: "因為 P(A ∩ B) = 0，說明 A 和 B 不能同時發生，因此兩者是互斥事件 (Mutually Exclusive)。"
       }
     };
 
@@ -1233,7 +1264,7 @@
         return array;
       }
 
-      /* 🎰 隨機屬性能量生成算法（移除了百搭ANY，僅生成5種基礎能量） */
+      /* 🎰 隨機屬性能量生成算法（僅生成5種基礎能量） */
       rollEnergyType() {
         const types = ["WATER", "FIRE", "ELECTRIC", "GRASS", "DARK"];
         return types[Math.floor(Math.random() * types.length)];
@@ -1242,7 +1273,8 @@
       initDecks() {
         const createCard = (id, name, hp, icon, skills, mathDesc, attribute) => ({
           id, name, hp, maxHp: hp, isKnockedOut: false, icon, skills, mathDesc, attribute,
-          attachedEnergies: { WATER: 0, FIRE: 0, ELECTRIC: 0, GRASS: 0, DARK: 0 }
+          /* ⚡ 能量保留與白色百搭修復：卡牌搭載獨立能量型別字典 */
+          attachedEnergies: { WATER: 0, FIRE: 0, ELECTRIC: 0, GRASS: 0, DARK: 0, ANY: 0 }
         });
 
         /* 🚀 技能技能耗能升級：百搭能量 ⚪ (ANY) 作為扣減需求，玩家使用任意能量皆可填補 */
@@ -1310,14 +1342,13 @@
           hand: [],
           activeCard: null,
           bench: [null, null, null],
-          discardPile: [],
           discardCount: 0,
           lifePoints: 3,
           hasAttachedEnergyThisTurn: false
         };
       }
 
-      /* 🪙 3D 先攻硬幣判定 */
+      /* 🪙 先攻硬幣判定 */
       triggerCoinFlip(onComplete) {
         document.getElementById("coin-flip-overlay").style.display = "flex";
         const coinEl = document.getElementById("coin-graphic");
@@ -1432,7 +1463,7 @@
             }
             this.turnNumber += 1; 
 
-            /* 🎰 回合開始，調度能量預告：當前能量承接上一輪預告，新生成下一輪預告 */
+            /* 🎰 回合開始，調度能量預告 */
             this.currentTurnEnergy = this.nextTurnEnergy;
             this.nextTurnEnergy = this.rollEnergyType();
 
@@ -1695,7 +1726,7 @@
           enemy.hp -= dmg;
           if (enemy.hp < 0) enemy.hp = 0;
 
-          /* 能量保留：不扣減能量 */
+          /* 能量保留 */
 
           this.currentPendingSkill = null;
 
@@ -1846,7 +1877,7 @@
         }
       }
 
-      /* AI 回合結束，交還控制權時強制將 isMyTurn 設為 true */
+      /* 🤖 [核心修復] AI 回合結束，交還控制權時強制將 isMyTurn 設為 true */
       endAiTurn() {
         this.isMyTurn = true; 
         this.transitionTo(BattleState.PLAYER_DRAW);
@@ -1903,7 +1934,7 @@
         }
       }
 
-      /* 🚀 優化：答題隨機化、星級星等星級展示、精確倒計時限時器 */
+      /* 🚀 優化：答題隨機化、星級難度展示、精確倒計時限時器 */
       showQuizModal(quizId, onAnswerComplete) {
         const quizKeys = Object.keys(DseQuizDatabase);
         const randomQuizId = quizKeys[Math.floor(Math.random() * quizKeys.length)];
@@ -1912,16 +1943,15 @@
         this.currentActiveQuestion = quiz;
         this.quizCallback = onAnswerComplete;
 
-        /* 渲染星級星等難度 */
+        /* 渲染星級難度 */
         const starsText = "⭐".repeat(quiz.difficulty);
         document.getElementById("quiz-type").innerText = `${quiz.topic} [難度: ${starsText}]`;
         document.getElementById("quiz-text").innerText = quiz.question;
 
-        /* 🚀 核心優化：選項隨機洗牌，防止答案總在選項B！ */
+        /* 🚀 核心優化：選項隨機洗牌，防止答案總在選項B */
         const originalOptions = [...quiz.options];
-        const correctText = originalOptions[quiz.correctAnswerIndex]; // 正確答案字串
+        const correctText = originalOptions[quiz.correctIndex]; // 正確答案字串
 
-        // 隨機打亂
         this.shuffle(originalOptions);
         const newCorrectIndex = originalOptions.indexOf(correctText);
 
@@ -1934,7 +1964,7 @@
           btn.innerText = opt;
           btn.onclick = () => {
             this.clearQuizTimer();
-            this.submitAnswer(idx === newCorrectIndex); // 直接比對是否是正確答案
+            this.submitAnswer(idx === newCorrectIndex); // 傳入 true 或是 false 代表作答結果
           };
           optionsBox.appendChild(btn);
         });
@@ -2013,19 +2043,17 @@
         overlay.style.display = "flex";
 
         if (this.winner === PlayerType.PLAYER) {
-          // 勝利：色彩繽紛
           bannerText.innerText = "You are the Winner ！";
           bannerText.className = "endgame-title winner-rainbow-text";
-          overlay.className = "endgame-winner-bg";
+          overlay.style.background = "radial-gradient(circle, rgba(102,252,241,0.2) 0%, rgba(255,0,127,0.2) 50%, rgba(0,0,0,0.95) 100%)";
           document.body.classList.remove("game-lost-filter");
         } else {
-          // 失敗：灰暗
           bannerText.innerText = "Game Over";
           bannerText.className = "endgame-title";
           bannerText.style.color = "#888";
           bannerText.style.textShadow = "none";
-          overlay.className = "endgame-loser-bg";
-          document.body.classList.add("game-lost-filter"); // 施加全局灰度濾鏡
+          overlay.style.background = "radial-gradient(circle, #222 0%, #000 100%)";
+          document.body.classList.add("game-lost-filter");
         }
       }
     }
@@ -2134,7 +2162,7 @@
       if (conn && conn.open) conn.send(data);
     }
 
-    /* P2P 聯機數據與慢動作 Playback */
+    /* P2P 聯機數據與慢動作 Playback (完美隔離塊級詞法作用域，徹底解決 P2P Card 重名鎖死錯誤) */
     function handleNetworkData(data) {
       try {
         switch(data.type) {
@@ -2254,6 +2282,7 @@
     }
 
     function handleHandCardDragStart(e, cardId) {
+      /* 🚀 拖曳安全鎖：非我的回合或非出牌階段直接禁止拖曳 */
       if (!engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION) {
         e.preventDefault();
         return;
@@ -2282,6 +2311,7 @@
       e.dataTransfer.setData("source", "active");
     }
 
+    /* 🚀 優化：多屬性能量核拖拉綁定 */
     function handleEnergyDragStart(e, energyType) {
       if (!engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION || engine.player.hasAttachedEnergyThisTurn) {
         e.preventDefault();
@@ -2492,7 +2522,7 @@
       }
     }
 
-    /* 🎨 UI 局部刷新 */
+    /* 🎨 UI 局部刷新 (100% 杜絕任何未定義 DOM 節點引用錯誤) */
     function updateUI() {
       try {
         const pActive = engine.player.activeCard;
@@ -2508,7 +2538,7 @@
           document.getElementById("player-icon").innerText = pActive.icon;
           document.getElementById("player-hp-bar").style.width = `${(pActive.hp / pActive.maxHp) * 100}%`;
           
-          /* 🚀 更新出戰怪底部的多屬性立體 3D 能量核 */
+          /* 更新出戰怪底部的多屬性立體 3D 能量核 */
           render3DEnergyCores("player-energy-cores", pActive.attachedEnergies);
 
           const skillsControl = document.getElementById("active-skills-control");
@@ -2568,7 +2598,7 @@
           document.getElementById("ai-icon").innerText = aActive.icon;
           document.getElementById("ai-hp-bar").style.width = `${(aActive.hp / aActive.maxHp) * 100}%`;
           
-          /* 🚀 更新對手怪底部的多屬性 3D 能量核 */
+          /* 更新對手怪底部的多屬性 3D 能量核 */
           render3DEnergyCores("ai-energy-cores", aActive.attachedEnergies);
         } else {
           document.getElementById("ai-name").innerText = "戰區空缺";
@@ -2647,7 +2677,7 @@
               inspectCard('player_bench', i);
             };
             
-            /* 🚀 後備怪獸生成 3D 多屬性能量核 */
+            /* 後備怪獸生成 3D 多屬性能量核 */
             let miniCores = "";
             for (let type in card.attachedEnergies) {
               const miniCount = card.attachedEnergies[type] || 0;
@@ -2720,7 +2750,7 @@
         document.getElementById("player-life-hearts").innerText = pHPs;
         document.getElementById("ai-life-hearts").innerText = aHPs;
 
-        /* 🚀 實體化廢棄區渲染：展示 topmost 陣亡卡牌 */
+        /* 實體化廢棄區渲染 */
         const pDiscardEl = document.getElementById("player-discard-pile");
         if (engine.player.discardPile && engine.player.discardPile.length > 0) {
           const topCard = engine.player.discardPile[engine.player.discardPile.length - 1];
@@ -2799,6 +2829,21 @@
         console.error("[updateUI Error Logged]", err);
       }
     }
+
+    /* 🛑 手動結束我的回合按鈕綁定事件 */
+    document.getElementById("btn-end-turn").onclick = () => {
+      if (engine.currentState === BattleState.PLAYER_PREPARATION && engine.isMyTurn) {
+        SoundEffects.click();
+        logConsole("🛑 [操作] 您主動結束了您的準備回合。");
+        if (engine.isMultiplayer) {
+          engine.isMyTurn = false;
+          sendNetData({ type: 'END_TURN' });
+          engine.transitionTo(BattleState.AI_TURN_START);
+        } else {
+          engine.transitionTo(BattleState.AI_TURN_START);
+        }
+      }
+    };
 
     /* 解鎖音訊限制 */
     document.addEventListener('click', () => SoundEffects.init(), { once: false });
