@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>《機率召喚對決：DSE 數域戰記》完美版</title>
+  <title>《機率召喚對決：DSE 數域戰記》</title>
   <!-- 引入 PeerJS 用於無伺服器 P2P 聯機 -->
   <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
   <style>
@@ -180,6 +180,7 @@
       flex-direction: column;
       gap: 10px;
       box-sizing: border-box;
+      max-height: 100%;
     }
 
     /* 生命與廢棄區 */
@@ -198,18 +199,22 @@
     }
 
     .discard-pile {
-      width: 60px;
-      height: 80px;
+      width: 65px;
+      height: 85px;
       border: 1.5px dashed rgba(255,255,255,0.2);
       border-radius: 6px;
       background: rgba(0,0,0,0.5);
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
-      font-size: 0.65rem;
+      font-size: 0.6rem;
       color: #777;
       text-align: center;
       line-height: 1.2;
+      box-sizing: border-box;
+      padding: 3px;
+      transition: all 0.3s;
     }
 
     /* 卡牌排布 */
@@ -294,8 +299,6 @@
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: radial-gradient(circle at 35% 35%, #ffffff 0%, var(--accent-gold) 45%, #cc9900 85%);
-      box-shadow: 0 0 10px var(--accent-gold), inset -2px -2px 4px rgba(0,0,0,0.7);
       transition: transform 0.2s;
     }
 
@@ -372,6 +375,7 @@
       box-sizing: border-box;
     }
 
+    /* 🎴 2.5D/3D 滑鼠陀螺儀傾斜特效容器 */
     .hand-card {
       width: 75px;
       height: 100px;
@@ -384,80 +388,103 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      transition: all 0.2s ease;
       font-size: 0.65rem;
       flex-shrink: 0;
+      transform-style: preserve-3d;
+      transition: transform 0.1s ease;
+      perspective: 300px;
     }
 
     .hand-card:active {
       cursor: grabbing;
     }
 
-    .hand-card:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 0 10px var(--accent-cyan);
+    /* 能量生成器樣式 */
+    .energy-generator-box {
+      background: rgba(0,0,0,0.4);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 8px;
+      padding: 8px;
+      width: 100%;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      align-items: center;
     }
 
-    /* 能量核發光樣式 */
-    .draggable-token {
-      background: linear-gradient(135deg, var(--accent-gold), #ff9900);
-      color: #000;
-      font-weight: bold;
-      padding: 12px 24px;
-      border-radius: 8px;
+    .energy-token-circle {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
       cursor: grab;
-      box-shadow: 0 0 15px var(--accent-gold);
-      display: inline-block;
-      text-shadow: 0 0 5px rgba(255,255,255,0.5);
-      border: 1px solid #fff;
+      border: 1.5px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.6);
       transition: transform 0.2s, box-shadow 0.2s;
     }
 
-    .draggable-token:active {
+    .energy-token-circle:active {
       cursor: grabbing;
-      transform: scale(0.95);
+      transform: scale(0.9);
     }
 
-    .draggable-token.disabled {
-      background: #333;
-      color: #777;
-      box-shadow: none;
-      border-color: #555;
+    .energy-token-circle.disabled {
+      background: #333 !important;
+      color: #777 !important;
+      box-shadow: none !important;
+      border-color: #555 !important;
       cursor: not-allowed;
+    }
+
+    .energy-preview-dot {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1px solid rgba(255,255,255,0.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
     }
 
     .log-panel {
       background: #020204;
       border: 1px solid #333;
       border-radius: 8px;
-      flex: 1;
+      flex: 1.1;
       padding: 10px;
       font-family: monospace;
       font-size: 0.8rem;
       overflow-y: auto;
       box-sizing: border-box;
       color: #4af626;
+      max-height: 140px;
     }
 
     .control-actions {
       background: var(--panel-bg);
       border-radius: 8px;
-      padding: 12px;
+      padding: 10px;
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 6px;
+      box-sizing: border-box;
     }
 
     .action-btn {
       background: linear-gradient(90deg, #1f4068, #162447);
       border: 1px solid var(--accent-cyan);
       color: #fff;
-      padding: 10px;
+      padding: 8px;
       border-radius: 6px;
       cursor: pointer;
       font-weight: bold;
       transition: all 0.2s ease;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
     }
 
     .action-btn:hover:not(:disabled) {
@@ -466,11 +493,39 @@
       box-shadow: 0 0 10px var(--accent-cyan);
     }
 
-    .action-btn:disabled {
-      border-color: #555;
-      color: #555;
+    /* 🛑 手動結束回合發光按鈕 (保證 100% 可見且帶有反饋動畫) */
+    #btn-end-turn {
+      background: linear-gradient(135deg, #ff0055 0%, #8b0000 100%);
+      border: 2px solid var(--accent-magenta);
+      box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+      color: #fff;
+      font-weight: bold;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      width: 100%;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    #btn-end-turn:hover:not(:disabled) {
+      background: #ff007f;
+      box-shadow: 0 0 25px rgba(255, 0, 127, 0.8);
+      transform: scale(1.02);
+    }
+
+    #btn-end-turn:active:not(:disabled) {
+      transform: scale(0.98);
+    }
+
+    #btn-end-turn:disabled {
+      background: #222 !important;
+      border-color: #555 !important;
+      color: #666 !important;
+      box-shadow: none !important;
       cursor: not-allowed;
-      background: #111;
+      transform: none !important;
     }
 
     /* 彈窗 */
@@ -618,13 +673,31 @@
       border-radius: 8px;
     }
 
-    /* 投硬幣特效 */
-    @keyframes spin-coin {
-      0% { transform: rotateY(0deg); }
-      100% { transform: rotateY(1800deg); }
+    /* 🪙 CSS3 3D 拉絲拋黃金古神殿硬幣 */
+    .ancient-coin {
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 30% 30%, #ffd700 0%, #b8860b 55%, #5c4008 100%);
+      border: 5px double #ffec8b;
+      box-shadow: 0 0 25px rgba(218,165,32,0.8), inset 0 0 15px rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      color: #ffec8b;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.9);
+      font-weight: bold;
+      font-family: 'Georgia', serif;
+      margin: 15px auto;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 1.5s cubic-bezier(0.1, 0.8, 0.3, 1);
     }
-    .coin-spin-anim {
-      animation: spin-coin 1.5s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+
+    .ancient-coin::before {
+      content: "Ω"; /* 古希臘數學符號 */
+      position: absolute;
     }
 
     /* 動作高亮光暈 */
@@ -682,8 +755,9 @@
   <div id="coin-flip-overlay" class="modal-overlay" style="display:none; z-index: 210;">
     <div class="modal-content" style="text-align: center; max-width: 400px; border-color: var(--accent-cyan); box-shadow: 0 0 25px var(--accent-cyan);">
       <h2 style="color: var(--accent-cyan); margin: 0 0 10px 0;">🪙 先攻硬幣投擲</h2>
-      <div id="coin-graphic" style="font-size: 5.5rem; margin: 25px 0; display: inline-block;">🪙</div>
-      <p id="coin-status-text" style="font-size: 1.25rem; font-weight: bold; color: var(--accent-gold); margin: 10px 0;"></p>
+      <!-- HTML5 純 CSS 3D 黃金硬幣 -->
+      <div id="coin-graphic" class="ancient-coin"></div>
+      <p id="coin-status-text" style="font-size: 1.15rem; font-weight: bold; color: var(--accent-gold); margin: 10px 0;"></p>
     </div>
   </div>
 
@@ -697,7 +771,7 @@
       <button class="lobby-btn" onclick="startLocalVsAi()">🤖 挑戰 AI (單人練習)</button>
       <hr style="border: 1px solid rgba(255,255,255,0.1); margin: 20px 0;" />
       <h3 style="color: var(--accent-magenta);">🌐 雙人線上聯機對戰</h3>
-      <p style="font-size: 0.85rem; color: #888;">P2P 聯網對決 (支援拖拉與先攻判定)</p>
+      <p style="font-size: 0.85rem; color: #888;">P2P 聯網對決 (支援 3D 硬幣投擲)</p>
       <button class="lobby-btn" onclick="hostPvPGame()">🏠 創立新對戰房</button>
       <div style="margin-top: 15px;">
         <input type="text" id="join-room-id" placeholder="請輸入對手房間密鑰..." style="padding: 10px; width: 55%; border-radius: 6px; border: 1px solid var(--accent-cyan); background:#000; color:#fff;" />
@@ -744,7 +818,7 @@
 
       <!-- 玩家戰區 (下方) -->
       <div class="field-row player-row" id="player-battle-row">
-        <!-- 玩家出戰卡 (支援手牌拖放、後備卡拖放、能量拖放、點擊Inspect) -->
+        <!-- 玩家出戰卡 -->
         <div class="card-slot">
           <div class="card" id="player-active-card" draggable="true" ondragstart="handleActiveCardDragStart(event)" ondragover="allowDrop(event)" ondrop="handleDropOnActive(event)">
             <div class="card-header">
@@ -772,22 +846,36 @@
 
     <!-- 控制面板 -->
     <div class="side-panel">
-      <div class="log-panel" id="log-console" style="padding:10px; overflow-y:auto;">
-        &gt; 戰鬥日誌加載中...<br/>
+      <!-- 🛑 結束回合按鈕 (最頂層外置，100% 顯眼發光) -->
+      <button class="action-btn" id="btn-end-turn" disabled>🛑 結束我的回合</button>
+
+      <!-- ⚡ 多色 3D 屬性附能拖拉池 -->
+      <div class="control-actions" style="align-items: center;">
+        
+        <!-- 🎰 能量抽卡預告面板 -->
+        <div class="energy-generator-box">
+          <div style="font-size: 0.72rem; color: var(--accent-gold); font-weight: bold; width:100%; text-align:center;">🎰 回合能量調度模組</div>
+          <div style="display:flex; justify-content:space-around; align-items:center; width:100%; margin-top:5px;">
+            <div style="text-align:center;">
+              <div style="font-size:0.6rem; color:#888; margin-bottom:3px;">可拖拉附能</div>
+              <div id="current-energy-slot">
+                <!-- 動態渲染當前回合生成的可拖拉能量球 -->
+              </div>
+            </div>
+            <div style="border-left:1px dashed #333; height:30px;"></div>
+            <div style="text-align:center;">
+              <div style="font-size:0.6rem; color:#888; margin-bottom:3px;">下一回合預告</div>
+              <div id="next-energy-slot" class="energy-preview-dot">?</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="font-size: 0.78rem; color: var(--accent-cyan); font-weight: bold; margin-top: 2px; text-align: center; width:100%; border-top:1px solid rgba(255,255,255,0.1); padding-top:4px;">⚔️ 施放出戰怪技能：</div>
+        <div id="active-skills-control" style="display: flex; flex-direction: column; gap: 5px; width: 100%;"></div>
       </div>
 
-      <!-- 右側核心操作區 (拖拉附能設計) -->
-      <div class="control-actions" style="align-items: center;">
-        <div style="font-size: 0.8rem; color: var(--accent-gold); font-weight: bold;">⚡ 拖曳能量核至下方怪獸附能：</div>
-        <div id="draggable-energy" class="draggable-token" draggable="true" ondragstart="handleEnergyDragStart(event)">
-          ⚡ 數學能量核
-        </div>
-        
-        <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold; margin-top: 5px; text-align: center; width:100%; border-top:1px solid rgba(255,255,255,0.1); padding-top:8px;">⚔️ 施放出戰怪技能：</div>
-        <div id="active-skills-control" style="display: flex; flex-direction: column; gap: 5px; width: 100%;"></div>
-
-        <!-- 🛑 手動結束回合按鈕（防止先攻第1回合卡死） -->
-        <button class="action-btn" id="btn-end-turn" style="background:linear-gradient(90deg, #1f4068, #111); border-color:#888; width:100%; margin-top:10px;" disabled>🛑 結束我的回合</button>
+      <div class="log-panel" id="log-console" style="padding:10px; overflow-y:auto;">
+        &gt; 戰鬥日誌加載中...<br/>
       </div>
 
       <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold;">🧑‍💻 我的手牌 (拖曳卡牌上場，點擊查閱詳情)：</div>
@@ -855,7 +943,17 @@
       AI: "AI"
     };
 
-    /* 🔊 安全優化版 Web Audio API 8-bit 合成器（防阻斷、安全忽略錯誤，絕不卡死） */
+    /* 💧🔥⚡🍃🔮 5 大 PTCG 屬性及 ⚪ 百搭屬性配色、背景漸變與立體光核 CSS 參數 */
+    const Attributes = {
+      WATER: { name: "水", color: "#45f3ff", icon: "💧", gradient: "linear-gradient(135deg, #0f2537, #0b0c10)", coreStyle: "background: radial-gradient(circle at 35% 35%, #ffffff 0%, #00d2ff 45%, #006699 90%); box-shadow: 0 0 10px #00d2ff;" },
+      FIRE: { name: "火", color: "#ff3300", icon: "🔥", gradient: "linear-gradient(135deg, #370f1a, #0b0c10)", coreStyle: "background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ff3300 45%, #990000 90%); box-shadow: 0 0 10px #ff3300;" },
+      ELECTRIC: { name: "電", color: "#ffcc00", icon: "⚡", gradient: "linear-gradient(135deg, #37310f, #0b0c10)", coreStyle: "background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ffcc00 45%, #997700 90%); box-shadow: 0 0 10px #ffcc00;" },
+      GRASS: { name: "草", color: "#00ff66", icon: "🍃", gradient: "linear-gradient(135deg, #0f371c, #0b0c10)", coreStyle: "background: radial-gradient(circle at 35% 35%, #ffffff 0%, #00ff66 45%, #006622 90%); box-shadow: 0 0 10px #00ff66;" },
+      DARK: { name: "暗", color: "#bb00ff", icon: "🔮", gradient: "linear-gradient(135deg, #270f37, #0b0c10)", coreStyle: "background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ff00ff 45%, #660066 90%); box-shadow: 0 0 10px #ff00ff;" },
+      ANY: { name: "百搭", color: "#ffffff", icon: "⚪", gradient: "linear-gradient(135deg, #333, #0b0c10)", coreStyle: "background: radial-gradient(circle at 35% 35%, #ffffff 0%, #cccccc 45%, #777777 90%); box-shadow: 0 0 10px #ffffff;" }
+    };
+
+    /* 🔊 安全優化版 Web Audio API */
     const SoundEffects = {
       audioCtx: null,
       init() {
@@ -864,7 +962,7 @@
             this.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
           }
         } catch (e) {
-          console.warn("AudioContext initialization blocked or unsupported by browser:", e);
+          console.warn("AudioContext blocked safely:", e);
         }
       },
       play(freq, type, duration, endFreq) {
@@ -872,7 +970,7 @@
           this.init();
           if (!this.audioCtx) return;
           if (this.audioCtx.state === 'suspended') {
-            this.audioCtx.resume().catch(e => console.log("Audio Context Resume BlockedSafely:", e));
+            this.audioCtx.resume().catch(e => console.log(e));
           }
           const osc = this.audioCtx.createOscillator();
           const gain = this.audioCtx.createGain();
@@ -891,7 +989,7 @@
           osc.start();
           osc.stop(this.audioCtx.currentTime + duration);
         } catch (e) {
-          console.warn("Sound playback safe warning (game continues perfectly):", e);
+          console.warn("Sound safe warn:", e);
         }
       },
       click() { this.play(600, 'sine', 0.05); },
@@ -922,7 +1020,7 @@
     };
 
     /* ==========================================
-     * 📚 擴充 DSE 數學題庫（純安全註釋，防擠壓壓縮失效）
+     * 📚 擴充 DSE 數學題庫（純安全註釋，防擠壓壓縮失效，包含期望值、機率、條件機率、排列組合等 10 道難題）
      * ========================================== */
     const DseQuizDatabase = {
       "Q_EXP_01": {
@@ -965,6 +1063,14 @@
         correctAnswerIndex: 0,
         explanation: "方法數 = C(5,2) * C(5,1) = 10 * 5 = 50 種。"
       },
+      "Q_COMB_02": {
+        id: "Q_COMB_02",
+        topic: "DSE 組合數 (Combinations)",
+        question: "從 7 名男生和 5 名女生中選出 4 人組成 DSE 備考小組，若小組中必須包含最少 3 名男生，求有多少種不同的選派方法？",
+        options: ["210種", "245種", "315種", "350種"],
+        correctAnswerIndex: 1,
+        explanation: "恰有3名男生: C(7,3)*C(5,1) = 35*5 = 175。恰有4名男生: C(7,4)*C(5,0) = 35*1 = 35。總選法 = 175 + 35 = 210? 噢，更正：C(7,3)*C(5,1) = 35*5 = 175，C(7,4) = 35。175+35=210種。選項1為正確答案。"
+      },
       "Q_GEOM_01": {
         id: "Q_GEOM_01",
         topic: "DSE 幾何概率與加法 (Probability Laws)",
@@ -988,6 +1094,14 @@
         options: ["0.12", "0.7", "0.1", "0.5"],
         correctAnswerIndex: 1,
         explanation: "互斥事件的併合概率公式：P(A ∪ B) = P(A) + P(B) = 0.4 + 0.3 = 0.7。"
+      },
+      "Q_MUT_EXCL": {
+        id: "Q_MUT_EXCL",
+        topic: "DSE 互斥與獨立判定",
+        question: "若 P(A) = 0.5, P(B) = 0.4 且 P(A ∩ B) = 0。則事件 A 與 B 的關係是？",
+        options: ["互相獨立", "互斥事件", "條件事件", "必然事件"],
+        correctAnswerIndex: 1,
+        explanation: "因為 P(A ∩ B) = 0，說明 A 和 B 不能同時發生，因此兩者是互斥事件 (Mutually Exclusive)。"
       }
     };
 
@@ -1008,6 +1122,10 @@
         this.gameOverReason = "";
         this.turnNumber = 0; 
         this.firstPlayerType = null; 
+        
+        /* 🎰 能量生成器數據庫狀態 */
+        this.currentTurnEnergy = "ELECTRIC"; /* 當前可拖曳能量 */
+        this.nextTurnEnergy = "WATER";      /* 下一回合預告能量 */
       }
 
       shuffle(array) {
@@ -1018,51 +1136,66 @@
         return array;
       }
 
+      /* 🎰 隨機屬性能量生成算法（包含白色百撘 ANY） */
+      rollEnergyType() {
+        const types = ["WATER", "FIRE", "ELECTRIC", "GRASS", "DARK", "ANY"];
+        return types[Math.floor(Math.random() * types.length)];
+      }
+
       initDecks() {
-        const createCard = (id, name, hp, icon, skills, mathDesc) => ({
-          id, name, hp, maxHp: hp, energyAttached: 0, isKnockedOut: false, icon, skills, mathDesc
+        const createCard = (id, name, hp, icon, skills, mathDesc, attribute) => ({
+          id, name, hp, maxHp: hp, isKnockedOut: false, icon, skills, mathDesc, attribute,
+          /* ⚡ 能量保留與白色百搭修復：卡牌搭載獨立能量型別字典 */
+          attachedEnergies: { WATER: 0, FIRE: 0, ELECTRIC: 0, GRASS: 0, DARK: 0, ANY: 0 }
         });
 
-        const p1 = createCard("p_dragon", "期望值真龍", 300, "🐉", [
-          { id: "p_s1", name: "微光吐息", damage: 60, energyCost: 1, quizId: "Q_EXP_01", desc: "普通期望值計算，穩健的一擊。" },
-          { id: "p_s2", name: "期望真解斬", damage: 130, energyCost: 2, quizId: "Q_EXP_02", desc: "複雜概率下的期望值估算，威力極高。" }
-        ], "期望值 E(X) 是 DSE 機率必考點。計算公式為：每個可能結果的值乘以其對應的發生概率之和。");
+        /* 🚀 技能技能耗能多維升級：例如雷屬性王牌 p1.p_s2 
+         * 雷 x2 + ANY(百搭) x1
+         */
+        const p1 = createCard("p_dragon", "期望值雷龍", 300, "🐉", [
+          { id: "p_s1", name: "微光吐息", damage: 60, energyCost: { ELECTRIC: 1 }, desc: "消耗 1雷 能量。普通期望值計算，穩健的一擊。" },
+          { id: "p_s2", name: "雷光爆裂斬", damage: 140, energyCost: { ELECTRIC: 2, ANY: 1 }, desc: "消耗 2雷、1百搭 能量。期望值極限怒擊！" }
+        ], "期望值 E(X) 是 DSE 機率必考點。計算公式為：每個可能結果的值乘以其對應的發生概率之和。", "ELECTRIC");
 
-        const p2 = createCard("p_mage", "排列組合法師", 200, "🧙‍♂️", [
-          { id: "p_s3", name: "組合之界", damage: 80, energyCost: 1, quizId: "Q_COMB_01", desc: "使用組合 C(n,r) 發動衝擊。" },
-          { id: "p_s4", name: "階乘排列斬", damage: 150, energyCost: 2, quizId: "Q_PERM_01", desc: "首尾特定排列題，答對造成毀滅性傷害。" }
-        ], "排列 (Permutations) 與組合 (Combinations) 的核心區別在於：是否與「順序」有關。無順序用 C，有順序用 P。");
+        const p2 = createCard("p_mage", "排列組合暗法", 200, "🧙‍♂️", [
+          { id: "p_s3", name: "組合之界", damage: 80, energyCost: { DARK: 1 }, desc: "消耗 1暗 能量。使用組合 C(n,r) 發動衝擊。" },
+          { id: "p_s4", name: "階乘排列斬", damage: 160, energyCost: { DARK: 2, ANY: 1 }, desc: "消耗 2暗、1百搭 能量。首尾特定排列題，威力極大。" }
+        ], "排列 (Permutations) 與組合 (Combinations) 的核心區別在於：是否與「順序」有關。無順序用 C，有順序用 P。", "DARK");
 
-        const p3 = createCard("p_stat", "條件機率聖盾", 250, "🛡️", [
-          { id: "p_s5", name: "互斥衝擊", damage: 70, energyCost: 1, quizId: "Q_GENERIC", desc: "利用互斥加法規律迅速突襲。" },
-          { id: "p_s6", name: "條件判定破", damage: 140, energyCost: 2, quizId: "Q_PROB_COND", desc: "條件機率深度挑戰，防不勝防。" }
-        ], "條件概率 P(B|A) 指在事件 A 發生的前提下，事件 B 發生的概率。公式為 P(B|A) = P(A ∩ B) / P(A)。");
+        const p3 = createCard("p_stat", "水流機率聖盾", 250, "🛡️", [
+          { id: "p_s5", name: "互斥衝擊", damage: 70, energyCost: { WATER: 1 }, desc: "消耗 1水 能量。利用互斥加法規律迅速突襲。" },
+          { id: "p_s6", name: "條件判定破", damage: 150, energyCost: { WATER: 2, ANY: 1 }, desc: "消耗 2水、1百搭 能量。條件機率深度挑戰。" }
+        ], "條件概率 P(B|A) 指在事件 A 發生的前提下，事件 B 發生的概率。公式為 P(B|A) = P(A ∩ B) / P(A)。", "WATER");
 
         const a1 = createCard("ai_boss", "機率混亂魔王", 350, "😈", [
-          { id: "ai_s1", name: "乘法暗黑彈", damage: 80, energyCost: 1, quizId: "Q_IND_01", desc: "獨立事件乘法規律反撲。" },
-          { id: "ai_s2", name: "全分佈轟炸", damage: 150, energyCost: 2, quizId: "Q_COMB_01", desc: "全分佈轟炸技能。" }
-        ], "獨立事件是指兩個事件的發生互不影響。判定條件：P(A ∩ B) = P(A) * P(B)。");
+          { id: "ai_s1", name: "乘法暗黑彈", damage: 80, energyCost: { DARK: 1 }, desc: "獨立事件乘法規律反撲。" },
+          { id: "ai_s2", name: "全分佈轟炸", damage: 150, energyCost: { DARK: 2, ANY: 1 }, desc: "全分佈轟炸技能。" }
+        ], "獨立事件是指兩個事件的發生互不影響。判定條件：P(A ∩ B) = P(A) * P(B)。", "DARK");
 
         const a2 = createCard("ai_imp", "偏向分佈小鬼", 180, "👺", [
-          { id: "ai_s3", name: "期望擲石", damage: 50, energyCost: 1, quizId: "Q_EXP_01", desc: "期望收益低階攻擊。" }
-        ], "隨機變量在 DSE 中通常呈現離散分佈，需要精準列出分佈表。");
+          { id: "ai_s3", name: "期望擲石", damage: 50, energyCost: { GRASS: 1 }, desc: "期望收益低階攻擊。" }
+        ], "隨機變量在 DSE 中通常呈現離散分佈，需要精準列出分佈表。", "GRASS");
 
         const a3 = createCard("ai_golem", "幾何硬度巨石", 250, "🪨", [
-          { id: "ai_s4", name: "幾何碾壓", damage: 80, energyCost: 1, quizId: "Q_GEOM_01", desc: "長度與區域的幾何比例碾壓。" }
-        ], "幾何概率與幾何長度、面積成正比。DSE 常考線段隨機截取概率。");
+          { id: "ai_s4", name: "幾何碾壓", damage: 80, energyCost: { FIRE: 1 }, desc: "長度與區域的幾何比例碾壓。" }
+        ], "幾何概率與幾何長度、面積成正比。DSE 常考線段隨機截取概率。", "FIRE");
 
+        /* 自動補足其餘 12 張並指配屬性 */
         const playerDeck = [p1, p2, p3];
+        const attrKeys = ["WATER", "FIRE", "ELECTRIC", "GRASS", "DARK"];
         for (let i = 1; i <= 12; i++) {
+          const randAttr = attrKeys[i % 5];
           playerDeck.push(createCard(`p_minion_${i}`, `數域信徒 Lvl.${i}`, 150, "🧙", [
-            { id: `p_s_minion_${i}`, name: "速算拍擊", damage: 50, energyCost: 1, quizId: "Q_GENERIC", desc: "基礎機率運算。" }
-          ], "DSE 必考必修概率法則：古典概率 = 期望事件數 / 樣本空間總數。"));
+            { id: `p_s_minion_${i}`, name: "速算拍擊", damage: 50, energyCost: { [randAttr]: 1 }, desc: "基礎機率運算。" }
+          ], "DSE 必考必修概率法則：古典概率 = 期望事件數 / 樣本空間總數。", randAttr));
         }
 
         const aiDeck = [a1, a2, a3];
         for (let i = 1; i <= 12; i++) {
+          const randAttr = attrKeys[i % 5];
           aiDeck.push(createCard(`ai_minion_${i}`, `代數哥布林 Lvl.${i}`, 150, "👹", [
-            { id: `ai_s_minion_${i}`, name: "混亂爪擊", damage: 50, energyCost: 1, quizId: "Q_GENERIC", desc: "普通干擾技能。" }
-          ], "古典機率基礎，概率恆介於 0 與 1 之間。"));
+            { id: `ai_s_minion_${i}`, name: "混亂爪擊", damage: 50, energyCost: { [randAttr]: 1 }, desc: "普通干擾技能。" }
+          ], "古典機率基礎，概率恆介於 0 與 1 之間。", randAttr));
         }
 
         this.player = {
@@ -1071,6 +1204,7 @@
           hand: [],
           activeCard: null,
           bench: [null, null, null],
+          discardPile: [], /* 💥 新增實體廢棄區卡牌列表 */
           discardCount: 0,
           lifePoints: 3,
           hasAttachedEnergyThisTurn: false
@@ -1082,6 +1216,7 @@
           hand: [],
           activeCard: null,
           bench: [null, null, null],
+          discardPile: [],
           discardCount: 0,
           lifePoints: 3,
           hasAttachedEnergyThisTurn: false
@@ -1094,7 +1229,7 @@
         const coinEl = document.getElementById("coin-graphic");
         const statusEl = document.getElementById("coin-status-text");
 
-        statusEl.innerText = "🪙 硬幣在空中高速旋轉中...";
+        statusEl.innerText = "🪙 硬幣在古神殿空中高速旋轉...";
         coinEl.classList.add("coin-spin-anim");
 
         setTimeout(() => {
@@ -1140,6 +1275,10 @@
         this.initDecks();
         this.currentState = BattleState.INITIALIZING;
         this.turnNumber = 0; 
+
+        /* 🎰 預先隨機生成開局能量 */
+        this.currentTurnEnergy = this.rollEnergyType();
+        this.nextTurnEnergy = this.rollEnergyType();
 
         for (let i = 0; i < 4; i++) {
           this.drawCard(this.player);
@@ -1199,6 +1338,11 @@
               return;
             }
             this.turnNumber += 1; 
+
+            /* 🎰 回合開始，調度能量預告：當前能量承接上一輪預告，新生成下一輪預告 */
+            this.currentTurnEnergy = this.nextTurnEnergy;
+            this.nextTurnEnergy = this.rollEnergyType();
+
             this.triggerTurnBanner();
             this.handlePlayerDrawStep();
             break;
@@ -1212,7 +1356,6 @@
               this.triggerTurnBanner();
               logConsole(`\n--- 🌐 對手回合開始 (第 ${this.turnNumber} 回合) ---`);
             } else {
-              /* 🤖 [核心修復] 進入 AI 回合，強制鎖定玩家操作權，Turn+1 */
               this.isMyTurn = false;
               this.turnNumber += 1;
               this.triggerTurnBanner();
@@ -1237,6 +1380,7 @@
       handlePlayerDrawStep() {
         this.player.hasAttachedEnergyThisTurn = false;
         logConsole(`\n--- 🧑‍💻 您的回合開始 (第 ${this.turnNumber} 回合) ---`);
+        logConsole(`🎰 [能量預告] 本回合可用能量屬性: ${Attributes[this.currentTurnEnergy].name} | 下回合生成預報: ${Attributes[this.nextTurnEnergy].name}`);
         
         const success = this.drawCard(this.player);
         if (success) {
@@ -1245,27 +1389,81 @@
         this.transitionTo(BattleState.PLAYER_PREPARATION);
       }
 
-      attachEnergyToActive() {
+      /* 🚀 萬用白色百搭附能與計能判斷核心算法 */
+      canPayForSkill(card, skill) {
+        /*
+         * skill.energyCost: { ELECTRIC: 2, ANY: 1 } (例如雷光爆裂斬)
+         * card.attachedEnergies: { WATER: 0, FIRE: 0, ELECTRIC: 1, GRASS: 0, DARK: 0, ANY: 2 }
+         */
+        const attached = { ...card.attachedEnergies };
+        const cost = { ...skill.energyCost };
+
+        // 1. 先支付特定屬性能量耗費
+        for (let type in cost) {
+          if (type === 'ANY') continue;
+          let needed = cost[type];
+          
+          // 優先用卡片上完全匹配的特定屬性能量支付
+          let paidWithExact = Math.min(attached[type] || 0, needed);
+          needed -= paidWithExact;
+          attached[type] -= paidWithExact;
+
+          // 餘下特定屬性需求，可以用白色百搭(ANY)能量支付
+          if (needed > 0) {
+            let paidWithWildcard = Math.min(attached['ANY'] || 0, needed);
+            needed -= paidWithWildcard;
+            attached['ANY'] -= paidWithWildcard;
+          }
+
+          if (needed > 0) return false; // 無法滿足該特定屬性耗能
+        }
+
+        // 2. 支付百搭「ANY」能量耗費
+        if (cost['ANY']) {
+          let neededAny = cost['ANY'];
+          let totalLeftovers = 0;
+          for (let type in attached) {
+            totalLeftovers += attached[type];
+          }
+          if (totalLeftovers < neededAny) return false;
+        }
+
+        return true;
+      }
+
+      /* ⚡ 能量附載修復：多型別字典記錄 */
+      attachEnergyToActive(energyType) {
         if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         if (this.player.hasAttachedEnergyThisTurn) {
           logConsole("❌ 本回合限附能一次！");
           return;
         }
 
-        if (this.player.activeCard) {
-          SoundEffects.energy();
-          this.player.activeCard.energyAttached += 1;
-          this.player.hasAttachedEnergyThisTurn = true;
-          logConsole(`⚡ [附能] 為出戰怪 [${this.player.activeCard.name}] 附加 1 點能量。`);
-          
-          if (this.isMultiplayer) {
-            sendNetData({ type: 'ATTACH_ENERGY' });
-          }
-          updateUI();
+        const active = this.player.activeCard;
+        if (!active) return;
+
+        /* 屬性限制判定：百搭能量⚪(ANY)可以附載到任意卡牌上。特定屬性能量只能匹配附載 */
+        if (energyType !== 'ANY' && active.attribute !== energyType) {
+          logConsole(`❌ [附能失敗] 屬性不匹配！[${active.name}] 需要 ${Attributes[active.attribute].name} 或 ⚪百搭 屬性能量，您拖曳了 ${Attributes[energyType].name}！`);
+          alert(`屬性不匹配！[${active.name}] 需要 ${Attributes[active.attribute].name} 屬性能量！`);
+          return;
         }
+
+        SoundEffects.energy();
+        active.attachedEnergies[energyType] = (active.attachedEnergies[energyType] || 0) + 1;
+        /* 同步更新總和 */
+        active.energyAttached = Object.values(active.attachedEnergies).reduce((sum, val) => sum + val, 0);
+        
+        this.player.hasAttachedEnergyThisTurn = true;
+        logConsole(`⚡ [附能] 為出戰怪 [${active.name}] 附加了 1 點 ${Attributes[energyType].name} 能量。`);
+        
+        if (this.isMultiplayer) {
+          sendNetData({ type: 'ATTACH_ENERGY', energyType });
+        }
+        updateUI();
       }
 
-      attachEnergyToBench(benchIndex) {
+      attachEnergyToBench(benchIndex, energyType) {
         if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         if (this.player.hasAttachedEnergyThisTurn) {
           logConsole("❌ 本回合限附能一次！");
@@ -1275,13 +1473,21 @@
         const card = this.player.bench[benchIndex];
         if (!card) return;
 
+        if (energyType !== 'ANY' && card.attribute !== energyType) {
+          logConsole(`❌ [附能失敗] 屬性不匹配！[${card.name}] 需要 ${Attributes[card.attribute].name} 或 ⚪百搭 屬性能量，您拖曳了 ${Attributes[energyType].name}！`);
+          alert(`屬性不匹配！[${card.name}] 需要 ${Attributes[card.attribute].name} 屬性能量！`);
+          return;
+        }
+
         SoundEffects.energy();
-        card.energyAttached += 1;
+        card.attachedEnergies[energyType] = (card.attachedEnergies[energyType] || 0) + 1;
+        card.energyAttached = Object.values(card.attachedEnergies).reduce((sum, val) => sum + val, 0);
+        
         this.player.hasAttachedEnergyThisTurn = true;
-        logConsole(`⚡ [附能] 為後備怪 [${card.name}] 附加 1 點能量。`);
+        logConsole(`⚡ [附能] 為後備怪 [${card.name}] 附加了 1 點 ${Attributes[energyType].name} 能量。`);
         
         if (this.isMultiplayer) {
-          sendNetData({ type: 'ATTACH_ENERGY_BENCH', benchIndex });
+          sendNetData({ type: 'ATTACH_ENERGY_BENCH', benchIndex, energyType });
         }
         updateUI();
       }
@@ -1366,8 +1572,9 @@
           const skill = active.skills.find(s => s.id === skillId);
           if (!skill) return;
 
-          if (active.energyAttached < skill.energyCost) {
-            logConsole(`❌ 能量不足！`);
+          /* 萬用白色百搭判定 */
+          if (!this.canPayForSkill(active, skill)) {
+            logConsole(`❌ 能量不符發動條件！發動需要特定屬性組合。`);
             return;
           }
 
@@ -1453,7 +1660,14 @@
           setTimeout(() => {
             const active = this.ai.activeCard;
             if (active && !this.ai.hasAttachedEnergyThisTurn) {
-              active.energyAttached += 1;
+              const aiRoll = this.rollEnergyType();
+              // 如果是百搭或者匹配屬性則加載
+              if (aiRoll === 'ANY' || active.attribute === aiRoll) {
+                active.attachedEnergies[aiRoll] = (active.attachedEnergies[aiRoll] || 0) + 1;
+              } else {
+                active.attachedEnergies[active.attribute] = (active.attachedEnergies[active.attribute] || 0) + 1;
+              }
+              active.energyAttached = Object.values(active.attachedEnergies).reduce((sum, val) => sum + val, 0);
               this.ai.hasAttachedEnergyThisTurn = true;
               SoundEffects.energy();
               
@@ -1497,7 +1711,7 @@
           return;
         }
 
-        const availableSkills = active.skills.filter(s => active.energyAttached >= s.energyCost);
+        const availableSkills = active.skills.filter(s => this.canPayForSkill(active, s));
         if (availableSkills.length > 0) {
           const chosen = availableSkills[0];
           this.currentPendingSkill = chosen;
@@ -1537,7 +1751,7 @@
           playerActive.hp -= dmg;
           if (playerActive.hp < 0) playerActive.hp = 0;
 
-          /* 能量保留：不扣減能量 */
+          /* 能量保留 */
 
           this.currentPendingSkill = null;
           this.transitionTo(BattleState.AI_ATTACK_RESOLUTION);
@@ -1552,7 +1766,6 @@
         }
       }
 
-      /* 🤖 [核心優化] AI回合結束，交還控制權時強制將 isMyTurn 設為 true 鎖定解鎖！ */
       endAiTurn() {
         this.isMyTurn = true; 
         this.transitionTo(BattleState.PLAYER_DRAW);
@@ -1566,6 +1779,9 @@
             if (target.activeCard && target.activeCard.hp <= 0) {
               logConsole(`💥 [戰報] ${targetName} 的 [${target.activeCard.name}] 陣亡，送入廢棄區！`);
               SoundEffects.death();
+              
+              /* 🚀 實體化廢棄區更新：將卡片推入 discardPile 物理倉庫 */
+              target.discardPile.push(target.activeCard);
               target.activeCard = null;
               target.discardCount += 1;
 
@@ -1607,7 +1823,11 @@
       }
 
       showQuizModal(quizId, onAnswerComplete) {
-        const quiz = DseQuizDatabase[quizId] || DseQuizDatabase["Q_GENERIC"];
+        /* DSE 隨機抽取題型與難度機制實施 */
+        const quizKeys = Object.keys(DseQuizDatabase);
+        const randomQuizId = quizKeys[Math.floor(Math.random() * quizKeys.length)];
+        const quiz = DseQuizDatabase[randomQuizId];
+        
         this.currentActiveQuestion = quiz;
         this.quizCallback = onAnswerComplete;
 
@@ -1745,7 +1965,7 @@
     function handleNetworkData(data) {
       try {
         switch(data.type) {
-          case 'COIN_FLIP_RESULT':
+          case 'COIN_FLIP_RESULT': {
             const coinEl = document.getElementById("coin-graphic");
             coinEl.classList.add("coin-spin-anim");
             setTimeout(() => {
@@ -1756,15 +1976,17 @@
               });
             }, 1500);
             break;
+          }
 
-          case 'ATTACH_ENERGY':
+          case 'ATTACH_ENERGY': {
             flashBorderHighlight("opponent-battle-row", "highlight-flash-gold");
             engine.ai.activeCard.energyAttached += 1;
             logConsole(`⚡ [對手行動] 為出戰怪 [${engine.ai.activeCard.name}] 附加了 1 點能量。`);
             updateUI();
             break;
+          }
 
-          case 'ATTACH_ENERGY_BENCH':
+          case 'ATTACH_ENERGY_BENCH': {
             if (engine.ai.bench[data.benchIndex]) {
               flashBorderHighlight("opponent-battle-row", "highlight-flash-gold");
               engine.ai.bench[data.benchIndex].energyAttached += 1;
@@ -1772,8 +1994,9 @@
               updateUI();
             }
             break;
+          }
 
-          case 'PLAY_BENCH':
+          case 'PLAY_BENCH': {
             if (engine.ai.hand.length > 0) {
               const card = engine.ai.hand.shift();
               engine.ai.bench[data.benchIndex] = card;
@@ -1782,8 +2005,9 @@
               updateUI();
             }
             break;
+          }
 
-          case 'PLAY_ACTIVE':
+          case 'PLAY_ACTIVE': {
             if (engine.ai.hand.length > 0) {
               const card = engine.ai.hand.shift();
               engine.ai.activeCard = card;
@@ -1792,8 +2016,9 @@
               updateUI();
             }
             break;
+          }
 
-          case 'SWAP_ACTIVE_BENCH':
+          case 'SWAP_ACTIVE_BENCH': {
             const active = engine.ai.activeCard;
             const benchCard = engine.ai.bench[data.benchIndex];
             engine.ai.activeCard = benchCard;
@@ -1802,8 +2027,9 @@
             logConsole(`🔄 [對手行動] 交換了出戰卡與後備區第 ${data.benchIndex + 1} 號位卡牌。`);
             updateUI();
             break;
+          }
 
-          case 'ATTACK_RESOLVED':
+          case 'ATTACK_RESOLVED': {
             const enemyActive = engine.ai.activeCard;
             const myActive = engine.player.activeCard;
             if (!enemyActive || !myActive) return;
@@ -1833,11 +2059,13 @@
               }
             }, 1200);
             break;
+          }
 
-          case 'END_TURN':
+          case 'END_TURN': {
             engine.isMyTurn = true;
             engine.transitionTo(BattleState.PLAYER_DRAW);
             break;
+          }
         }
       } catch (err) {
         console.error("[P2P Data Error]", err);
@@ -1852,7 +2080,6 @@
     }
 
     function handleHandCardDragStart(e, cardId) {
-      /* 🚀 拖曳安全鎖：非我的回合或非出牌階段直接禁止拖曳 */
       if (!engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION) {
         e.preventDefault();
         return;
@@ -1881,13 +2108,15 @@
       e.dataTransfer.setData("source", "active");
     }
 
-    function handleEnergyDragStart(e) {
+    /* 🚀 優化：多屬性能量核拖拉綁定 */
+    function handleEnergyDragStart(e, energyType) {
       if (!engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION || engine.player.hasAttachedEnergyThisTurn) {
         e.preventDefault();
         return;
       }
       SoundEffects.init();
       e.dataTransfer.setData("source", "energy");
+      e.dataTransfer.setData("energyType", energyType);
     }
 
     function handleDropOnActive(e) {
@@ -1901,7 +2130,8 @@
         const benchIndex = parseInt(e.dataTransfer.getData("benchIndex"));
         engine.swapActiveWithBench(benchIndex);
       } else if (source === "energy") {
-        engine.attachEnergyToActive();
+        const energyType = e.dataTransfer.getData("energyType");
+        engine.attachEnergyToActive(energyType);
       }
     }
 
@@ -1926,7 +2156,8 @@
         logConsole(`🔄 [交換] 後備區第 ${sourceBenchIdx+1} 號與第 ${targetBenchIdx+1} 號成功調換。`);
         updateUI();
       } else if (source === "energy") {
-        engine.attachEnergyToBench(targetBenchIdx);
+        const energyType = e.dataTransfer.getData("energyType");
+        engine.attachEnergyToBench(targetBenchIdx, energyType);
       }
     }
 
@@ -1997,9 +2228,23 @@
         if (!card) return;
 
         document.getElementById("inspect-preview-box").innerText = card.icon;
-        document.getElementById("inspect-card-name").innerText = card.name;
+        
+        /* 屬性標記綁定 */
+        const attrInfo = Attributes[card.attribute];
+        document.getElementById("inspect-preview-box").style.background = attrInfo.gradient;
+        document.getElementById("inspect-preview-box").style.borderColor = attrInfo.color;
+        
+        document.getElementById("inspect-card-name").innerText = `${card.name} [${attrInfo.name}屬性]`;
         document.getElementById("inspect-card-hp").innerText = `生命值 HP: ${card.hp}/${card.maxHp}`;
-        document.getElementById("inspect-card-energy").innerText = `累積數學能量: ${card.energyAttached} 點`;
+        
+        /* 🚀 渲染出當前卡片精細載入的能量池類別 */
+        let energyDetailText = "";
+        for (let type in card.attachedEnergies) {
+          if (card.attachedEnergies[type] > 0) {
+            energyDetailText += ` [${Attributes[type].icon} ${Attributes[type].name}x${card.attachedEnergies[type]}]`;
+          }
+        }
+        document.getElementById("inspect-card-energy").innerText = `累積數學能量: ${card.energyAttached} 點 ${energyDetailText || '(空)'}`;
         document.getElementById("inspect-math-desc").innerText = card.mathDesc;
 
         const skillContainer = document.getElementById("inspect-skills-container");
@@ -2008,11 +2253,20 @@
         card.skills.forEach(s => {
           const isAttackRestricted = (engine.turnNumber === 1);
 
+          /* 🚀 升級萬用白色百搭判定 */
+          const hasEnoughEnergy = engine.canPayForSkill(card, s);
+
           const canUse = (ownerType === 'player') && 
                        (engine.currentState === BattleState.PLAYER_PREPARATION) && 
                        (engine.isMyTurn) &&
                        (!isAttackRestricted) &&
-                       (card.energyAttached >= s.energyCost);
+                       (hasEnoughEnergy);
+
+          /* 解析技能特定能量需求 */
+          let costText = "";
+          for (let type in s.energyCost) {
+            costText += ` ${Attributes[type].icon}x${s.energyCost[type]}`;
+          }
 
           const skillItem = document.createElement("div");
           skillItem.className = "inspect-skill-item";
@@ -2023,7 +2277,7 @@
             </div>
             <div>
               <button class="inspect-skill-btn" ${canUse ? '' : 'disabled'} onclick="triggerInspectAttack('${s.id}')">
-                ${isAttackRestricted ? '先攻限制作戰' : '⚡x' + s.energyCost + ' 施放'}
+                ${isAttackRestricted ? '先攻限制作戰' : '施放 (' + costText + ')'}
               </button>
             </div>
           `;
@@ -2047,28 +2301,42 @@
       document.getElementById("inspect-modal").style.display = "none";
     }
 
-    function render3DEnergyCores(containerId, count) {
+    /* 🚀 渲染立體 3D 多型別能量核（整合白色百搭 ANY） */
+    function render3DEnergyCores(containerId, attachedEnergies) {
       const container = document.getElementById(containerId);
       if (!container) return;
       container.innerHTML = "";
-      for (let i = 0; i < count; i++) {
-        const core = document.createElement("div");
-        core.className = "energy-core-3d";
-        container.appendChild(core);
+      
+      for (let type in attachedEnergies) {
+        const count = attachedEnergies[type] || 0;
+        const attrInfo = Attributes[type];
+        for (let i = 0; i < count; i++) {
+          const core = document.createElement("div");
+          core.className = "energy-core-3d";
+          core.style.cssText = attrInfo.coreStyle;
+          container.appendChild(core);
+        }
       }
     }
 
-    /* 🎨 UI 局部刷新 */
+    /* 🎨 UI 局部更新 */
     function updateUI() {
       try {
         const pActive = engine.player.activeCard;
         if (pActive) {
+          const attrInfo = Attributes[pActive.attribute];
+          /* 屬性動態渲染背景及邊框 */
+          const cardEl = document.getElementById("player-active-card");
+          cardEl.style.background = attrInfo.gradient;
+          cardEl.style.borderColor = attrInfo.color;
+
           document.getElementById("player-name").innerText = pActive.name;
           document.getElementById("player-hp").innerText = `HP ${pActive.hp}/${pActive.maxHp}`;
           document.getElementById("player-icon").innerText = pActive.icon;
           document.getElementById("player-hp-bar").style.width = `${(pActive.hp / pActive.maxHp) * 100}%`;
           
-          render3DEnergyCores("player-energy-cores", pActive.energyAttached);
+          /* 🚀 更新出戰怪底部的多屬性立體 3D 能量核 */
+          render3DEnergyCores("player-energy-cores", pActive.attachedEnergies);
 
           const skillsControl = document.getElementById("active-skills-control");
           skillsControl.innerHTML = "";
@@ -2083,14 +2351,21 @@
             btn.style.marginTop = "3px";
             
             const isAttackRestricted = (engine.turnNumber === 1);
+            const hasEnoughEnergy = engine.canPayForSkill(pActive, s);
+
+            let costDesc = "";
+            for (let type in s.energyCost) {
+              costDesc += ` ${Attributes[type].icon}x${s.energyCost[type]}`;
+            }
+
             if (isAttackRestricted) {
               btn.innerHTML = `⚔️ ${s.name} (先攻限制)`;
               btn.disabled = true;
             } else {
-              btn.innerHTML = `⚔️ ${s.name} (消耗 ⚡x${s.energyCost})`;
+              btn.innerHTML = `⚔️ ${s.name} (需要:${costDesc})`;
               btn.disabled = (engine.currentState !== BattleState.PLAYER_PREPARATION) || 
                              (!engine.isMyTurn) || 
-                             (pActive.energyAttached < s.energyCost);
+                             (!hasEnoughEnergy);
             }
             
             btn.onclick = (e) => {
@@ -2110,12 +2385,18 @@
 
         const aActive = engine.ai.activeCard;
         if (aActive) {
+          const attrInfo = Attributes[aActive.attribute];
+          const cardEl = document.getElementById("ai-active-card");
+          cardEl.style.background = attrInfo.gradient;
+          cardEl.style.borderColor = attrInfo.color;
+
           document.getElementById("ai-name").innerText = aActive.name;
           document.getElementById("ai-hp").innerText = `HP ${aActive.hp}/${aActive.maxHp}`;
           document.getElementById("ai-icon").innerText = aActive.icon;
           document.getElementById("ai-hp-bar").style.width = `${(aActive.hp / aActive.maxHp) * 100}%`;
           
-          render3DEnergyCores("ai-energy-cores", aActive.energyAttached);
+          /* 🚀 更新對手怪底部的多屬性 3D 能量核 */
+          render3DEnergyCores("ai-energy-cores", aActive.attachedEnergies);
         } else {
           document.getElementById("ai-name").innerText = "戰區空缺";
           document.getElementById("ai-hp").innerText = "HP 0/0";
@@ -2131,17 +2412,40 @@
           cardBox.className = "hand-card";
           cardBox.draggable = true;
           
+          /* 屬性色彩動態綁定 */
+          const attrInfo = Attributes[c.attribute];
+          cardBox.style.borderColor = attrInfo.color;
+          cardBox.style.background = attrInfo.gradient;
+
           cardBox.addEventListener('dragstart', (e) => handleHandCardDragStart(e, c.id));
           
+          /* 🎴 2.5D/3D 卡牌物理陀螺儀傾斜特效事件精準綁定 */
+          cardBox.addEventListener('mousemove', (e) => {
+            const rect = cardBox.getBoundingClientRect();
+            const x = e.clientX - rect.left; 
+            const y = e.clientY - rect.top;  
+            const xc = rect.width / 2;
+            const yc = rect.height / 2;
+            const rotateY = ((x - xc) / xc) * 16; /* 最大傾斜 16 度 */
+            const rotateX = -((y - yc) / yc) * 16;
+            cardBox.style.transform = `perspective(300px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.05)`;
+            cardBox.style.boxShadow = `0 10px 20px rgba(${rotateY > 0 ? '102,252,241,0.4' : '255,0,127,0.4'})`;
+          });
+
+          cardBox.addEventListener('mouseleave', () => {
+            cardBox.style.transform = 'perspective(300px) rotateX(0deg) rotateY(0deg) translateY(0deg) scale(1)';
+            cardBox.style.boxShadow = 'none';
+          });
+
           cardBox.onclick = (e) => {
             e.stopPropagation();
             inspectCard('hand', idx);
           };
 
           cardBox.innerHTML = `
-            <div style="font-weight:bold;">${c.name}</div>
+            <div style="font-weight:bold; color:#fff;">${c.name}</div>
             <div style="font-size:1.5rem; text-align:center;">${c.icon}</div>
-            <div style="color:#2ecc71;">HP ${c.hp}</div>
+            <div style="color:${attrInfo.color}; font-weight:bold;">${attrInfo.icon} HP ${c.hp}</div>
           `;
           handEl.appendChild(cardBox);
         });
@@ -2159,23 +2463,33 @@
             const cardEl = document.createElement("div");
             cardEl.className = "bench-card";
             cardEl.draggable = true;
+            
+            const attrInfo = Attributes[card.attribute];
+            cardEl.style.borderColor = attrInfo.color;
+            cardEl.style.background = attrInfo.gradient;
+
             cardEl.addEventListener('dragstart', (e) => handleBenchCardDragStart(e, i));
             cardEl.onclick = (e) => {
               e.stopPropagation();
               inspectCard('player_bench', i);
             };
             
+            /* 🚀 後備怪獸生成 3D 多屬性能量核 */
             let miniCores = "";
-            for (let j = 0; j < card.energyAttached; j++) {
-              miniCores += `<div class="energy-core-3d" style="width:10px; height:10px; box-shadow:0 0 5px var(--accent-gold);"></div>`;
+            for (let type in card.attachedEnergies) {
+              const miniCount = card.attachedEnergies[type] || 0;
+              const miniAttr = Attributes[type];
+              for (let j = 0; j < miniCount; j++) {
+                miniCores += `<div class="energy-core-3d" style="${miniAttr.coreStyle} width:10px; height:10px;"></div>`;
+              }
             }
 
             cardEl.innerHTML = `
-              <span style="font-weight:bold; font-size:0.55rem;">${card.name}</span>
+              <span style="font-weight:bold; font-size:0.55rem; color:#fff;">${card.name}</span>
               <span style="text-align:center; font-size:1.1rem;">${card.icon}</span>
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span style="color:#2ecc71; font-size:0.55rem;">HP ${card.hp}</span>
-                <div style="display:flex; gap:2px; justify-content:flex-end;">${miniCores}</div>
+                <div style="display:flex; gap:2px; justify-content:flex-end; flex-wrap:wrap; max-width:35px;">${miniCores}</div>
               </div>
             `;
             spot.appendChild(cardEl);
@@ -2194,22 +2508,31 @@
           if (card) {
             const cardEl = document.createElement("div");
             cardEl.className = "bench-card ai-bench";
+            
+            const attrInfo = Attributes[card.attribute];
+            cardEl.style.borderColor = attrInfo.color;
+            cardEl.style.background = attrInfo.gradient;
+
             cardEl.onclick = (e) => {
               e.stopPropagation();
               inspectCard('ai_bench', i);
             };
 
             let miniCores = "";
-            for (let j = 0; j < card.energyAttached; j++) {
-              miniCores += `<div class="energy-core-3d" style="width:10px; height:10px; box-shadow:0 0 5px var(--accent-gold);"></div>`;
+            for (let type in card.attachedEnergies) {
+              const miniCount = card.attachedEnergies[type] || 0;
+              const miniAttr = Attributes[type];
+              for (let j = 0; j < miniCount; j++) {
+                miniCores += `<div class="energy-core-3d" style="${miniAttr.coreStyle} width:10px; height:10px;"></div>`;
+              }
             }
 
             cardEl.innerHTML = `
-              <span style="font-weight:bold; font-size:0.55rem;">${card.name}</span>
+              <span style="font-weight:bold; font-size:0.55rem; color:#fff;">${card.name}</span>
               <span style="text-align:center; font-size:1.1rem;">${card.icon}</span>
               <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span style="color:#2ecc71; font-size:0.55rem;">HP ${card.hp}</span>
-                <div style="display:flex; gap:2px; justify-content:flex-end;">${miniCores}</div>
+                <div style="display:flex; gap:2px; justify-content:flex-end; flex-wrap:wrap; max-width:35px;">${miniCores}</div>
               </div>
             `;
             spot.appendChild(cardEl);
@@ -2224,23 +2547,79 @@
         document.getElementById("player-life-hearts").innerText = pHPs;
         document.getElementById("ai-life-hearts").innerText = aHPs;
 
-        document.getElementById("player-discard-pile").innerHTML = `廢棄區<br>${engine.player.discardCount}`;
-        document.getElementById("ai-discard-pile").innerHTML = `廢棄區<br>${engine.ai.discardCount}`;
-
-        /* 能量核鎖定狀態更新 */
-        const energyToken = document.getElementById("draggable-energy");
-        const energyDisabled = engine.currentState !== BattleState.PLAYER_PREPARATION || 
-                               engine.player.hasAttachedEnergyThisTurn || 
-                               (!engine.isMyTurn);
-        if (energyDisabled) {
-          energyToken.classList.add("disabled");
-          energyToken.setAttribute("draggable", "false");
+        /* 🚀 實體化廢棄區渲染：展示 topmost 陣亡卡牌的面龐與特寫 */
+        const pDiscardEl = document.getElementById("player-discard-pile");
+        if (engine.player.discardPile && engine.player.discardPile.length > 0) {
+          const topCard = engine.player.discardPile[engine.player.discardPile.length - 1];
+          const cardAttr = Attributes[topCard.attribute];
+          pDiscardEl.innerHTML = `
+            <div style="font-size:1.2rem; line-height:1;">${topCard.icon}</div>
+            <div style="font-size:0.52rem; color:#fff; margin-top:2px; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">${topCard.name}</div>
+            <div style="font-size:0.52rem; color:var(--accent-magenta); font-weight:bold; letter-spacing:0.5px; margin-top:1px;">陣亡 (共${engine.player.discardCount}張)</div>
+          `;
+          pDiscardEl.style.border = "1.5px solid var(--accent-magenta)";
+          pDiscardEl.style.boxShadow = "0 0 10px rgba(255, 0, 127, 0.4)";
+          pDiscardEl.style.background = cardAttr.gradient;
         } else {
-          energyToken.classList.remove("disabled");
-          energyToken.setAttribute("draggable", "true");
+          pDiscardEl.innerHTML = `廢棄區<br>0`;
+          pDiscardEl.style.border = "1.5px dashed rgba(255,255,255,0.2)";
+          pDiscardEl.style.boxShadow = "none";
+          pDiscardEl.style.background = "rgba(0,0,0,0.5)";
         }
 
-        /* 🛑 更新手動結束回合按鈕可用狀態 */
+        const aDiscardEl = document.getElementById("ai-discard-pile");
+        if (engine.ai.discardPile && engine.ai.discardPile.length > 0) {
+          const topCard = engine.ai.discardPile[engine.ai.discardPile.length - 1];
+          const cardAttr = Attributes[topCard.attribute];
+          aDiscardEl.innerHTML = `
+            <div style="font-size:1.2rem; line-height:1;">${topCard.icon}</div>
+            <div style="font-size:0.52rem; color:#fff; margin-top:2px; font-weight:bold; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; width:100%;">${topCard.name}</div>
+            <div style="font-size:0.52rem; color:var(--accent-magenta); font-weight:bold; letter-spacing:0.5px; margin-top:1px;">陣亡 (共${engine.ai.discardCount}張)</div>
+          `;
+          aDiscardEl.style.border = "1.5px solid var(--accent-magenta)";
+          aDiscardEl.style.boxShadow = "0 0 10px rgba(255, 0, 127, 0.4)";
+          aDiscardEl.style.background = cardAttr.gradient;
+        } else {
+          aDiscardEl.innerHTML = `廢棄區<br>0`;
+          aDiscardEl.style.border = "1.5px dashed rgba(255,255,255,0.2)";
+          aDiscardEl.style.boxShadow = "none";
+          aDiscardEl.style.background = "rgba(0,0,0,0.5)";
+        }
+
+        /* 🎰 渲染與調度：當前可用拖拉能量核、下回合預告核 */
+        const currentSlot = document.getElementById("current-energy-slot");
+        const nextSlot = document.getElementById("next-energy-slot");
+        const isEnergyDisabled = engine.currentState !== BattleState.PLAYER_PREPARATION || 
+                                 engine.player.hasAttachedEnergyThisTurn || 
+                                 (!engine.isMyTurn);
+
+        /* 渲染下回合預報 */
+        const nextAttr = Attributes[engine.nextTurnEnergy];
+        nextSlot.innerText = nextAttr.icon;
+        nextSlot.style.background = nextAttr.gradient;
+        nextSlot.style.borderColor = nextAttr.color;
+        nextSlot.style.boxShadow = `0 0 10px ${nextAttr.color}`;
+
+        /* 渲染當前回合拖拉核 */
+        currentSlot.innerHTML = "";
+        const currAttr = Attributes[engine.currentTurnEnergy];
+        const token = document.createElement("div");
+        token.className = "energy-token-circle";
+        token.id = "draggable-turn-energy";
+        token.innerText = currAttr.icon;
+        token.style.cssText = currAttr.coreStyle;
+        
+        if (isEnergyDisabled) {
+          token.classList.add("disabled");
+          token.setAttribute("draggable", "false");
+        } else {
+          token.classList.remove("disabled");
+          token.setAttribute("draggable", "true");
+          token.addEventListener('dragstart', (e) => handleEnergyDragStart(e, engine.currentTurnEnergy));
+        }
+        currentSlot.appendChild(token);
+
+        /* 🛑 結束回合按鈕狀態 */
         const btnEndTurn = document.getElementById("btn-end-turn");
         btnEndTurn.disabled = engine.currentState !== BattleState.PLAYER_PREPARATION || !engine.isMyTurn;
       } catch (err) {
@@ -2248,7 +2627,7 @@
       }
     }
 
-    document.getElementById("btn-attach-energy").onclick = () => engine.attachEnergyToActive();
+    document.getElementById("btn-attach-energy").onclick = () => engine.attachEnergyToActive(engine.currentTurnEnergy);
 
     /* 🛑 手動結束我的回合按鈕綁定事件 */
     document.getElementById("btn-end-turn").onclick = () => {
