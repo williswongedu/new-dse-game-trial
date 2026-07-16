@@ -375,7 +375,7 @@
       box-sizing: border-box;
     }
 
-    /* 🎴 2.5D/3D 滑鼠陀螺儀傾斜特效容器 */
+    /* 🎴 2.5D/3D 卡牌物理陀螺儀傾斜特效容器 */
     .hand-card {
       width: 75px;
       height: 100px;
@@ -493,7 +493,7 @@
       box-shadow: 0 0 10px var(--accent-cyan);
     }
 
-    /* 🛑 手動結束回合發光按鈕 (保證 100% 可見且帶有反饋動畫) */
+    /* 🛑 重點美化：手動結束回合發光按鈕 (保證 100% 可見且帶有反饋動畫) */
     #btn-end-turn {
       background: linear-gradient(135deg, #ff0055 0%, #8b0000 100%);
       border: 2px solid var(--accent-magenta);
@@ -818,7 +818,7 @@
 
       <!-- 玩家戰區 (下方) -->
       <div class="field-row player-row" id="player-battle-row">
-        <!-- 玩家出戰卡 -->
+        <!-- 玩家出戰卡 (支援手牌拖放、後備卡拖放、能量拖放、點擊Inspect) -->
         <div class="card-slot">
           <div class="card" id="player-active-card" draggable="true" ondragstart="handleActiveCardDragStart(event)" ondragover="allowDrop(event)" ondrop="handleDropOnActive(event)">
             <div class="card-header">
@@ -1020,7 +1020,7 @@
     };
 
     /* ==========================================
-     * 📚 擴充 DSE 數學題庫（純安全註釋，防擠壓壓縮失效，包含期望值、機率、條件機率、排列組合等 10 道難題）
+     * 📚 擴充 DSE 數學題庫（純安全註釋，防擠壓壓縮失效）
      * ========================================== */
     const DseQuizDatabase = {
       "Q_EXP_01": {
@@ -1068,8 +1068,8 @@
         topic: "DSE 組合數 (Combinations)",
         question: "從 7 名男生和 5 名女生中選出 4 人組成 DSE 備考小組，若小組中必須包含最少 3 名男生，求有多少種不同的選派方法？",
         options: ["210種", "245種", "315種", "350種"],
-        correctAnswerIndex: 1,
-        explanation: "恰有3名男生: C(7,3)*C(5,1) = 35*5 = 175。恰有4名男生: C(7,4)*C(5,0) = 35*1 = 35。總選法 = 175 + 35 = 210? 噢，更正：C(7,3)*C(5,1) = 35*5 = 175，C(7,4) = 35。175+35=210種。選項1為正確答案。"
+        correctAnswerIndex: 0,
+        explanation: "恰有3名男生: C(7,3)*C(5,1) = 35*5 = 175。恰有4名男生: C(7,4) = 35。總選法 = 175 + 35 = 210種。"
       },
       "Q_GEOM_01": {
         id: "Q_GEOM_01",
@@ -1216,7 +1216,6 @@
           hand: [],
           activeCard: null,
           bench: [null, null, null],
-          discardPile: [],
           discardCount: 0,
           lifePoints: 3,
           hasAttachedEnergyThisTurn: false
@@ -1356,6 +1355,7 @@
               this.triggerTurnBanner();
               logConsole(`\n--- 🌐 對手回合開始 (第 ${this.turnNumber} 回合) ---`);
             } else {
+              /* 🤖 [核心修復] 進入 AI 回合，強制鎖定玩家操作權，Turn+1 */
               this.isMyTurn = false;
               this.turnNumber += 1;
               this.triggerTurnBanner();
@@ -1391,34 +1391,26 @@
 
       /* 🚀 萬用白色百搭附能與計能判斷核心算法 */
       canPayForSkill(card, skill) {
-        /*
-         * skill.energyCost: { ELECTRIC: 2, ANY: 1 } (例如雷光爆裂斬)
-         * card.attachedEnergies: { WATER: 0, FIRE: 0, ELECTRIC: 1, GRASS: 0, DARK: 0, ANY: 2 }
-         */
         const attached = { ...card.attachedEnergies };
         const cost = { ...skill.energyCost };
 
-        // 1. 先支付特定屬性能量耗費
         for (let type in cost) {
           if (type === 'ANY') continue;
           let needed = cost[type];
           
-          // 優先用卡片上完全匹配的特定屬性能量支付
           let paidWithExact = Math.min(attached[type] || 0, needed);
           needed -= paidWithExact;
           attached[type] -= paidWithExact;
 
-          // 餘下特定屬性需求，可以用白色百搭(ANY)能量支付
           if (needed > 0) {
             let paidWithWildcard = Math.min(attached['ANY'] || 0, needed);
             needed -= paidWithWildcard;
             attached['ANY'] -= paidWithWildcard;
           }
 
-          if (needed > 0) return false; // 無法滿足該特定屬性耗能
+          if (needed > 0) return false; 
         }
 
-        // 2. 支付百搭「ANY」能量耗費
         if (cost['ANY']) {
           let neededAny = cost['ANY'];
           let totalLeftovers = 0;
@@ -1431,7 +1423,7 @@
         return true;
       }
 
-      /* ⚡ 能量附載修復：多型別字典記錄 */
+      /* ⚡ 能量附載：多型別字典記錄 */
       attachEnergyToActive(energyType) {
         if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         if (this.player.hasAttachedEnergyThisTurn) {
@@ -1451,7 +1443,6 @@
 
         SoundEffects.energy();
         active.attachedEnergies[energyType] = (active.attachedEnergies[energyType] || 0) + 1;
-        /* 同步更新總和 */
         active.energyAttached = Object.values(active.attachedEnergies).reduce((sum, val) => sum + val, 0);
         
         this.player.hasAttachedEnergyThisTurn = true;
@@ -1614,7 +1605,7 @@
           enemy.hp -= dmg;
           if (enemy.hp < 0) enemy.hp = 0;
 
-          /* 能量保留：不扣減能量 */
+          /* 能量保留 */
 
           this.currentPendingSkill = null;
 
@@ -1661,7 +1652,6 @@
             const active = this.ai.activeCard;
             if (active && !this.ai.hasAttachedEnergyThisTurn) {
               const aiRoll = this.rollEnergyType();
-              // 如果是百搭或者匹配屬性則加載
               if (aiRoll === 'ANY' || active.attribute === aiRoll) {
                 active.attachedEnergies[aiRoll] = (active.attachedEnergies[aiRoll] || 0) + 1;
               } else {
@@ -1766,6 +1756,7 @@
         }
       }
 
+      /* 🤖 [核心修復] AI 回合結束，交還控制權時強制將 isMyTurn 設為 true */
       endAiTurn() {
         this.isMyTurn = true; 
         this.transitionTo(BattleState.PLAYER_DRAW);
@@ -1867,7 +1858,7 @@
           this.quizCallback = null;
 
           if (callback) {
-            console.log("[submitAnswer] 答題成功提交，回調執行核心攻擊...");
+            console.log("[submitAnswer] 答題成功提交，回調執行攻擊...");
             callback(correct);
           }
         } catch (err) {
@@ -2026,7 +2017,7 @@
             flashBorderHighlight("opponent-battle-row", "highlight-flash-magenta");
             logConsole(`🔄 [對手行動] 交換了出戰卡與後備區第 ${data.benchIndex + 1} 號位卡牌。`);
             updateUI();
-            break;
+            break; 
           }
 
           case 'ATTACK_RESOLVED': {
@@ -2080,6 +2071,7 @@
     }
 
     function handleHandCardDragStart(e, cardId) {
+      /* 🚀 拖曳安全鎖：非我的回合或非出牌階段直接禁止拖曳 */
       if (!engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION) {
         e.preventDefault();
         return;
@@ -2301,7 +2293,7 @@
       document.getElementById("inspect-modal").style.display = "none";
     }
 
-    /* 🚀 渲染立體 3D 多型別能量核（整合白色百搭 ANY） */
+    /* 🚀 渲染立體 3D 能量核 */
     function render3DEnergyCores(containerId, attachedEnergies) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -2319,7 +2311,7 @@
       }
     }
 
-    /* 🎨 UI 局部更新 */
+    /* 🎨 UI 局部刷新 */
     function updateUI() {
       try {
         const pActive = engine.player.activeCard;
@@ -2547,7 +2539,7 @@
         document.getElementById("player-life-hearts").innerText = pHPs;
         document.getElementById("ai-life-hearts").innerText = aHPs;
 
-        /* 🚀 實體化廢棄區渲染：展示 topmost 陣亡卡牌的面龐與特寫 */
+        /* 🚀 實體化廢棄區渲染：展示 topmost 陣亡卡牌 */
         const pDiscardEl = document.getElementById("player-discard-pile");
         if (engine.player.discardPile && engine.player.discardPile.length > 0) {
           const topCard = engine.player.discardPile[engine.player.discardPile.length - 1];
@@ -2619,15 +2611,13 @@
         }
         currentSlot.appendChild(token);
 
-        /* 🛑 結束回合按鈕狀態 */
+        /* 🛑 更新手動結束回合按鈕可用狀態 */
         const btnEndTurn = document.getElementById("btn-end-turn");
         btnEndTurn.disabled = engine.currentState !== BattleState.PLAYER_PREPARATION || !engine.isMyTurn;
       } catch (err) {
         console.error("[updateUI Error Logged]", err);
       }
     }
-
-    document.getElementById("btn-attach-energy").onclick = () => engine.attachEnergyToActive(engine.currentTurnEnergy);
 
     /* 🛑 手動結束我的回合按鈕綁定事件 */
     document.getElementById("btn-end-turn").onclick = () => {
