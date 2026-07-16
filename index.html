@@ -458,7 +458,7 @@
       box-shadow: 0 0 10px var(--accent-cyan);
     }
 
-    /* 🛑 手動結束回合發光按鈕 (保證 100% 可見) */
+    /* 🛑 手動結束回合發光按鈕 */
     #btn-end-turn {
       background: linear-gradient(135deg, #ff0055 0%, #8b0000 100%);
       border: 1.5px solid var(--accent-magenta);
@@ -1073,9 +1073,10 @@
           { id: "p_s2", name: "期望真解斬", damage: 130, energyCost: 2, quizId: "Q_EXP_02", desc: "複雜概率下的期望值估算，威力極高。" }
         ], "期望值 E(X) 是 DSE 機率必考點。計算公式為：每個可能結果的值乘以其對應的發生概率之和。", "ELECTRIC");
 
+        /* 🚀 修正 p_s4 中原先致命的無 Key 屬性 "DARK" 語法錯誤！ */
         const p2 = createCard("p_mage", "排列組合法師", 200, "🧙‍♂️", [
           { id: "p_s3", name: "組合之界", damage: 80, energyCost: 1, quizId: "Q_COMB_01", desc: "使用組合 C(n,r) 發動衝擊。" },
-          { id: "p_s4", name: "階乘排列斬", damage: 150, energyCost: 2, quizId: "Q_PERM_01", desc: "首尾特定排列題，答對造成毀滅性傷害。", "DARK" }
+          { id: "p_s4", name: "階乘排列斬", damage: 150, energyCost: 2, quizId: "Q_PERM_01", desc: "首尾特定排列題，答對造成毀滅性傷害。" }
         ], "排列 (Permutations) 與組合 (Combinations) 的核心區別在於：是否與「順序」有關。無順序用 C，有順序用 P。", "DARK");
 
         const p3 = createCard("p_stat", "條件機率聖盾", 250, "🛡️", [
@@ -1865,7 +1866,7 @@
             flashBorderHighlight("opponent-battle-row", "highlight-flash-magenta");
             logConsole(`🔄 [對手行動] 交換了出戰卡與後備區第 ${data.benchIndex + 1} 號位卡牌。`);
             updateUI();
-            break; /* 🚀 完美修復點：多餘的大括號已被徹底移除！ */
+            break;
 
           case 'ATTACK_RESOLVED':
             const enemyActive = engine.ai.activeCard;
