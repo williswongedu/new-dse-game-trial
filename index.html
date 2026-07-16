@@ -458,7 +458,7 @@
       box-shadow: 0 0 10px var(--accent-cyan);
     }
 
-    /* 🛑 重點美化：手動結束回合發光按鈕（保證 100% 清晰可見） */
+    /* 🛑 手動結束回合發光按鈕 */
     #btn-end-turn {
       background: linear-gradient(135deg, #ff0055 0%, #8b0000 100%);
       border: 1.5px solid var(--accent-magenta);
@@ -966,6 +966,76 @@
     };
 
     /* ==========================================
+     * 📚 擴充 DSE 數學題庫（純安全註釋，防擠壓壓縮失效）
+     * ========================================== */
+    const DseQuizDatabase = {
+      "Q_EXP_01": {
+        id: "Q_EXP_01",
+        topic: "DSE 期望值 (Expected Value)",
+        question: "在某抽獎活動中，中獎概率為 0.15。中獎可得獎金 $800，未中獎則需支付 $50 手續費。求參與該抽獎的期望收益是多少？",
+        options: ["$120", "$77.5", "$112.5", "$80"],
+        correctAnswerIndex: 1,
+        explanation: "期望值 = 800 * 0.15 + (-50) * (1 - 0.15) = 120 - 42.5 = $77.5。"
+      },
+      "Q_EXP_02": {
+        id: "Q_EXP_02",
+        topic: "DSE 期望值 (Expected Value)",
+        question: "擲一枚不均勻硬幣，出現正面的概率為 0.4。若出現正面可得 100 傷害分，反面可得 50 傷害分。求此攻擊的預期傷害值是多少？",
+        options: ["75分", "70分", "60分", "80分"],
+        correctAnswerIndex: 1,
+        explanation: "期望值 = 100 * 0.4 + 50 * 0.6 = 40 + 30 = 70分。"
+      },
+      "Q_PROB_COND": {
+        id: "Q_PROB_COND",
+        topic: "DSE 條件概率 (Conditional Prob)",
+        question: "已知 P(A) = 0.6, P(B) = 0.5 且 P(A ∪ B) = 0.8。求條件概率 P(B | A) 的值？",
+        options: ["0.3", "0.5", "0.6", "0.8"],
+        correctAnswerIndex: 1,
+        explanation: "P(A ∩ B) = P(A) + P(B) - P(A ∪ B) = 0.6 + 0.5 - 0.8 = 0.3。則 P(B|A) = P(A ∩ B) / P(A) = 0.3 / 0.6 = 0.5。"
+      },
+      "Q_PERM_01": {
+        id: "Q_PERM_01",
+        topic: "DSE 排列數 (Permutations)",
+        question: "將 'MATHS' 這 5 個英文字母隨機排成一列。求首尾兩個字母皆為輔音的概率是多少？",
+        options: ["3/10", "3/5", "1/5", "1/2"],
+        correctAnswerIndex: 1,
+        explanation: "輔音有 M, T, H, S 共 4 個。首尾排輔音方法數 = P(4,2) = 12。中間 3 個字母隨意排 = 3! = 6。合規排列 = 12 * 6 = 72。總排列 = 5! = 120。概率 = 72 / 120 = 3/5。"
+      },
+      "Q_COMB_01": {
+        id: "Q_COMB_01",
+        topic: "DSE 組合數 (Combinations)",
+        question: "一個盒子中有 5 個紅球和 5 個白球。若從中隨機一次取出 3 個球，求恰好取出 2 個紅球 and 1 個白球的組合方法有多少種？",
+        options: ["50", "120", "25", "10"],
+        correctAnswerIndex: 0,
+        explanation: "方法數 = C(5,2) * C(5,1) = 10 * 5 = 50 種。"
+      },
+      "Q_GEOM_01": {
+        id: "Q_GEOM_01",
+        topic: "DSE 幾何概率與加法 (Probability Laws)",
+        question: "一條長為 10 cm 的線段被隨機截成兩段。若其中一段長度小於 3 cm 的概率為 p，則 p 的值是多少？",
+        options: ["0.3", "0.6", "0.5", "0.4"],
+        correctAnswerIndex: 1,
+        explanation: "若一段小於 3 cm，截點必須落在離左端 3 cm 以內或離右端 3 cm 以內。有效區間長度為 3 + 3 = 6 cm。概率 = 6 / 10 = 0.6。"
+      },
+      "Q_IND_01": {
+        id: "Q_IND_01",
+        topic: "DSE 獨立事件 (Independent Events)",
+        question: "小明和小華各自解答同一道 DSE 難題，兩人能獨立解答的概率分別為 0.7 和 0.6。求該題被最少一人解答出來的概率是多少？",
+        options: ["0.42", "0.88", "0.82", "0.95"],
+        correctAnswerIndex: 1,
+        explanation: "最少一人答出概率 = 1 - 兩人皆答不出 = 1 - (1 - 0.7) * (1 - 0.6) = 1 - 0.3 * 0.4 = 1 - 0.12 = 0.88。"
+      },
+      "Q_GENERIC": {
+        id: "Q_GENERIC",
+        topic: "DSE 機率基礎運算",
+        question: "若 P(A) = 0.4, P(B) = 0.3，且 A 和 B 為互斥事件 (Mutually Exclusive)。求 P(A ∪ B) 的概率？",
+        options: ["0.12", "0.7", "0.1", "0.5"],
+        correctAnswerIndex: 1,
+        explanation: "互斥事件的併合概率公式：P(A ∪ B) = P(A) + P(B) = 0.4 + 0.3 = 0.7。"
+      }
+    };
+
+    /* ==========================================
      * ⚔️ 遊戲核心數據庫與狀態管理 (Engine Class)
      * ========================================== */
     class BattleEngine {
@@ -1067,7 +1137,7 @@
         };
       }
 
-      /* 🪙 3D 先攻硬幣判定 */
+      /* 🪙 先攻硬幣判定 */
       triggerCoinFlip(onComplete) {
         document.getElementById("coin-flip-overlay").style.display = "flex";
         const coinEl = document.getElementById("coin-graphic");
@@ -1191,6 +1261,7 @@
               this.triggerTurnBanner();
               logConsole(`\n--- 🌐 對手回合開始 (第 ${this.turnNumber} 回合) ---`);
             } else {
+              /* 🤖 進入 AI 回合，強制鎖定玩家操作權，Turn+1 */
               this.isMyTurn = false;
               this.turnNumber += 1;
               this.triggerTurnBanner();
@@ -1223,7 +1294,6 @@
         this.transitionTo(BattleState.PLAYER_PREPARATION);
       }
 
-      /* 🚀 拖曳附能實施：嚴格檢測屬性匹配限制 */
       attachEnergyToActive(energyType) {
         if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         if (this.player.hasAttachedEnergyThisTurn) {
@@ -1401,7 +1471,7 @@
           enemy.hp -= dmg;
           if (enemy.hp < 0) enemy.hp = 0;
 
-          /* 🚀 能量保留：不扣減能量 */
+          /* 能量保留：不扣減能量 */
 
           this.currentPendingSkill = null;
 
@@ -1503,7 +1573,7 @@
             this.resolveAiAttack(correct);
           });
         } else {
-          logConsole(`🤖 AI 能量不足以發動技能，直接結束回合。`);
+          logConsole(`🤖 AI 能量不足以發動技能，結束回合。`);
           this.endAiTurn();
         }
       }
@@ -1735,7 +1805,7 @@
       if (conn && conn.open) conn.send(data);
     }
 
-    /* P2P 聯機數據與慢動作 Playback */
+    /* P2P 聯機數據與慢動作 Playback (完美移除 unmatched 大括號，絕不卡死) */
     function handleNetworkData(data) {
       try {
         switch(data.type) {
@@ -1795,8 +1865,7 @@
             flashBorderHighlight("opponent-battle-row", "highlight-flash-magenta");
             logConsole(`🔄 [對手行動] 交換了出戰卡與後備區第 ${data.benchIndex + 1} 號位卡牌。`);
             updateUI();
-          }
-          break;
+            break; /* 🚀 完美修復點：多餘的大括號被徹底移除！ */
 
           case 'ATTACK_RESOLVED':
             const enemyActive = engine.ai.activeCard;
@@ -1847,6 +1916,7 @@
     }
 
     function handleHandCardDragStart(e, cardId) {
+      /* 🚀 拖曳安全鎖：非我的回合或非出牌階段直接禁止拖曳 */
       if (!engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION) {
         e.preventDefault();
         return;
@@ -2291,6 +2361,8 @@
         console.error("[updateUI Error Logged]", err);
       }
     }
+
+    document.getElementById("btn-attach-energy").onclick = () => engine.attachEnergyToActive();
 
     /* 🛑 手動結束我的回合按鈕綁定事件 */
     document.getElementById("btn-end-turn").onclick = () => {
