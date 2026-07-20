@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>數域圖鑑 codex — 數域戰記</title>
+  <style>
+    /* ==========================================
+     * Cyberpunk 霓虹風格樣式 (CSS)
+     * ========================================== */
+    :root {
+      --bg-color: #0b0c10;
+      --panel-bg: #1f2833;
+      --accent-cyan: #66fcf1;
+      --accent-blue: #45f3ff;
+      --accent-magenta: #ff007f;
+      --accent-gold: #ffcc00;
+      --text-white: #ffffff;
+      --text-gray: #c5c6c7;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-white);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(90deg, #1f2833, #0b0c10);
+      padding: 5px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(102, 252, 241, 0.3);
+      height: 50px;
+      box-sizing: border-box;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent-cyan);
+      text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+    }
+
+    nav {
+      display: flex;
+      gap: 15px;
+    }
+
+    nav a {
+      color: var(--text-gray);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    nav a:hover, nav a.active {
+      color: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+      background: rgba(102, 252, 241, 0.1);
+    }
+
+    .codex-container {
+      display: flex;
+      flex: 1;
+      padding: 15px;
+      gap: 15px;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    /* 左側卡牌網格與篩選 */
+    .codex-main {
+      flex: 2.8;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      overflow: hidden;
+    }
+
+    /* 屬性篩選標籤 */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      background: var(--panel-bg);
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.05);
+    }
+
+    .filter-btn {
+      background: #0b0c10;
+      border: 1px solid var(--accent-cyan);
+      color: var(--accent-cyan);
+      padding: 6px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 0.8rem;
+    }
+
+    .filter-btn:hover, .filter-btn.active {
+      background: var(--accent-cyan);
+      color: #000;
+      box-shadow: 0 0 10px var(--accent-cyan);
+    }
+
+    /* 卡牌網格 */
+    .cards-grid {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    /* 3D 霓虹效果卡牌 */
+    .codex-card {
+      height: 190px;
+      border-radius: 10px;
+      border: 2px solid #555;
+      padding: 8px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      cursor: pointer;
+      transform-style: preserve-3d;
+      transition: transform 0.2s, border-color 0.3s, box-shadow 0.3s;
+      perspective: 300px;
+    }
+
+    .codex-card:hover {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 5px 15px rgba(102, 252, 241, 0.3);
+    }
+
+    .codex-card-header {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 0.75rem;
+    }
+
+    .codex-card-image {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.2rem;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      margin: 5px 0;
+    }
+
+    .codex-card-footer {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.65rem;
+      align-items: center;
+    }
+
+    /* 右側詳情面板 */
+    .codex-sidebar {
+      flex: 1.2;
+      background: rgba(31, 40, 51, 0.6);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      overflow-y: auto;
+      box-sizing: border-box;
+    }
+
+    .deck-counter-box {
+      background: #000;
+      border: 1.5px solid var(--accent-gold);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      box-shadow: 0 0 10px rgba(255,204,0,0.2);
+    }
+
+    .deck-counter-title {
+      font-size: 0.8rem;
+      color: var(--accent-gold);
+      font-weight: bold;
+    }
+
+    .deck-count {
+      font-size: 1.6rem;
+      font-weight: bold;
+      margin-top: 4px;
+    }
+
+    .formula-badge {
+      background: rgba(102, 252, 241, 0.1);
+      border: 1px solid var(--accent-cyan);
+      padding: 10px;
+      border-radius: 6px;
+      font-family: monospace;
+      color: var(--accent-cyan);
+      line-height: 1.4;
+    }
+
+    /* 20卡牌限制提示 */
+    .deck-add-btn {
+      background: linear-gradient(90deg, #1f4068, #162447);
+      border: 1.5px solid var(--accent-gold);
+      color: #fff;
+      padding: 8px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+    }
+
+    .deck-add-btn:hover {
+      background: var(--accent-gold);
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>📚 數域圖鑑 — Card Codex</h1>
+    <nav>
+      <a href="index.html">⚔️ 戰鬥對決</a>
+      <a href="codex.html" class="active">📚 數域圖鑑</a>
+      <a href="gacha.html">🎰 能量抽卡</a>
+    </nav>
+    <div class="state-indicator">數域備考模式</div>
+  </header>
+
+  <div class="codex-container">
+    
+    <!-- 左側主展示區 -->
+    <div class="codex-main">
+      <!-- 屬性過濾欄 -->
+      <div class="filter-bar">
+        <button class="filter-btn active" onclick="filterCards('ALL')">ALL 全部</button>
+        <button class="filter-btn" onclick="filterCards('WATER')">💧 水 (Geometry)</button>
+        <button class="filter-btn" onclick="filterCards('FIRE')">🔥 火 (Functions)</button>
+        <button class="filter-btn" onclick="filterCards('ELECTRIC')">⚡ 電 (Probability)</button>
+        <button class="filter-btn" onclick="filterCards('GRASS')">🍃 草 (Algebra)</button>
+        <button class="filter-btn" onclick="filterCards('DARK')">🔮 暗 (Complex)</button>
+      </div>
+
+      <!-- 卡牌牆 -->
+      <div class="cards-grid" id="codex-cards-grid">
+        <!-- 動態渲染卡牌 -->
+      </div>
+    </div>
+
+    <!-- 右側數據詳情與備考板 -->
+    <div class="codex-sidebar">
+      
+      <!-- 20張卡組構築計數器 -->
+      <div class="deck-counter-box">
+        <div class="deck-counter-title">📋 我的專屬數域備考卡組</div>
+        <div class="deck-count" id="deck-counter-lbl">0 / 20</div>
+        <div style="font-size:0.65rem; color:#888; margin-top:3px;">每場對戰限制上限為 20 張卡牌</div>
+      </div>
+
+      <!-- 選中卡牌數據 -->
+      <div id="codex-detail-panel" style="display: flex; flex-direction: column; gap:12px;">
+        <h3 id="detail-name" style="color:var(--accent-cyan); margin:0;">請點選左側卡牌</h3>
+        <p id="detail-attribute" style="margin:0; font-size:0.85rem; color:#aaa;"></p>
+        <div id="detail-hp" style="font-weight:bold; color:#2ecc71;"></div>
+        
+        <div style="border-top:1px dashed rgba(255,255,255,0.1); padding-top:10px;">
+          <h4 style="margin:0 0 5px 0; color:var(--accent-gold);">⚔️ 搭載數域技能：</h4>
+          <div id="detail-skills" style="font-size:0.8rem; line-height:1.4;"></div>
+        </div>
+
+        <div style="border-top:1px dashed rgba(255,255,255,0.1); padding-top:10px;">
+          <h4 style="margin:0 0 5px 0; color:var(--accent-cyan);">🎓 核心數學公式關聯：</h4>
+          <div id="detail-formula" class="formula-badge">E(X) = Σ x_i * p_i</div>
+        </div>
+
+        <button class="deck-add-btn" id="btn-add-to-deck" onclick="mockAddToDeck()">➕ 加入我的備考卡組 (20卡限制)</button>
+      </div>
+
+    </div>
+
+  </div>
+
+  <script>
+    const Attributes = {
+      WATER: { name: "水 (Geometry)", color: "#45f3ff", icon: "💧", gradient: "linear-gradient(135deg, #0f2537, #0b0c10)" },
+      FIRE: { name: "火 (Functions)", color: "#ff3300", icon: "🔥", gradient: "linear-gradient(135deg, #370f1a, #0b0c10)" },
+      ELECTRIC: { name: "電 (Probability)", color: "#ffcc00", icon: "⚡", gradient: "linear-gradient(135deg, #37310f, #0b0c10)" },
+      GRASS: { name: "草 (Algebra)", color: "#00ff66", icon: "🍃", gradient: "linear-gradient(135deg, #0f371c, #0b0c10)" },
+      DARK: { name: "暗 (Complex)", color: "#bb00ff", icon: "🔮", gradient: "linear-gradient(135deg, #270f37, #0b0c10)" }
+    };
+
+    // 圖鑑卡片配置
+    const CodexCards = [
+      { id: "c1", name: "期望值真龍", hp: 300, icon: "🐉", attribute: "ELECTRIC", mathDesc: "期望值 E(X) 指隨機變量的長期平均。公式為 E(X) = Σ x_i * p_i。", skills: "雷光爆裂斬 (消耗: 2電, 1百搭)" },
+      { id: "c2", name: "期望值戰龍", hp: 260, icon: "🦖", attribute: "ELECTRIC", mathDesc: "中階機率，計算多重離散概率事件的分佈。", skills: "期望撕裂斬 (消耗: 1電, 1百搭)" },
+      { id: "c3", name: "條件機率聖盾", hp: 250, icon: "🛡️", attribute: "WATER", mathDesc: "條件概率 P(B|A) 指在事件 A 發生的前提下，事件 B 發生的概率。公式為 P(B|A) = P(A ∩ B) / P(A)。", skills: "條件判定破 (消耗: 2水, 1百搭)" },
+      { id: "c4", name: "排列組合暗法", hp: 200, icon: "🧙‍♂️", attribute: "DARK", mathDesc: "排列 P(n,r) = n! / (n-r)! (與順序有關)；組合 C(n,r) = n! / [r!(n-r)!] (與順序無關)。", skills: "階乘排列斬 (消耗: 2暗, 1百搭)" },
+      { id: "c5", name: "二次函數炎虎", hp: 220, icon: "🐯", attribute: "FIRE", mathDesc: "二次函數 y = ax^2 + bx + c 的頂點坐標為 (-b/2a, -Δ/4a)。當 a > 0 有最小值；a < 0 有最大值。", skills: "頂點烈焰判 (消耗: 1火, 1百搭)" },
+      { id: "c6", name: "幾何等比飛鷹", hp: 210, icon: "🦅", attribute: "GRASS", mathDesc: "等比數列第 n 項 a_n = a * r^(n-1)。當 |r| < 1 時，無限項之和 S_inf = a / (1-r)。", skills: "無限等比翼 (消耗: 1草, 1百搭)" },
+      { id: "c7", name: "古典極限法師", hp: 150, icon: "🧙", attribute: "WATER", mathDesc: "古典概率 = 期望事件數 / 樣本空間總數。概率恆介於 0 與 1 之間。", skills: "古典速算 (消耗: 1水)" },
+      { id: "c8", name: "等差公差劍士", hp: 240, icon: "⚔️", attribute: "GRASS", mathDesc: "等差數列通項公式 a_n = a + (n-1)d。前 n 項和 S_n = (n/2)(2a + (n-1)d)。", skills: "等差連環刺 (消耗: 1草, 1百搭)" }
+    ];
+
+    let selectedCard = CodexCards[0];
+    let mockDeckCount = 12; 
+
+    function filterCards(attrType) {
+      const grid = document.getElementById("codex-cards-grid");
+      grid.innerHTML = "";
+
+      const filtered = attrType === "ALL" ? CodexCards : CodexCards.filter(c => c.attribute === attrType);
+      
+      /* 🚀 核心優化：從 localStorage 背包中動態載入擁有數量 */
+      let backpack = JSON.parse(localStorage.getItem("math_realm_backpack")) || {};
+
+      filtered.forEach(c => {
+        const attrInfo = Attributes[c.attribute];
+        const ownedCount = backpack[c.id] || 0; // 如果沒有則為 0 
+
+        const cardBox = document.createElement("div");
+        cardBox.className = "codex-card";
+        cardBox.style.borderColor = attrInfo.color;
+        cardBox.style.background = attrInfo.gradient;
+        
+        // 如果擁有數量為 0，則呈現灰色半透明鎖定外觀
+        if (ownedCount === 0) {
+          cardBox.style.opacity = "0.5";
+        }
+
+        cardBox.innerHTML = `
+          <div class="codex-card-header">
+            <span>${c.name}</span>
+            <span style="color:#2ecc71;">HP ${c.hp}</span>
+          </div>
+          <div class="codex-card-image">${c.icon}</div>
+          <div class="codex-card-footer">
+            <span style="color:${attrInfo.color}; font-weight:bold;">${attrInfo.icon} ${attrInfo.name.split(" ")[0]}</span>
+            <span style="color:var(--accent-gold); font-weight:bold;">擁有: ${ownedCount}張</span>
+          </div>
+        `;
+
+        // 3D 陀螺儀
+        cardBox.addEventListener('mousemove', (e) => {
+          const rect = cardBox.getBoundingClientRect();
+          const x = e.clientX - rect.left; 
+          const y = e.clientY - rect.top;  
+          const xc = rect.width / 2;
+          const yc = rect.height / 2;
+          const rotateY = ((x - xc) / xc) * 15; 
+          const rotateX = -((y - yc) / yc) * 15;
+          cardBox.style.transform = `perspective(300px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.04)`;
+        });
+
+        cardBox.addEventListener('mouseleave', () => {
+          cardBox.style.transform = 'perspective(300px) rotateX(0deg) rotateY(0deg) scale(1)';
+        });
+
+        cardBox.onclick = () => selectCard(c, ownedCount);
+        grid.appendChild(cardBox);
+      });
+
+      const buttons = document.querySelectorAll(".filter-btn");
+      buttons.forEach(btn => btn.classList.remove("active"));
+      event.target.classList.add("active");
+    }
+
+    function selectCard(card, ownedCount) {
+      selectedCard = card;
+      const attrInfo = Attributes[card.attribute];
+
+      document.getElementById("detail-name").innerText = `${card.name} (已擁有: ${ownedCount} 張)`;
+      document.getElementById("detail-name").style.color = attrInfo.color;
+      document.getElementById("detail-attribute").innerText = `屬性類別：${attrInfo.name}`;
+      document.getElementById("detail-hp").innerText = `生命值上限 HP: ${card.hp}`;
+      document.getElementById("detail-skills").innerText = card.skills;
+      document.getElementById("detail-formula").innerText = card.mathDesc;
+      
+      const previewBox = document.getElementById("inspect-preview-box");
+      previewBox.innerText = card.icon;
+      previewBox.style.background = attrInfo.gradient;
+      previewBox.style.borderColor = attrInfo.color;
+
+      // 如果擁有數為 0，則禁用加入卡組按鈕
+      const addBtn = document.getElementById("btn-add-to-deck");
+      if (ownedCount === 0) {
+        addBtn.disabled = true;
+        addBtn.innerText = "🔒 尚未解鎖此卡（請前往抽卡）";
+        addBtn.style.background = "#333";
+      } else {
+        addBtn.disabled = false;
+        addBtn.innerText = "➕ 加入我的備考卡組 (20卡限制)";
+        addBtn.style.background = "linear-gradient(90deg, #1f4068, #162447)";
+      }
+    }
+
+    function mockAddToDeck() {
+      if (mockDeckCount >= 20) {
+        alert("❌ 構築失敗：備考卡組已達 20 張卡牌上限！請先移除其他卡牌。");
+        return;
+      }
+      mockDeckCount++;
+      document.getElementById("deck-counter-lbl").innerText = `${mockDeckCount} / 20`;
+      alert(`✅ 成功將 [${selectedCard.name}] 加入您的備考卡組！當前卡牌數: ${mockDeckCount}/20`);
+    }
+
+    // 初始化加載
+    filterCards("ALL");
+    selectCard(CodexCards[0], 0);
+  </script>
+</body>
+</html>
