@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>能量抽卡包 — 數域戰記</title>
+  <style>
+    /* ==========================================
+     * Cyberpunk 霓虹風格樣式 (CSS)
+     * ========================================== */
+    :root {
+      --bg-color: #0b0c10;
+      --panel-bg: #1f2833;
+      --accent-cyan: #66fcf1;
+      --accent-blue: #45f3ff;
+      --accent-magenta: #ff007f;
+      --accent-gold: #ffcc00;
+      --text-white: #ffffff;
+      --text-gray: #c5c6c7;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: var(--bg-color);
+      color: var(--text-white);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    header {
+      background: linear-gradient(90deg, #1f2833, #0b0c10);
+      padding: 5px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 2px solid var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(102, 252, 241, 0.3);
+      height: 50px;
+      box-sizing: border-box;
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 1.2rem;
+      color: var(--accent-cyan);
+      text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+    }
+
+    nav {
+      display: flex;
+      gap: 15px;
+    }
+
+    nav a {
+      color: var(--text-gray);
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      transition: all 0.3s ease;
+    }
+
+    nav a:hover, nav a.active {
+      color: var(--accent-cyan);
+      border-color: var(--accent-cyan);
+      background: rgba(102, 252, 241, 0.1);
+    }
+
+    .gacha-container {
+      display: flex;
+      flex: 1;
+      padding: 20px;
+      gap: 20px;
+      overflow: hidden;
+      box-sizing: border-box;
+    }
+
+    /* 左側抽卡調控台 */
+    .gacha-main {
+      flex: 1.2;
+      background: rgba(31, 40, 51, 0.6);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-sizing: border-box;
+    }
+
+    /* 右側撕開卡包展示區 */
+    .gacha-display {
+      flex: 2.8;
+      background: #020204;
+      border: 1px solid #333;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      padding: 10px;
+      box-sizing: border-box;
+    }
+
+    .pack-booster {
+      width: 180px;
+      height: 280px;
+      background: linear-gradient(135deg, var(--accent-magenta), #8b0000);
+      border: 3px double var(--accent-gold);
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(255, 0, 127, 0.5);
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-around;
+      transition: transform 0.3s;
+    }
+
+    .pack-booster:hover {
+      transform: scale(1.05) rotate(2deg);
+      box-shadow: 0 15px 40px rgba(255, 0, 127, 0.8);
+    }
+
+    /* 抽出的卡牌展示網格 */
+    .results-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 12px;
+      width: 100%;
+      height: 100%;
+      align-items: center;
+      justify-content: center;
+      display: none; 
+    }
+
+    .gacha-card-result {
+      height: 220px;
+      border-radius: 10px;
+      border: 2px solid var(--accent-cyan);
+      background: #000;
+      padding: 10px;
+      box-sizing: border-box;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transform-style: preserve-3d;
+      transition: transform 0.5s;
+    }
+
+    .lobby-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(90deg, #1f4068, #162447);
+      border: 1px solid var(--accent-cyan);
+      color: #fff;
+      font-weight: bold;
+      cursor: pointer;
+      border-radius: 6px;
+      font-size: 1rem;
+      margin-top: 15px;
+    }
+
+    .lobby-btn:hover {
+      background: var(--accent-cyan);
+      color: #000;
+      box-shadow: 0 0 12px var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🎰 能量抽卡 — Gacha System</h1>
+    <nav>
+      <a href="index.html">⚔️ 戰鬥對決</a>
+      <a href="codex.html">📚 數域圖鑑</a>
+      <a href="gacha.html" class="active">🎰 能量抽卡</a>
+    </nav>
+    <div class="state-indicator">機率抽取中</div>
+  </header>
+
+  <div class="gacha-container">
+    
+    <!-- 左欄控制台 -->
+    <div class="gacha-main">
+      <div>
+        <h2 style="color:var(--accent-gold); margin-top:0;">🎰 數域抽卡控制台</h2>
+        <p style="font-size:0.85rem; color:#888;">消耗您獲得的數學積分（重整不刷抽），機率獲取全新怪獸卡與自訂美術卡！</p>
+        
+        <div style="background:#000; padding:15px; border-radius:8px; border:1px solid rgba(255,255,255,0.05); margin-top:20px;">
+          <div style="font-size:0.8rem; color:#aaa;">我的可用數學積分</div>
+          <div style="font-size:2rem; font-weight:bold; color:var(--accent-gold); margin-top:5px;" id="mp-lbl">1,500 MP</div>
+        </div>
+
+        <div style="margin-top:20px; font-size:0.8rem; color:#ccc;">
+          <strong>🔮 卡牌發送機率公佈：</strong><br/>
+          - <span style="color:var(--accent-gold); font-weight:bold;">UR 期望值真龍: 1.0%</span><br/>
+          - SSR 期望值龍: <span style="color:var(--accent-magenta);">4.0%</span><br/>
+          - SR 條件機率聖盾: <span style="color:var(--accent-cyan);">15.0%</span><br/>
+          - R 排列組合法師: <span style="color:var(--accent-blue);">30.0%</span><br/>
+          - N 普通數域信徒: <span style="color:#aaa;">50.0%</span>
+        </div>
+      </div>
+
+      <button class="lobby-btn" id="btn-draw-act" onclick="triggerDrawPack()">🎰 消耗 500 MP 撕開卡包 (5張)</button>
+    </div>
+
+    <!-- 右欄展示區 -->
+    <div class="gacha-display" id="gacha-display-zone">
+      <!-- 卡包外觀 -->
+      <div class="pack-booster" id="booster-pack-view" onclick="triggerDrawPack()">
+        <div style="font-size: 3.5rem;">🎒</div>
+        <div style="font-weight:bold; font-size:1.1rem; color:var(--accent-gold);">數域限定・5連包</div>
+        <div style="font-size:0.8rem; color:#fff;">點擊撕開卡包</div>
+      </div>
+
+      <!-- 撕開後的 5 連抽展示網格 -->
+      <div class="results-grid" id="draw-results-grid"></div>
+    </div>
+
+  </div>
+
+  <script>
+    const Attributes = {
+      WATER: { name: "水", color: "#45f3ff", icon: "💧", gradient: "linear-gradient(135deg, #0f2537, #0b0c10)" },
+      FIRE: { name: "火", color: "#ff3300", icon: "🔥", gradient: "linear-gradient(135deg, #370f1a, #0b0c10)" },
+      ELECTRIC: { name: "電", color: "#ffcc00", icon: "⚡", gradient: "linear-gradient(135deg, #37310f, #0b0c10)" },
+      GRASS: { name: "草", color: "#00ff66", icon: "🍃", gradient: "linear-gradient(135deg, #0f371c, #0b0c10)" },
+      DARK: { name: "暗", color: "#bb00ff", icon: "🔮", gradient: "linear-gradient(135deg, #270f37, #0b0c10)" }
+    };
+
+    /* 抽卡池，包含 1% 機率的 UR 卡 c1 */
+    const CardsDatabase = [
+      { id: "c1", name: "期望值真龍", icon: "🐉", attr: "ELECTRIC", rarity: "UR" },
+      { id: "c2", name: "期望值戰龍", icon: "🦖", attr: "ELECTRIC", rarity: "SSR" },
+      { id: "c3", name: "條件機率聖盾", icon: "🛡️", attr: "WATER", rarity: "SR" },
+      { id: "c4", name: "排列組合暗法", icon: "🧙", attr: "DARK", rarity: "SR" },
+      { id: "c5", name: "二次函數炎虎", icon: "🐯", attr: "FIRE", rarity: "R" },
+      { id: "c6", name: "幾何等比飛鷹", icon: "🦅", attr: "GRASS", rarity: "R" },
+      { id: "c7", name: "古典極限法師", icon: "🧙‍♂️", attr: "WATER", rarity: "N" },
+      { id: "c8", name: "等差公差劍士", icon: "⚔️", attr: "GRASS", rarity: "N" }
+    ];
+
+    /* 💾 核心修復：從 localStorage 讀取 MP，確保重新整理不刷抽 */
+    let userMp = parseInt(localStorage.getItem("math_realm_mp"));
+    if (isNaN(userMp)) {
+      userMp = 1500;
+      localStorage.setItem("math_realm_mp", userMp);
+    }
+    document.getElementById("mp-lbl").innerText = `${userMp} MP`;
+
+    function triggerDrawPack() {
+      if (userMp < 500) {
+        alert("❌ 餘額不足：您的數學積分不夠，請先前往主大廳完成每日任務賺取！");
+        return;
+      }
+
+      /* 💾 扣點數並永久保存，不容刷抽 */
+      userMp -= 500;
+      localStorage.setItem("math_realm_mp", userMp);
+      document.getElementById("mp-lbl").innerText = `${userMp} MP`;
+
+      const booster = document.getElementById("booster-pack-view");
+      const grid = document.getElementById("draw-results-grid");
+
+      // 1. 卡包撕開拋空動畫
+      booster.style.transform = "scale(0.8) rotateX(180deg)";
+      booster.style.opacity = "0";
+
+      setTimeout(() => {
+        booster.style.display = "none";
+        grid.style.display = "grid";
+        grid.innerHTML = "";
+
+        // 2. 獲取已有背包數據
+        let backpack = JSON.parse(localStorage.getItem("math_realm_backpack")) || {};
+
+        // 3. 隨機機率抽取 5 張卡牌
+        for (let i = 0; i < 5; i++) {
+          const rolledCard = rollOneCard();
+          const attrInfo = Attributes[rolledCard.attr];
+
+          // 💾 累計寫入背包
+          backpack[rolledCard.id] = (backpack[rolledCard.id] || 0) + 1;
+
+          const cardEl = document.createElement("div");
+          cardEl.className = "gacha-card-result";
+          cardEl.style.borderColor = attrInfo.color;
+          cardEl.style.background = attrInfo.gradient;
+          cardEl.style.transform = "scale(0.5) rotateY(90deg)"; 
+
+          cardEl.innerHTML = `
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; font-weight:bold;">
+              <span>${rolledCard.name}</span>
+              <span style="color:var(--accent-gold); font-size:0.8rem;">${rolledCard.rarity}</span>
+            </div>
+            <div style="font-size:2.8rem; text-align:center;">${rolledCard.icon}</div>
+            <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:${attrInfo.color}; font-weight:bold;">
+              <span>${attrInfo.icon} ${attrInfo.name}</span>
+              <span>100% 官方</span>
+            </div>
+          `;
+
+          grid.appendChild(cardEl);
+
+          setTimeout(() => {
+            cardEl.style.transform = "scale(1) rotateY(0deg)";
+          }, i * 150);
+        }
+
+        // 💾 保存背包數據
+        localStorage.setItem("math_realm_backpack", JSON.stringify(backpack));
+
+        // 新增一個「再抽一次」按鈕
+        const btnBox = document.createElement("div");
+        btnBox.style.position = "absolute";
+        btnBox.style.bottom = "20px";
+        btnBox.innerHTML = `<button class="lobby-btn" style="width:200px; box-shadow:0 0 10px var(--accent-cyan);" onclick="resetGachaPack()">🎰 再抽一次</button>`;
+        document.getElementById("gacha-display-zone").appendChild(btnBox);
+
+      }, 500);
+    }
+
+    /* 🎰 UR 1% 高階亂數發送核心 */
+    function rollOneCard() {
+      const roll = Math.random() * 100;
+      if (roll <= 1.0) {
+        return CardsDatabase.find(c => c.rarity === "UR"); // 1% UR
+      } else if (roll <= 5.0) {
+        return CardsDatabase.find(c => c.rarity === "SSR"); // 4% SSR
+      } else if (roll <= 20.0) {
+        return CardsDatabase.filter(c => c.rarity === "SR")[Math.floor(Math.random() * 2)]; // 15% SR
+      } else if (roll <= 50.0) {
+        return CardsDatabase.filter(c => c.rarity === "R")[Math.floor(Math.random() * 2)]; // 30% R
+      } else {
+        return CardsDatabase.filter(c => c.rarity === "N")[Math.floor(Math.random() * 2)]; // 50% N
+      }
+    }
+
+    function resetGachaPack() {
+      window.location.reload();
+    }
+  </script>
+</body>
+</html>
