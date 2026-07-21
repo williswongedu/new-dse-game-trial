@@ -21,7 +21,6 @@
       --text-gray: #c5c6c7;
       --hp-color: #2ecc71;
     }
-
     body {
       margin: 0;
       padding: 0;
@@ -34,11 +33,9 @@
       overflow: hidden;
       transition: filter 1s ease;
     }
-
     body.game-lost-filter {
       filter: grayscale(1) contrast(0.8) brightness(0.6);
     }
-
     header {
       background: linear-gradient(90deg, #1f2833, #0b0c10);
       padding: 5px 20px;
@@ -51,19 +48,16 @@
       box-sizing: border-box;
       z-index: 250; /* 保證導航欄永久最上層 */
     }
-
     header h1 {
       margin: 0;
       font-size: 1.2rem;
       color: var(--accent-cyan);
       text-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
     }
-
     nav {
       display: flex;
       gap: 15px;
     }
-
     nav a {
       color: var(--text-gray);
       text-decoration: none;
@@ -74,13 +68,11 @@
       border: 1px solid transparent;
       transition: all 0.3s ease;
     }
-
     nav a:hover, nav a.active {
       color: var(--accent-cyan);
       border-color: var(--accent-cyan);
       background: rgba(102, 252, 241, 0.1);
     }
-
     .state-indicator {
       background: var(--panel-bg);
       border: 1px solid var(--accent-cyan);
@@ -90,8 +82,7 @@
       color: var(--accent-cyan);
       font-size: 0.8rem;
     }
-
-    /* 主大廳介面 (z-index與層級修復，完全不擋頂部導航) */
+    /* 主大廳首頁介面 */
     #lobby-screen {
       position: absolute;
       top: 50px; left: 0; right: 0; bottom: 0;
@@ -104,7 +95,6 @@
       align-items: center;
       justify-content: center;
     }
-
     .lobby-left {
       flex: 1.1;
       display: flex;
@@ -119,7 +109,6 @@
       justify-content: space-around;
       box-shadow: 0 0 20px rgba(102, 252, 241, 0.2);
     }
-
     .mascot-container {
       position: relative;
       width: 100%;
@@ -127,7 +116,6 @@
       flex-direction: column;
       align-items: center;
     }
-
     .mascot-image-box {
       width: 180px;
       height: 180px;
@@ -137,7 +125,6 @@
       transform-style: preserve-3d;
       transition: transform 0.2s;
     }
-
     .mascot-speech-bubble {
       background: #1f2833;
       border: 1px solid var(--accent-cyan);
@@ -151,7 +138,6 @@
       position: relative;
       box-shadow: 0 4px 10px rgba(0,0,0,0.5);
     }
-
     .lobby-center {
       flex: 1.4;
       display: flex;
@@ -160,7 +146,6 @@
       height: 95%;
       box-sizing: border-box;
     }
-
     .lobby-right {
       flex: 1.3;
       display: flex;
@@ -169,7 +154,6 @@
       height: 95%;
       box-sizing: border-box;
     }
-
     .lobby-panel-card {
       background: rgba(0,0,0,0.8);
       border: 1px solid rgba(255,255,255,0.1);
@@ -181,7 +165,6 @@
       flex-direction: column;
       overflow-y: auto;
     }
-
     .lobby-panel-title {
       font-size: 0.9rem;
       font-weight: bold;
@@ -190,7 +173,6 @@
       padding-bottom: 4px;
       margin-bottom: 8px;
     }
-
     .lobby-btn {
       width: 100%;
       padding: 10px;
@@ -203,13 +185,11 @@
       font-size: 0.9rem;
       transition: all 0.2s;
     }
-
     .lobby-btn:hover {
       background: var(--accent-cyan);
       color: #000;
       box-shadow: 0 0 12px var(--accent-cyan);
     }
-
     /* 每日簽到看板樣式 */
     .checkin-grid {
       display: grid;
@@ -217,7 +197,6 @@
       gap: 4px;
       margin-top: 5px;
     }
-
     .checkin-day-card {
       background: #111;
       border: 1px solid #333;
@@ -228,19 +207,16 @@
       cursor: pointer;
       transition: all 0.2s;
     }
-
     .checkin-day-card.active-today {
       border-color: var(--accent-gold);
       background: rgba(255,204,0,0.1);
       box-shadow: 0 0 8px var(--accent-gold);
     }
-
     .checkin-day-card.claimed {
       border-color: var(--accent-cyan);
       background: rgba(102,252,241,0.1);
       color: var(--accent-cyan);
     }
-
     /* 戰場容器 */
     .game-container {
       display: flex;
@@ -251,7 +227,6 @@
       box-sizing: border-box;
       gap: 15px;
     }
-
     .battlefield {
       flex: 3.2;
       display: flex;
@@ -263,7 +238,6 @@
       padding: 12px;
       box-sizing: border-box;
     }
-
     .field-row {
       display: flex;
       justify-content: space-between;
@@ -275,18 +249,15 @@
       position: relative;
       transition: box-shadow 0.3s ease;
     }
-
     .player-row {
       background: rgba(102, 252, 241, 0.03);
       border-left: 4px solid var(--accent-cyan);
     }
-
     .ai-row {
       background: rgba(255, 0, 127, 0.03);
       border-right: 4px solid var(--accent-magenta);
       flex-direction: row-reverse;
     }
-
     .side-panel {
       flex: 1.3;
       display: flex;
@@ -295,7 +266,6 @@
       box-sizing: border-box;
       max-height: 100%;
     }
-
     /* 生命與廢棄區 */
     .prize-area {
       width: 85px;
@@ -304,13 +274,11 @@
       gap: 8px;
       align-items: center;
     }
-
     .life-hearts {
       font-size: 1.1rem;
       color: var(--accent-magenta);
       letter-spacing: 2px;
     }
-
     .discard-pile {
       width: 65px;
       height: 85px;
@@ -329,7 +297,6 @@
       padding: 3px;
       transition: all 0.3s;
     }
-
     /* 卡牌排布 */
     .card-slot {
       display: flex;
@@ -339,7 +306,6 @@
       width: 48%;
       height: 100%;
     }
-
     .card {
       width: 170px;
       height: 240px;
@@ -355,23 +321,19 @@
       box-sizing: border-box;
       cursor: grab;
     }
-
     .card:active {
       cursor: grabbing;
     }
-
     .ai-card {
       border-color: var(--accent-magenta);
       cursor: pointer;
     }
-
     .card-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       margin-bottom: 5px;
     }
-
     .card-name {
       font-size: 0.9rem;
       font-weight: bold;
@@ -379,13 +341,11 @@
       overflow: hidden;
       text-overflow: ellipsis;
     }
-
     .card-hp {
       font-size: 0.8rem;
       color: #2ecc71;
       font-weight: bold;
     }
-
     .card-image-box {
       flex: 1;
       background: #0b0c10;
@@ -398,7 +358,6 @@
       margin-bottom: 8px;
       overflow: hidden;
     }
-
     /* 3D 立體化能量光核容器 */
     .energy-cores-container {
       display: flex;
@@ -408,8 +367,7 @@
       margin-top: 2px;
       gap: 4px;
     }
-
-    /* 🚀 3D 霓虹能量核內嵌屬性圖案樣式 */
+    /* 3D 霓虹能量核樣式 */
     .energy-core-3d {
       width: 18px;
       height: 18px;
@@ -422,14 +380,12 @@
       font-weight: bold;
       transition: transform 0.2s;
     }
-
     .card-click-tip {
       font-size: 0.65rem;
       color: #777;
       text-align: center;
       margin-top: 2px;
     }
-
     /* 後備區 */
     .bench-area {
       flex: 1;
@@ -442,7 +398,6 @@
       height: 90%;
       align-items: center;
     }
-
     .bench-spot {
       width: 65px;
       height: 90px;
@@ -458,7 +413,6 @@
       cursor: pointer;
       transition: box-shadow 0.3s;
     }
-
     .bench-card {
       width: 100%;
       height: 100%;
@@ -472,16 +426,13 @@
       justify-content: space-between;
       cursor: grab;
     }
-
     .bench-card:active {
       cursor: grabbing;
     }
-
     .bench-card.ai-bench {
       border-color: var(--accent-magenta);
       cursor: pointer;
     }
-
     /* 手牌與能量拖拉 */
     .hand-container {
       background: var(--panel-bg);
@@ -495,7 +446,6 @@
       height: 120px;
       box-sizing: border-box;
     }
-
     .hand-card {
       width: 75px;
       height: 100px;
@@ -514,11 +464,9 @@
       transition: transform 0.1s ease;
       perspective: 300px;
     }
-
     .hand-card:active {
       cursor: grabbing;
     }
-
     /* 能量生成器樣式 */
     .energy-generator-box {
       background: rgba(0,0,0,0.4);
@@ -532,7 +480,6 @@
       gap: 6px;
       align-items: center;
     }
-
     .energy-token-circle {
       width: 38px;
       height: 38px;
@@ -546,12 +493,10 @@
       box-shadow: 0 4px 12px rgba(0,0,0,0.6);
       transition: transform 0.2s, box-shadow 0.2s;
     }
-
     .energy-token-circle:active {
       cursor: grabbing;
       transform: scale(0.9);
     }
-
     .energy-token-circle.disabled {
       background: #333 !important;
       color: #777 !important;
@@ -559,7 +504,6 @@
       border-color: #555 !important;
       cursor: not-allowed;
     }
-
     .energy-preview-dot {
       width: 24px;
       height: 24px;
@@ -570,7 +514,6 @@
       justify-content: center;
       font-size: 0.8rem;
     }
-
     .log-panel {
       background: #020204;
       border: 1px solid #333;
@@ -584,7 +527,6 @@
       color: #4af626;
       max-height: 140px;
     }
-
     .control-actions {
       background: var(--panel-bg);
       border-radius: 8px;
@@ -594,7 +536,6 @@
       gap: 6px;
       box-sizing: border-box;
     }
-
     .action-btn {
       background: linear-gradient(90deg, #1f4068, #162447);
       border: 1px solid var(--accent-cyan);
@@ -606,14 +547,12 @@
       transition: all 0.2s ease;
       font-size: 0.85rem;
     }
-
     .action-btn:hover:not(:disabled) {
       background: var(--accent-cyan);
       color: #000;
       box-shadow: 0 0 10px var(--accent-cyan);
     }
-
-    /* 🛑 手動結束回合發光按鈕 */
+    /* 手動結束回合按鈕 */
     #btn-end-turn {
       background: linear-gradient(135deg, #ff0055 0%, #8b0000 100%);
       border: 2px solid var(--accent-magenta);
@@ -628,17 +567,14 @@
       text-transform: uppercase;
       letter-spacing: 1px;
     }
-
     #btn-end-turn:hover:not(:disabled) {
       background: #ff007f;
       box-shadow: 0 0 25px rgba(255, 0, 127, 0.8);
       transform: scale(1.02);
     }
-
     #btn-end-turn:active:not(:disabled) {
       transform: scale(0.98);
     }
-
     #btn-end-turn:disabled {
       background: #222 !important;
       border-color: #555 !important;
@@ -647,7 +583,6 @@
       cursor: not-allowed;
       transform: none !important;
     }
-
     /* 彈窗 */
     .modal-overlay {
       position: absolute;
@@ -660,7 +595,6 @@
       padding: 20px;
       box-sizing: border-box;
     }
-
     .modal-content {
       background: radial-gradient(circle at center, #1f2833, #0b0c10);
       border: 2px solid var(--accent-gold);
@@ -672,18 +606,15 @@
       box-sizing: border-box;
       position: relative;
     }
-
     .inspect-content {
       border-color: var(--accent-cyan);
       box-shadow: 0 0 30px rgba(102,252,241,0.5);
     }
-
     .inspect-grid {
       display: flex;
       gap: 20px;
       margin-top: 15px;
     }
-
     .inspect-card-preview {
       width: 150px;
       height: 210px;
@@ -697,32 +628,27 @@
       font-size: 3rem;
       position: relative;
     }
-
     .inspect-details {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 10px;
     }
-
     .inspect-title {
       font-size: 1.4rem;
       color: var(--accent-cyan);
       font-weight: bold;
     }
-
     .inspect-hp {
       font-size: 1.1rem;
       color: #2ecc71;
     }
-
     .inspect-skill-list {
       display: flex;
       flex-direction: column;
       gap: 8px;
       margin-top: 10px;
     }
-
     .inspect-skill-item {
       background: rgba(255,255,255,0.05);
       border: 1px solid rgba(255,255,255,0.1);
@@ -732,7 +658,6 @@
       justify-content: space-between;
       align-items: center;
     }
-
     .inspect-skill-btn {
       background: var(--accent-cyan);
       color: #000;
@@ -742,19 +667,16 @@
       font-weight: bold;
       cursor: pointer;
     }
-
     .inspect-skill-btn:disabled {
       background: #555;
       color: #888;
       cursor: not-allowed;
     }
-
     .options-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 12px;
     }
-
     .option-btn {
       background: #0b0c10;
       border: 1px solid var(--accent-cyan);
@@ -765,13 +687,11 @@
       font-size: 0.95rem;
       text-align: left;
     }
-
     .option-btn:hover {
       background: var(--accent-cyan);
       color: #000;
     }
-
-    /* 🎬 "第 X 回合" 巨型淡出橫幅 */
+    /* 回合巨型淡出橫幅 */
     #turn-banner-overlay {
       position: absolute;
       top: 50%; left: 50%;
@@ -792,8 +712,7 @@
       white-space: nowrap;
       border-radius: 8px;
     }
-
-    /* 🪙 CSS3 3D 拉絲拋黃金古神殿硬幣 */
+    /* 3D 命運硬幣 CSS 動畫 */
     .ancient-coin {
       width: 110px;
       height: 110px;
@@ -802,19 +721,16 @@
       transform-style: preserve-3d;
       transition: transform 1.6s cubic-bezier(0.1, 0.8, 0.3, 1);
     }
-
     /* 拋空翻轉 keyframes */
     @keyframes physical-toss {
       0% { transform: translateY(0) rotateX(0deg) rotateY(0deg) scale(1); }
       50% { transform: translateY(-160px) rotateX(720deg) rotateY(720deg) scale(1.4); }
       100% { transform: translateY(0) rotateX(1440deg) rotateY(var(--target-rotation)) scale(1); }
     }
-
     .coin-spin-anim {
       animation: physical-toss 1.6s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
     }
-
-    /* 硬幣正面反面物理紋理 */
+    /* 硬幣正面反面 */
     .ancient-coin-front, .ancient-coin-back {
       position: absolute;
       width: 100%;
@@ -834,17 +750,14 @@
       box-shadow: 0 0 25px rgba(218,165,32,0.8), inset 0 0 15px rgba(0,0,0,0.8);
       box-sizing: border-box;
     }
-
     .ancient-coin-front {
       background: radial-gradient(circle at 30% 30%, #ffd700 0%, #b8860b 55%, #5c4008 100%);
     }
-
     .ancient-coin-back {
       background: radial-gradient(circle at 30% 30%, #ffd700 0%, #b8860b 55%, #5c4008 100%);
       transform: rotateY(180deg);
     }
-
-    /* 🎬 答題計時器霓虹條 */
+    /* 答題計時器 */
     .timer-container {
       width: 100%;
       height: 6px;
@@ -854,15 +767,13 @@
       margin-bottom: 12px;
       border: 1px solid rgba(255,255,255,0.05);
     }
-
     .timer-bar {
       height: 100%;
       background: linear-gradient(90deg, var(--accent-cyan), var(--accent-blue));
       width: 100%;
       transition: width 0.1s linear, background-color 0.5s;
     }
-
-    /* 🏆 結算終結彈窗大美化 */
+    /* 結算終結彈窗 */
     #endgame-overlay {
       position: absolute;
       top: 0; left: 0; right: 0; bottom: 0;
@@ -873,22 +784,18 @@
       align-items: center;
       justify-content: center;
     }
-
     .endgame-winner-bg {
       background: radial-gradient(circle, rgba(102,252,241,0.2) 0%, rgba(255,0,127,0.2) 50%, rgba(0,0,0,0.95) 100%) !important;
     }
-
     .endgame-loser-bg {
       background: radial-gradient(circle, #222 0%, #000 100%) !important;
     }
-
     .endgame-title {
       font-size: 3.5rem;
       font-weight: bold;
       margin-bottom: 30px;
       text-shadow: 0 0 20px var(--accent-cyan);
     }
-
     .winner-rainbow-text {
       background: linear-gradient(to right, #ef5350, #f48fb1, #7e57c2, #2196f3, #26a69a, #4caf50, #ffca28, #ff7043);
       -webkit-background-clip: text;
@@ -896,13 +803,11 @@
       animation: rainbow-animation 4s linear infinite;
       text-shadow: none !important;
     }
-
     @keyframes rainbow-animation {
       0% { background-position: 0% 50%; }
       50% { background-position: 100% 50%; }
       100% { background-position: 0% 50%; }
     }
-
     /* 動作高亮光暈 */
     .highlight-flash-gold {
       box-shadow: 0 0 35px var(--accent-gold) !important;
@@ -910,7 +815,6 @@
     .highlight-flash-magenta {
       box-shadow: 0 0 35px var(--accent-magenta) !important;
     }
-
     @keyframes vibrate {
       0% { transform: translate(0, 0); }
       20% { transform: translate(-6px, 6px); }
@@ -919,11 +823,9 @@
       80% { transform: translate(6px, 6px); }
       100% { transform: translate(0, 0); }
     }
-
     .vibrating {
       animation: vibrate 0.1s ease-in-out infinite;
     }
-
     .hp-bar-container {
       width: 100%;
       height: 8px;
@@ -932,7 +834,6 @@
       overflow: hidden;
       margin-top: 5px;
     }
-
     .hp-bar-fill {
       height: 100%;
       background: var(--hp-color);
@@ -942,7 +843,6 @@
   </style>
 </head>
 <body>
-
   <!-- 頂部導航 -->
   <header>
     <h1>🎮 機率召喚對決：數域戰記</h1>
@@ -954,15 +854,15 @@
     <div class="state-indicator" id="turn-state-lbl">狀態: 大廳中</div>
   </header>
 
-  <!-- 🏆 遊戲終結大彈窗 -->
+  <!-- 遊戲終結大彈窗 (Win/Lose) -->
   <div id="endgame-overlay">
     <div class="endgame-title" id="endgame-banner-text">You are the Winner ！</div>
     <p id="endgame-sub-reason" style="font-size: 1.2rem; color: #888; margin-bottom: 40px;"></p>
-    <!-- 一鍵返回大廳 -->
+    <!-- 一鍵返回大廳 (Home) -->
     <button class="lobby-btn" style="width: 250px; font-size:1.1rem; border-color:var(--accent-gold); box-shadow: 0 0 15px var(--accent-gold);" onclick="returnToHomeLobby()">🏠 Home / 返回大廳</button>
   </div>
 
-  <!-- 🪙 命運硬幣投擲彈窗 -->
+  <!-- 命運硬幣投擲彈窗 -->
   <div id="coin-flip-overlay" class="modal-overlay" style="display:none; z-index: 210;">
     <div class="modal-content" style="text-align: center; max-width: 400px; border-color: var(--accent-cyan); box-shadow: 0 0 25px var(--accent-cyan);">
       <h2 style="color: var(--accent-cyan); margin: 0 0 10px 0;">🪙 先攻硬幣投擲</h2>
@@ -977,18 +877,16 @@
     </div>
   </div>
 
-  <!-- 🎬 回合彈幕橫幅 -->
+  <!-- 回合彈幕橫幅 -->
   <div id="turn-banner-overlay">第 1 回合</div>
 
-  <!-- 🏠 PTCG 級別主大廳首頁介面 (Lobby Hub) -->
+  <!-- PTCG 級別主大廳首頁介面 (Lobby Hub) -->
   <div id="lobby-screen">
-    
-    <!-- 左欄：3D 看板怪獸與自訂美術 Fallback 系統 -->
+    <!-- 左欄：3D 看板怪獸 -->
     <div class="lobby-left">
       <h3 style="color:var(--accent-cyan); margin:0;">🔮 看板王牌怪獸</h3>
       <div class="mascot-container" id="mascot-touch-zone">
         <div class="mascot-image-box" id="mascot-view-box">
-          <!-- 自定義美術雙重防爆 -->
           <img src="assets/mascots/active.png" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';" style="max-width:100%; max-height:100%; object-fit:contain;" />
           <span style="font-size: 7.5rem; display: none;">🐉</span>
         </div>
@@ -1011,7 +909,6 @@
         </div>
         <div id="connection-status" style="font-size: 0.8rem; color: var(--accent-gold); text-align: center; margin-top: 5px;"></div>
       </div>
-
       <div class="lobby-panel-card">
         <div class="lobby-panel-title">📈 5大核心數域雷達診斷</div>
         <div style="font-size: 0.8rem; color: #888; margin-bottom: 8px;">系統根據歷次對決答題正確率實時推算：</div>
@@ -1022,10 +919,8 @@
           
           <div style="display:flex; justify-content:space-between;"><span>💧 水 - 度量圖形空間 (Geometry)</span><strong style="color:var(--accent-blue);">75% [合格]</strong></div>
           <div style="background:#222; height:6px; border-radius:3px;"><div style="background:var(--accent-blue); width:75%; height:100%;"></div></div>
-
           <div style="display:flex; justify-content:space-between;"><span>🔮 暗 - 高階代數與數系 (Advanced)</span><strong style="color:var(--accent-magenta);">65% [合格]</strong></div>
           <div style="background:#222; height:6px; border-radius:3px;"><div style="background:var(--accent-magenta); width:65%; height:100%;"></div></div>
-
           <div style="display:flex; justify-content:space-between;"><span>🍃 草 - 數與代數基礎 (Algebra)</span><strong style="color:#2ecc71;">45% [常規]</strong></div>
           <div style="background:#222; height:6px; border-radius:3px;"><div style="background:#2ecc71; width:45%; height:100%;"></div></div>
         </div>
@@ -1041,26 +936,21 @@
           <!-- 簽到卡片 -->
         </div>
       </div>
-
       <div class="lobby-panel-card" style="flex:1.2;">
         <div class="lobby-panel-title">🏆 每日備戰任務 (保存紀錄)</div>
         <div style="display:flex; flex-direction:column; gap:10px; font-size: 0.8rem;" id="daily-quests-container">
           <!-- 每日隨機任務 -->
         </div>
       </div>
-
       <div class="lobby-panel-card" style="flex:0.55; justify-content: center; align-items:center; border-color: var(--accent-gold);">
         <button class="lobby-btn" id="btn-claim-pack" style="background: linear-gradient(90deg, #ffcc00, #ff9900); border-color:#fff; color:#000;" onclick="claimQuestBundle()" disabled>🔒 完成全部任務領取卡包</button>
       </div>
     </div>
-
   </div>
 
   <!-- 戰場容器 -->
   <div class="game-container">
-    
     <div class="battlefield">
-      
       <!-- 對手戰區 (上方) -->
       <div class="field-row ai-row" id="opponent-battle-row">
         <div class="card-slot">
@@ -1097,7 +987,7 @@
 
       <!-- 玩家戰區 (下方) -->
       <div class="field-row player-row" id="player-battle-row">
-        <!-- 玩家出戰卡 (支援手牌拖放、後備卡拖放、能量拖放、點擊Inspect) -->
+        <!-- 玩家出戰卡 -->
         <div class="card-slot">
           <div class="card" id="player-active-card" draggable="true" ondragstart="handleActiveCardDragStart(event)" ondragover="allowDrop(event)" ondrop="handleDropOnActive(event)">
             <div class="card-header">
@@ -1123,17 +1013,15 @@
           <div class="bench-area" id="player-bench"></div>
         </div>
       </div>
-
     </div>
 
     <!-- 控制面板 -->
     <div class="side-panel">
-      <!-- 🛑 結束回合按鈕 (最頂層外置，100% 顯眼發光，完全移除 btn-attach-energy 解決 Syntax 鎖死) -->
+      <!-- 結束回合按鈕 (最頂層外置) -->
       <button class="action-btn" id="btn-end-turn" disabled>🛑 結束我的回合</button>
-
+      
       <!-- ⚡ 多色 3D 屬性附能拖拉池 -->
       <div class="control-actions" style="align-items: center;">
-        
         <!-- 🎰 能量抽卡預告面板 -->
         <div class="energy-generator-box">
           <div style="font-size: 0.72rem; color: var(--accent-gold); font-weight: bold; width:100%; text-align:center;">🎰 回合能量調度模組</div>
@@ -1151,19 +1039,16 @@
             </div>
           </div>
         </div>
-
         <div style="font-size: 0.78rem; color: var(--accent-cyan); font-weight: bold; margin-top: 2px; text-align: center; width:100%; border-top:1px solid rgba(255,255,255,0.1); padding-top:4px;">⚔️ 施放出戰怪技能：</div>
         <div id="active-skills-control" style="display: flex; flex-direction: column; gap: 5px; width: 100%;"></div>
       </div>
-
+      
       <div class="log-panel" id="log-console" style="padding:10px; overflow-y:auto;">
         &gt; 戰鬥日誌加載中...<br/>
       </div>
-
       <div style="font-size: 0.8rem; color: var(--accent-cyan); font-weight: bold;">🧑‍💻 我的手牌 (拖曳卡牌上場，點擊查閱詳情)：</div>
       <div class="hand-container" id="player-hand"></div>
     </div>
-
   </div>
 
   <!-- 📚 答題挑戰彈窗 -->
@@ -1173,7 +1058,7 @@
         <span id="quiz-title">📚 數學挑戰</span>
         <span style="font-size: 0.8rem; color: #aaa;" id="quiz-type">古典概率</span>
       </div>
-      <!-- 🎬 倒計時霓虹條 -->
+      <!-- 倒計時霓虹條 -->
       <div class="timer-container">
         <div id="quiz-timer-bar" class="timer-bar"></div>
       </div>
@@ -1210,6 +1095,69 @@
    * 戰鬥狀態機與核心邏輯引擎 (JavaScript)
    * ========================================== -->
   <script>
+    /* ==========================================
+     * 🎵 Web Audio API 復古合成器音效系統
+     * ========================================== */
+    const SoundEffects = {
+      ctx: null,
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+      },
+      play(freq, type = 'sine', duration = 0.1, delay = 0) {
+        try {
+          this.init();
+          if (!this.ctx) return;
+          if (this.ctx.state === 'suspended') {
+            this.ctx.resume();
+          }
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, this.ctx.currentTime + delay);
+          gain.gain.setValueAtTime(0.08, this.ctx.currentTime + delay);
+          gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + delay + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(this.ctx.currentTime + delay);
+          osc.stop(this.ctx.currentTime + delay + duration);
+        } catch (e) {
+          console.warn("Audio play blocked or failed:", e);
+        }
+      },
+      click() {
+        this.play(600, 'sine', 0.08);
+      },
+      energy() {
+        this.play(800, 'triangle', 0.15);
+        this.play(1200, 'triangle', 0.15, 0.05);
+      },
+      hit() {
+        this.play(150, 'sawtooth', 0.2);
+        this.play(100, 'sawtooth', 0.2, 0.05);
+      },
+      death() {
+        this.play(300, 'sawtooth', 0.4);
+        this.play(150, 'sawtooth', 0.4, 0.15);
+      },
+      correct() {
+        this.play(523.25, 'sine', 0.1);       // C5
+        this.play(659.25, 'sine', 0.1, 0.08);   // E5
+        this.play(783.99, 'sine', 0.18, 0.16);  // G5
+      },
+      wrong() {
+        this.play(220, 'sawtooth', 0.2);       // A3
+        this.play(196, 'sawtooth', 0.25, 0.08); // G3
+      },
+      win() {
+        this.play(523.25, 'sine', 0.12);
+        this.play(659.25, 'sine', 0.12, 0.08);
+        this.play(783.99, 'sine', 0.12, 0.16);
+        this.play(1046.50, 'sine', 0.35, 0.24); // C6
+      }
+    };
+
     const BattleState = {
       INITIALIZING: "INITIALIZING",
       PLAYER_DRAW: "PLAYER_DRAW",
@@ -1229,7 +1177,7 @@
       AI: "AI"
     };
 
-    /* 💧🔥⚡🍃🔮 5 大 PTCG 屬性配色、背景漸變與立體光核 CSS 參數 */
+    /* 💧🔥⚡🍃🔮 5 大 PTCG 屬性配色 */
     const Attributes = {
       WATER: { name: "水 (Geometry)", color: "#45f3ff", icon: "💧", gradient: "linear-gradient(135deg, #0f2537, #0b0c10)", coreStyle: "background: radial-gradient(circle at 35% 35%, #ffffff 0%, #00d2ff 45%, #006699 90%); box-shadow: 0 0 10px #00d2ff;" },
       FIRE: { name: "火 (Functions)", color: "#ff3300", icon: "🔥", gradient: "linear-gradient(135deg, #370f1a, #0b0c10)", coreStyle: "background: radial-gradient(circle at 35% 35%, #ffffff 0%, #ff3300 45%, #990000 90%); box-shadow: 0 0 10px #ff3300;" },
@@ -1247,9 +1195,7 @@
       ELECTRIC: "WATER"
     };
 
-    /* ==========================================
-     * 📚 題庫：增加多元化課題、簡單直接考題、隨機打亂與計時
-     * ========================================== */
+    /* 📚 題庫 */
     const DseQuizDatabase = {
       "Q_EXP_01": {
         id: "Q_EXP_01",
@@ -1284,12 +1230,12 @@
       "Q_PERM_01": {
         id: "Q_PERM_01",
         topic: "排列數 (⭐⭐⭐ 困難)",
-        question: "將 'MATHS' 共 5 個字母随机排成一列。求首尾皆為輔音的概率？",
+        question: "將 'MATHS' 共 5 個字母隨機排成一列。求首尾皆為輔音的概率？",
         options: ["3/5", "3/10", "1/5", "2/5"],
         correctIndex: 0,
         difficulty: 3,
         timeLimit: 90,
-        explanation: "首尾選輔音: P(4,2)=12。中間任排: 3!=6。方法 = 72。總排法 5!=120. 概率 = 72/120 = 3/5。"
+        explanation: "首尾選輔音: P(4,2)=12。中間任排: 3!=6。方法 = 72。總排法 5!=120。概率 = 72/120 = 3/5。"
       },
       "Q_COMB_01": {
         id: "Q_COMB_01",
@@ -1304,7 +1250,7 @@
       "Q_COMB_02": {
         id: "Q_COMB_02",
         topic: "組合數 (⭐⭐ 中等)",
-        question: "從 7 名男生和 5 名女生中選出 4 人組成 DSE 備考小組，若小組中必須包含最少 3 名男生，求有多少種不同的選派方法？",
+        question: "從 7 名男生和 5 名女生中選出 4 人組成備考小組，若小組中必須包含最少 3 名男生，求有多少種不同的選派方法？",
         options: ["210種", "245種", "315種", "350種"],
         correctIndex: 0,
         difficulty: 2,
@@ -1353,7 +1299,6 @@
       }
     };
 
-    /* 🚀 擴充多課題大廳怪獸隨機提醒 */
     const mascotSpeeches = [
       "期望值 E(X) 指隨機變量的長期平均。公式為 E(X) = Σ xi * pi 喔！",
       "二次函數頂點坐標公式為 (-b/2a, -Δ/4a)，別記錯了！",
@@ -1361,10 +1306,9 @@
       "若 |r| < 1，無限項等比數列之和 S_inf = a / (1 - r) 才是收斂的！",
       "互斥事件 A 與 B，相交機率 P(A ∩ B) = 0。兩者絕不可能同時發生！",
       "複數系統中，虛數 i = √-1，且 i^2 = -1，i^3 = -i，i^4 = 1。循環不已！",
-      "線性規劃中，最大值或最小值必在可行域的「頂點（Vertices）」上取得！"
+      "線性規劃中，最大值 or 最小值必在可行域的「頂點（Vertices）」上取得！"
     ];
 
-    /* 🚀 每日備戰隨機 Quests 資料庫 */
     const DailyQuestDatabase = [
       { id: "quest_01", desc: "在機率與統計考核中，成功答對 2 題", points: 100 },
       { id: "quest_02", desc: "施放一次需要 2 能量以上的高強度技能", points: 150 },
@@ -1410,7 +1354,6 @@
         return array;
       }
 
-      /* 🎰 牌組依存生成算法 */
       rollEnergyType(attributesList) {
         if (!attributesList || attributesList.length === 0) {
           return "ELECTRIC"; 
@@ -1421,11 +1364,9 @@
       initDecks() {
         const createCard = (id, name, hp, icon, skills, mathDesc, attribute) => ({
           id, name, hp, maxHp: hp, isKnockedOut: false, icon, skills, mathDesc, attribute,
-          /* ⚡ 能量保留與白色百搭修復：卡牌搭載獨立能量型別字典 */
           attachedEnergies: { WATER: 0, FIRE: 0, ELECTRIC: 0, GRASS: 0, DARK: 0, ANY: 0 }
         });
 
-        /* 🚀 技能技能耗能升級：百搭能量 ⚪ (ANY) 作為扣減需求，玩家使用任意能量皆可填補 */
         const p1 = createCard("p_dragon", "期望值雷龍", 300, "🐉", [
           { id: "p_s1", name: "微光吐息", damage: 60, energyCost: { ELECTRIC: 1 }, desc: "消耗 1電 能量。普通期望值計算，穩健的一擊。" },
           { id: "p_s2", name: "雷光爆裂斬", damage: 140, energyCost: { ELECTRIC: 2, ANY: 1 }, desc: "消耗 2雷、1百搭 能量。期望值極限怒擊！" }
@@ -1439,7 +1380,7 @@
         const p3 = createCard("p_stat", "水流機率聖盾", 250, "🛡️", [
           { id: "p_s5", name: "互斥衝擊", damage: 70, energyCost: { WATER: 1 }, desc: "消耗 1水 能量。利用互斥加法規律迅速突襲。" },
           { id: "p_s6", name: "條件判定破", damage: 150, energyCost: { WATER: 2, ANY: 1 }, desc: "消耗 2水、1百搭 能量。條件機率深度挑戰。" }
-        ], "條件概率 P(B|A) 指在事件 A 發生的前提下，事件 B 發生的概率。公式為 P(B|A) = P(A ∩ B) / P(A)。", "WATER");
+        ], "條件概率 P(B|A) 指在事件 A 發生的前提下，事件 B 發生的概率。公式為 P(B|A) = P(A ∩ B) / P(A)或是由乘法定律導出。", "WATER");
 
         const a1 = createCard("ai_boss", "機率混亂魔王", 350, "😈", [
           { id: "ai_s1", name: "乘法暗黑彈", damage: 80, energyCost: { DARK: 1 }, desc: "獨立事件乘法規律反撲。" },
@@ -1454,7 +1395,6 @@
           { id: "ai_s4", name: "幾何碾壓", damage: 80, energyCost: { FIRE: 1 }, desc: "長度與區域的幾何比例碾壓。" }
         ], "幾何概率與幾何長度、面積成正比。常考線段隨機截取概率。", "FIRE");
 
-        /* 🚀 牌組構建：牌組限制為 20 張卡牌 */
         const playerDeck = [p1, p2, p3];
         const attrKeys = ["WATER", "FIRE", "ELECTRIC", "GRASS", "DARK"];
         for (let i = 1; i <= 17; i++) {
@@ -1478,7 +1418,7 @@
           hand: [],
           activeCard: null,
           bench: [null, null, null],
-          discardPile: [], /* 💥 實體化廢棄區卡牌列表 */
+          discardPile: [], 
           discardCount: 0,
           lifePoints: 3,
           hasAttachedEnergyThisTurn: false
@@ -1490,6 +1430,7 @@
           hand: [],
           activeCard: null,
           bench: [null, null, null],
+          discardPile: [],
           discardCount: 0,
           lifePoints: 3,
           hasAttachedEnergyThisTurn: false
@@ -1501,19 +1442,15 @@
         document.getElementById("coin-flip-overlay").style.display = "flex";
         const coinEl = document.getElementById("coin-graphic");
         const statusEl = document.getElementById("coin-status-text");
-
         statusEl.innerText = "🪙 硬幣在古神殿空中高速旋轉...";
         
-        // 投擲硬幣動畫：隨機旋轉 3D 角度 (1800度 物理翻轉拋空)
         const isHeads = Math.random() < 0.5;
-        const rotateValue = isHeads ? 1800 : 1980; // 1800是正面(Ω)，1980是反面(後)
+        const rotateValue = isHeads ? 1800 : 1980; 
         
         coinEl.style.setProperty('--target-rotation', `${rotateValue}deg`);
         coinEl.classList.add("coin-spin-anim");
-
         setTimeout(() => {
           coinEl.classList.remove("coin-spin-anim");
-          // 固定最終旋轉位置
           coinEl.style.transform = `rotateY(${rotateValue}deg)`;
           
           if (this.isMultiplayer) {
@@ -1523,15 +1460,12 @@
               return;
             }
           }
-
           this.applyCoinFlipResult(isHeads, onComplete);
-
         }, 1600);
       }
 
       applyCoinFlipResult(myIsFirst, onComplete) {
         const statusEl = document.getElementById("coin-status-text");
-        
         if (myIsFirst) {
           this.firstPlayerType = PlayerType.PLAYER;
           this.isMyTurn = true;
@@ -1541,7 +1475,6 @@
           this.isMyTurn = false;
           statusEl.innerHTML = "🤖 <span style='color:var(--accent-magenta);'>反面 (後)！對手獲得先攻！</span>";
         }
-
         setTimeout(() => {
           document.getElementById("coin-flip-overlay").style.display = "none";
           onComplete();
@@ -1553,7 +1486,6 @@
         this.currentState = BattleState.INITIALIZING;
         this.turnNumber = 0; 
 
-        /* 🎰 [核心優化] 建立牌組屬性庫 */
         this.playerDeckAttributes = [...new Set(this.player.deck.map(c => c.attribute))];
         if (this.player.activeCard) this.playerDeckAttributes.push(this.player.activeCard.attribute);
         this.player.bench.forEach(c => { if(c) this.playerDeckAttributes.push(c.attribute); });
@@ -1564,7 +1496,6 @@
         this.ai.bench.forEach(c => { if(c) this.aiDeckAttributes.push(c.attribute); });
         this.aiDeckAttributes = [...new Set(this.aiDeckAttributes)];
 
-        /* 🎰 隨機生成開局能量 */
         this.currentTurnEnergy = this.rollEnergyType(this.playerDeckAttributes);
         this.nextTurnEnergy = this.rollEnergyType(this.playerDeckAttributes);
 
@@ -1575,16 +1506,13 @@
 
         this.player.activeCard = this.player.deck.pop();
         this.ai.activeCard = this.ai.deck.pop();
-
         this.player.bench[0] = this.player.deck.pop();
         this.ai.bench[0] = this.ai.deck.pop();
 
-        /* 開始投硬幣判定 */
         if (this.isMultiplayer && role === 'guest') {
           document.getElementById("connection-status").innerText = "⏳ 等待房主投擲先攻硬幣...";
           document.getElementById("coin-flip-overlay").style.display = "flex";
           document.getElementById("coin-status-text").innerText = "🪙 房主正在投擲硬幣...";
-          // 客方動畫旋轉
           document.getElementById("coin-graphic").style.transform = "rotateY(1800deg)";
         } else {
           this.triggerCoinFlip(() => {
@@ -1601,7 +1529,6 @@
         }
       }
 
-      /* 🎬 巨型回合指示橫幅 */
       triggerTurnBanner() {
         const banner = document.getElementById("turn-banner-overlay");
         banner.innerText = `第 ${this.turnNumber} 回合 - ${this.isMyTurn ? "我的回合" : "對手回合"}`;
@@ -1619,7 +1546,6 @@
       transitionTo(newState) {
         this.currentState = newState;
         document.getElementById("turn-state-lbl").innerText = `狀態: ${newState}`;
-
         switch (newState) {
           case BattleState.PLAYER_DRAW:
             if (this.isMultiplayer && !this.isMyTurn) {
@@ -1627,11 +1553,8 @@
               return;
             }
             this.turnNumber += 1; 
-
-            /* 🎰 回合開始，調度預告能量 */
             this.currentTurnEnergy = this.nextTurnEnergy;
             this.nextTurnEnergy = this.rollEnergyType(this.playerDeckAttributes);
-
             this.triggerTurnBanner();
             this.handlePlayerDrawStep();
             break;
@@ -1645,7 +1568,6 @@
               this.triggerTurnBanner();
               logConsole(`\n--- 🌐 對手回合開始 (第 ${this.turnNumber} 回合) ---`);
             } else {
-              /* 🤖 進入 AI 回合，強制鎖定玩家操作權，Turn+1 */
               this.isMyTurn = false;
               this.turnNumber += 1;
               this.triggerTurnBanner();
@@ -1661,7 +1583,7 @@
       }
 
       drawCard(playerState) {
-        if (playerState.deck.length > 0) {
+        if (playerState && playerState.deck.length > 0) {
           playerState.hand.push(playerState.deck.pop());
           return true;
         }
@@ -1680,23 +1602,17 @@
         this.transitionTo(BattleState.PLAYER_PREPARATION);
       }
 
-      /* 🚀 萬用白色百搭附能與計能判斷核心算法（可以用任何能量填補百搭） */
       canPayForSkill(card, skill) {
         const attached = { ...card.attachedEnergies };
         const cost = { ...skill.energyCost };
-
-        // 1. 先支付特定屬性能量耗費
         for (let type in cost) {
           if (type === 'ANY') continue;
           let needed = cost[type];
           let paidWithExact = Math.min(attached[type] || 0, needed);
           needed -= paidWithExact;
           attached[type] -= paidWithExact;
-
           if (needed > 0) return false; 
         }
-
-        // 2. 支付百搭「ANY」能量耗費：可以用卡牌上剩餘的任何其他屬性能量抵扣
         if (cost['ANY']) {
           let neededAny = cost['ANY'];
           let totalLeftovers = 0;
@@ -1705,22 +1621,17 @@
           }
           if (totalLeftovers < neededAny) return false;
         }
-
         return true;
       }
 
-      /* ⚡ [核心優化修復] 萬能拖拉附能：任何能量卡牌屬性不同也 100% 允許附載！ */
       attachEnergyToActive(energyType) {
-        if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
+        if (!this.player || this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         if (this.player.hasAttachedEnergyThisTurn) {
           logConsole("❌ 本回合限附能一次！");
           return;
         }
-
         const active = this.player.activeCard;
         if (!active) return;
-
-        /* 🚀 屬性限制徹底移除：不再要求屬性一致！任何卡片均可拖載任何能量！ */
         SoundEffects.energy();
         active.attachedEnergies[energyType] = (active.attachedEnergies[energyType] || 0) + 1;
         active.energyAttached = Object.values(active.attachedEnergies).reduce((sum, val) => sum + val, 0);
@@ -1735,16 +1646,13 @@
       }
 
       attachEnergyToBench(benchIndex, energyType) {
-        if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
+        if (!this.player || this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         if (this.player.hasAttachedEnergyThisTurn) {
           logConsole("❌ 本回合限附能一次！");
           return;
         }
-
         const card = this.player.bench[benchIndex];
         if (!card) return;
-
-        /* 🚀 屬性限制徹底移除：任何後備卡牌均可拖載任何能量！ */
         SoundEffects.energy();
         card.attachedEnergies[energyType] = (card.attachedEnergies[energyType] || 0) + 1;
         card.energyAttached = Object.values(card.attachedEnergies).reduce((sum, val) => sum + val, 0);
@@ -1759,19 +1667,15 @@
       }
 
       swapActiveWithBench(benchIndex) {
-        if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
-        
+        if (!this.player || this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         const active = this.player.activeCard;
         const bCard = this.player.bench[benchIndex];
-        
         if (!bCard && !active) return; 
-
+        
         this.player.activeCard = bCard;
         this.player.bench[benchIndex] = active;
-
         logConsole(`🔄 [交換] 出戰卡與後備區第 ${benchIndex + 1} 號位成功互換！`);
         SoundEffects.click();
-
         if (this.isMultiplayer) {
           sendNetData({ type: 'SWAP_ACTIVE_BENCH', benchIndex });
         }
@@ -1779,13 +1683,11 @@
       }
 
       playCardToBench(handCardId, targetBenchIdx) {
-        if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
-        
+        if (!this.player || this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         if (this.player.bench[targetBenchIdx] !== null) {
           logConsole("❌ 該後備槽位已有卡牌！");
           return;
         }
-
         const idx = this.player.hand.findIndex(c => c.id === handCardId);
         if (idx !== -1) {
           SoundEffects.click();
@@ -1801,13 +1703,11 @@
       }
 
       playCardToActive(handCardId) {
-        if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
-        
+        if (!this.player || this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
         if (this.player.activeCard !== null) {
           logConsole("❌ 出戰區已有卡牌，請拖曳至後備區空位！");
           return;
         }
-
         const idx = this.player.hand.findIndex(c => c.id === handCardId);
         if (idx !== -1) {
           SoundEffects.click();
@@ -1825,29 +1725,22 @@
       playerDeclareAttack(skillId) {
         try {
           if (this.currentState !== BattleState.PLAYER_PREPARATION || !this.isMyTurn) return;
-
-          /* 先攻限制：第一回合不能發動技能攻擊 */
           if (this.turnNumber === 1) {
             logConsole("❌ 先攻限制：先攻者在第一回合內無法發動技能攻擊，只能置入或配置卡牌！");
             alert("先攻限制：第一回合無法發動技能！請結束回合交棒對手。");
             return;
           }
-
           const active = this.player.activeCard;
           if (!active) return;
           const skill = active.skills.find(s => s.id === skillId);
           if (!skill) return;
-
-          /* 萬用白色百搭判定 */
           if (!this.canPayForSkill(active, skill)) {
             logConsole(`❌ 能量不符發動條件！發動需要特定屬性組合。`);
             return;
           }
-
           console.log("[BattleEngine] 攻擊宣布成功，技能:", skill.name);
           this.currentPendingSkill = skill;
           this.transitionTo(BattleState.PLAYER_QUIZ_CHALLENGE);
-
           this.showQuizModal(skill.quizId, (correct) => {
             this.resolvePlayerAttack(correct);
           });
@@ -1861,13 +1754,10 @@
           const active = this.player.activeCard;
           const enemy = this.ai.activeCard;
           const skill = this.currentPendingSkill;
-
           if (!active || !enemy || !skill) return;
-
           let dmg = skill.damage;
           animateCardVibrate("ai-active-card");
           SoundEffects.hit();
-
           if (isCorrect) {
             dmg = Math.floor(skill.damage * 1.5);
             logConsole(`🎯 答對了！暴擊！[${active.name}] 使用 [${skill.name}] 對 [${enemy.name}] 造成 ${dmg} 點傷害！`);
@@ -1875,31 +1765,19 @@
             dmg = Math.floor(skill.damage * 0.5);
             logConsole(`❌ 答錯了！只對 [${enemy.name}] 造成 ${dmg} 點傷害 (折半)。`);
           }
-
-          /* 🚀 屬性剋制系統實施 (💧 > 🔥 > 🍃 > 🔮 > ⚡ > 💧) */
           const counteredAttribute = TypeStrengths[active.attribute];
           if (counteredAttribute === enemy.attribute) {
             dmg += 50; 
             logConsole(`💥 屬性壓制！[${Attributes[active.attribute].name}] 完美剋制 [${Attributes[enemy.attribute].name}]，追加 +50 點壓制傷害（累計 ${dmg} 點）！`);
             flashBorderHighlight("opponent-battle-row", "highlight-flash-magenta");
           }
-
-          /* 1. 先行在後端扣血 */
           enemy.hp -= dmg;
           if (enemy.hp < 0) enemy.hp = 0;
-
-          /* 能量保留 */
-
           this.currentPendingSkill = null;
-
           if (this.isMultiplayer) {
             sendNetData({ type: 'ATTACK_RESOLVED', skillId: skill.id, isCorrect, finalDmg: dmg });
           }
-
-          /* 2. 切換狀態（刷新 UI） */
           this.transitionTo(BattleState.PLAYER_ATTACK_RESOLUTION);
-
-          /* 3. 延時進行淘汰與回合轉換 */
           setTimeout(() => {
             try {
               this.checkKnockout(() => {
@@ -1913,24 +1791,18 @@
               });
             } catch (innerErr) {}
           }, 1200);
-
         } catch (err) {
           console.error("[Attack Resolution Error]", err);
         }
       }
 
-      /* AI 行動可視化 Playback 慢動作 */
       handleAiTurnStart() {
         this.ai.hasAttachedEnergyThisTurn = false;
         logConsole(`\n--- 🤖 AI 回合開始 (第 ${this.turnNumber} 回合) ---`);
-
-        // 第一步：AI 慢動作抽牌
         setTimeout(() => {
           this.drawCard(this.ai);
           logConsole("🤖 [AI 動作] AI 抽取了 1 張牌。");
           this.transitionTo(BattleState.AI_PREPARATION);
-
-          // 第二步：AI 慢動作為怪獸附能 (高亮光暈)
           setTimeout(() => {
             const active = this.ai.activeCard;
             if (active && !this.ai.hasAttachedEnergyThisTurn) {
@@ -1944,8 +1816,6 @@
               logConsole(`⚡ [AI 動作] AI 為 [${active.name}] 附加了 1 點能量。`);
               updateUI();
             }
-
-            // 第三步：AI 慢動作放置後備卡
             setTimeout(() => {
               const emptyIdx = this.ai.bench.indexOf(null);
               if (emptyIdx !== -1 && this.ai.hand.length > 0) {
@@ -1954,22 +1824,16 @@
                 logConsole(`🔄 [AI 動作] AI 將一張卡牌召喚至後備區 ${emptyIdx + 1} 號位。`);
                 updateUI();
               }
-
-              // 第四步：AI 宣告攻擊 (第一回合不能攻擊)
               setTimeout(() => {
                 if (this.turnNumber === 1) {
                   logConsole("🤖 [AI 動作] AI 處於先攻第一回合，受先攻限制無法攻擊，結束回合。");
                   this.endAiTurn();
                   return;
                 }
-
                 this.executeAiAttackDecision();
               }, 1200);
-
             }, 1200);
-
           }, 1200);
-
         }, 1000);
       }
 
@@ -1979,15 +1843,12 @@
           this.endAiTurn();
           return;
         }
-
         const availableSkills = active.skills.filter(s => this.canPayForSkill(active, s));
         if (availableSkills.length > 0) {
           const chosen = availableSkills[0];
           this.currentPendingSkill = chosen;
-
           logConsole(`⚔️ [AI 宣告攻擊] 準備發動 [${chosen.name}]！請進行答題防守！`);
           this.transitionTo(BattleState.AI_QUIZ_DEFENSE);
-
           this.showQuizModal(chosen.quizId, (correct) => {
             this.resolveAiAttack(correct);
           });
@@ -2002,13 +1863,10 @@
           const aiActive = this.ai.activeCard;
           const playerActive = this.player.activeCard;
           const skill = this.currentPendingSkill;
-
           if (!aiActive || !playerActive || !skill) return;
-
           let dmg = skill.damage;
           animateCardVibrate("player-active-card");
           SoundEffects.hit();
-
           if (playerDefended) {
             dmg = Math.floor(skill.damage * 0.5);
             logConsole(`🛡️ 格擋成功！您受到 ${dmg} 點傷害。`);
@@ -2016,23 +1874,16 @@
             dmg = Math.floor(skill.damage * 1.5);
             logConsole("💥 格擋失敗！承受暴擊 " + dmg + " 點傷害！");
           }
-
-          /* AI 屬性剋制判定 */
           const counteredAttribute = TypeStrengths[aiActive.attribute];
           if (counteredAttribute === playerActive.attribute) {
             dmg += 50;
             logConsole(`💥 屬性剋制！對手 [${Attributes[aiActive.attribute].name}] 完美剋制您的 [${Attributes[playerActive.attribute].name}]，追加 +50 點壓制傷害（累計 ${dmg} 點）！`);
             flashBorderHighlight("player-battle-row", "highlight-flash-magenta");
           }
-
           playerActive.hp -= dmg;
           if (playerActive.hp < 0) playerActive.hp = 0;
-
-          /* 能量保留 */
-
           this.currentPendingSkill = null;
           this.transitionTo(BattleState.AI_ATTACK_RESOLUTION);
-
           setTimeout(() => {
             try {
               this.checkKnockout(() => this.endAiTurn());
@@ -2043,7 +1894,6 @@
         }
       }
 
-      /* AI 回合結束，交還控制權時強制將 isMyTurn 設為 true */
       endAiTurn() {
         this.isMyTurn = true; 
         this.transitionTo(BattleState.PLAYER_DRAW);
@@ -2052,27 +1902,22 @@
       checkKnockout(onComplete) {
         try {
           this.transitionTo(BattleState.CHECK_KNOCKOUT);
-
           const processDeath = (target, enemy, targetName, enemyName) => {
             if (target.activeCard && target.activeCard.hp <= 0) {
               logConsole(`💥 [戰報] ${targetName} 的 [${target.activeCard.name}] 陣亡，送入廢棄區！`);
               SoundEffects.death();
               
-              /* 實體化廢棄區更新：將卡片推入 discardPile 物理倉庫 */
               target.discardPile.push(target.activeCard);
               target.activeCard = null;
               target.discardCount += 1;
-
               target.lifePoints -= 1;
-              logConsole(`💔 ${targetName} 生命值減一！賫生命值: ${target.lifePoints}/3`);
-
+              logConsole(`💔 ${targetName} 生命值減一！賸餘生命值: ${target.lifePoints}/3`);
               if (target.lifePoints <= 0) {
                 this.winner = enemy.type;
                 this.gameOverReason = `${targetName} 的生命值歸零！`;
                 this.transitionTo(BattleState.GAME_OVER);
                 return true;
               }
-
               const availableBenchIdx = target.bench.findIndex(c => c !== null);
               if (availableBenchIdx !== -1) {
                 target.activeCard = target.bench[availableBenchIdx];
@@ -2087,20 +1932,16 @@
             }
             return false;
           };
-
           let over = processDeath(this.ai, this.player, this.isMultiplayer ? "🌐 對手" : "AI", "🧑‍💻 玩家");
           if (over) return;
-
           over = processDeath(this.player, this.ai, "🧑‍💻 玩家", "對手");
           if (over) return;
-
           onComplete();
         } catch (err) {
           console.error("[Check Knockout Error]", err);
         }
       }
 
-      /* 優化：答題隨機化、星級難度展示、精確倒計時限時器 */
       showQuizModal(quizId, onAnswerComplete) {
         const quizKeys = Object.keys(DseQuizDatabase);
         const randomQuizId = quizKeys[Math.floor(Math.random() * quizKeys.length)];
@@ -2108,22 +1949,15 @@
         
         this.currentActiveQuestion = quiz;
         this.quizCallback = onAnswerComplete;
-
-        /* 渲染星級難度 */
         const starsText = "⭐".repeat(quiz.difficulty);
         document.getElementById("quiz-type").innerText = `${quiz.topic} [難度: ${starsText}]`;
         document.getElementById("quiz-text").innerText = quiz.question;
-
-        /* Options random wash options */
         const originalOptions = [...quiz.options];
         const correctText = originalOptions[quiz.correctIndex]; 
-
         this.shuffle(originalOptions);
         const newCorrectIndex = originalOptions.indexOf(correctText);
-
         const optionsBox = document.getElementById("quiz-options");
         optionsBox.innerHTML = "";
-
         originalOptions.forEach((opt, idx) => {
           const btn = document.createElement("button");
           btn.className = "option-btn";
@@ -2134,10 +1968,7 @@
           };
           optionsBox.appendChild(btn);
         });
-
-        /* 倒計時限時器啟動 */
         this.startQuizTimer(quiz.timeLimit);
-
         document.getElementById("quiz-modal").style.display = "flex";
       }
 
@@ -2147,16 +1978,13 @@
         let timeLeft = limitSeconds;
         timerBar.style.width = "100%";
         timerBar.style.backgroundColor = "var(--accent-cyan)";
-
         this.quizTimerInterval = setInterval(() => {
           timeLeft -= 0.1;
           const percentage = (timeLeft / limitSeconds) * 100;
           timerBar.style.width = `${percentage}%`;
-
           if (timeLeft <= limitSeconds * 0.3) {
             timerBar.style.backgroundColor = "var(--accent-magenta)"; 
           }
-
           if (timeLeft <= 0) {
             this.clearQuizTimer();
             document.getElementById("quiz-modal").style.display = "none";
@@ -2178,7 +2006,6 @@
           this.clearQuizTimer();
           const quiz = this.currentActiveQuestion;
           if (!quiz) return; 
-
           document.getElementById("quiz-modal").style.display = "none";
           
           if (correct) {
@@ -2187,13 +2014,10 @@
           } else {
             SoundEffects.wrong();
           }
-
           alert(`【答題判定：${correct ? "✅ 正確！" : "❌ 錯誤！"}】\n\n官方解析：\n${quiz.explanation}`);
-
           const callback = this.quizCallback;
           this.currentActiveQuestion = null;
           this.quizCallback = null;
-
           if (callback) {
             console.log("[submitAnswer] 執行回調...");
             callback(correct);
@@ -2203,15 +2027,12 @@
         }
       }
 
-      /* 🏆 結算大美化彈窗與灰暗/繽膚濾鏡 */
       triggerEndGameOverlay() {
         const overlay = document.getElementById("endgame-overlay");
         const bannerText = document.getElementById("endgame-banner-text");
         const subReason = document.getElementById("endgame-sub-reason");
-
         subReason.innerText = `戰局結束原因：${this.gameOverReason}`;
         overlay.style.display = "flex";
-
         if (this.winner === PlayerType.PLAYER) {
           bannerText.innerText = "You are the Winner ！";
           bannerText.className = "endgame-title winner-rainbow-text";
@@ -2228,7 +2049,6 @@
       }
     }
 
-    // 返回大廳主頁
     function returnToHomeLobby() {
       SoundEffects.click();
       
@@ -2253,7 +2073,6 @@
     let peer = null;
     let conn = null;
     let role = ''; 
-
     const PEER_CONFIG = {
       host: '0.peerjs.com',
       port: 443,
@@ -2262,14 +2081,16 @@
     };
 
     function hostPvPGame() {
+      if (typeof Peer === 'undefined') {
+        alert("無法載入 PeerJS 聯網模組，請檢查您的網路連線或稍後再試！");
+        return;
+      }
       SoundEffects.init();
       SoundEffects.click();
       
       const pin = Math.floor(1000 + Math.random() * 9000).toString(); 
       document.getElementById("connection-status").innerText = "⏳ 正在向對戰主機註冊密鑰...";
-
       peer = new Peer(`dse-realm-${pin}`, PEER_CONFIG);
-
       peer.on('open', () => {
         document.getElementById("connection-status").innerHTML = `
           🏠 房間創建成功！<br/>
@@ -2277,13 +2098,11 @@
           <span style="font-size:0.8rem; color:#888;">請讓另一位玩家在網頁輸入此密鑰連線加入...</span>
         `;
       });
-
       peer.on('connection', (connection) => {
         conn = connection;
         role = 'host';
         setupConnectionListeners();
       });
-
       peer.on('error', (err) => {
         alert("密鑰已被佔用或連線受阻，請重新創建！");
         window.location.reload();
@@ -2291,6 +2110,10 @@
     }
 
     function joinPvPGame() {
+      if (typeof Peer === 'undefined') {
+        alert("無法載入 PeerJS 聯網模組，請檢查您的網路連線或稍後再試！");
+        return;
+      }
       SoundEffects.init();
       SoundEffects.click();
       
@@ -2299,11 +2122,8 @@
         alert("請輸入有效的房間密鑰！");
         return;
       }
-
       document.getElementById("connection-status").innerText = `⏳ 正在憑密鑰 [${pin}] 連線中...`;
-
       peer = new Peer(PEER_CONFIG);
-
       peer.on('open', () => {
         conn = peer.connect(`dse-realm-${pin}`);
         role = 'guest';
@@ -2320,7 +2140,6 @@
           engine.startGame();
         }, 1200);
       });
-
       conn.on('data', (data) => handleNetworkData(data));
       conn.on('close', () => {
         alert("對手斷開連線！");
@@ -2332,13 +2151,12 @@
       if (conn && conn.open) conn.send(data);
     }
 
-    /* P2P 聯機數據與慢動作 Playback */
     function handleNetworkData(data) {
       try {
         switch(data.type) {
           case 'COIN_FLIP_RESULT': {
             const coinEl = document.getElementById("coin-graphic");
-            const rotateValue = data.hostIsFirst ? 1980 : 1800; // 如果host先攻，則guest旋轉到1980(後攻)
+            const rotateValue = data.hostIsFirst ? 1980 : 1800; 
             coinEl.style.transform = `rotateY(${rotateValue}deg)`;
             
             setTimeout(() => {
@@ -2349,7 +2167,6 @@
             }, 1500);
             break;
           }
-
           case 'ATTACH_ENERGY': {
             flashBorderHighlight("opponent-battle-row", "highlight-flash-gold");
             engine.ai.activeCard.energyAttached += 1;
@@ -2357,7 +2174,6 @@
             updateUI();
             break;
           }
-
           case 'ATTACH_ENERGY_BENCH': {
             if (engine.ai.bench[data.benchIndex]) {
               flashBorderHighlight("opponent-battle-row", "highlight-flash-gold");
@@ -2367,7 +2183,6 @@
             }
             break;
           }
-
           case 'PLAY_BENCH': {
             if (engine.ai.hand.length > 0) {
               const card = engine.ai.hand.shift();
@@ -2378,7 +2193,6 @@
             }
             break;
           }
-
           case 'PLAY_ACTIVE': {
             if (engine.ai.hand.length > 0) {
               const card = engine.ai.hand.shift();
@@ -2389,7 +2203,6 @@
             }
             break;
           }
-
           case 'SWAP_ACTIVE_BENCH': {
             const active = engine.ai.activeCard;
             const benchCard = engine.ai.bench[data.benchIndex];
@@ -2400,7 +2213,6 @@
             updateUI();
             break; 
           }
-
           case 'ATTACK_RESOLVED': {
             const enemyActive = engine.ai.activeCard;
             const myActive = engine.player.activeCard;
@@ -2413,8 +2225,6 @@
             myActive.hp -= data.finalDmg;
             if (myActive.hp < 0) myActive.hp = 0;
             
-            /* 能量保留 */
-            
             engine.transitionTo(BattleState.AI_ATTACK_RESOLUTION);
             
             if (data.isCorrect) {
@@ -2422,7 +2232,6 @@
             } else {
               logConsole(`🛡️ [對手攻擊] 對手解題失誤，只對您造成 ${data.finalDmg} 傷害。`);
             }
-
             setTimeout(() => {
               try {
                 engine.checkKnockout(() => {});
@@ -2432,7 +2241,6 @@
             }, 1200);
             break;
           }
-
           case 'END_TURN': {
             engine.isMyTurn = true;
             engine.transitionTo(BattleState.PLAYER_DRAW);
@@ -2452,8 +2260,7 @@
     }
 
     function handleHandCardDragStart(e, cardId) {
-      /* 🚀 拖曳安全鎖：非我的回合或非出牌階段直接禁止拖曳 */
-      if (!engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION) {
+      if (!engine || !engine.player || !engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION) {
         e.preventDefault();
         return;
       }
@@ -2463,7 +2270,7 @@
     }
 
     function handleBenchCardDragStart(e, index) {
-      if (!engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION) {
+      if (!engine || !engine.player || !engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION) {
         e.preventDefault();
         return;
       }
@@ -2473,7 +2280,7 @@
     }
 
     function handleActiveCardDragStart(e) {
-      if (!engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION) {
+      if (!engine || !engine.player || !engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION) {
         e.preventDefault();
         return;
       }
@@ -2481,9 +2288,8 @@
       e.dataTransfer.setData("source", "active");
     }
 
-    /* 優化：多屬性能量核拖拉綁定 */
     function handleEnergyDragStart(e, energyType) {
-      if (!engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION || engine.player.hasAttachedEnergyThisTurn) {
+      if (!engine || !engine.player || !engine.isMyTurn || engine.currentState !== BattleState.PLAYER_PREPARATION || engine.player.hasAttachedEnergyThisTurn) {
         e.preventDefault();
         return;
       }
@@ -2495,7 +2301,6 @@
     function handleDropOnActive(e) {
       e.preventDefault();
       const source = e.dataTransfer.getData("source");
-
       if (source === "hand") {
         const cardId = e.dataTransfer.getData("text/plain");
         engine.playCardToActive(cardId);
@@ -2511,7 +2316,6 @@
     function handleDropOnBench(e, targetBenchIdx) {
       e.preventDefault();
       const source = e.dataTransfer.getData("source");
-
       if (source === "hand") {
         const cardId = e.dataTransfer.getData("text/plain");
         engine.playCardToBench(cardId, targetBenchIdx);
@@ -2534,7 +2338,6 @@
       }
     }
 
-    /* 邊框閃爍特效 */
     function flashBorderHighlight(elementId, cssClass) {
       const el = document.getElementById(elementId);
       if (el) {
@@ -2591,19 +2394,18 @@
       try {
         SoundEffects.init();
         SoundEffects.click();
-        let card = null;
+        if (!engine || !engine.player || !engine.ai) return;
 
+        let card = null;
         if (ownerType === 'player') card = engine.player.activeCard;
         else if (ownerType === 'ai') card = engine.ai.activeCard;
         else if (ownerType === 'player_bench') card = engine.player.bench[cardIndex];
         else if (ownerType === 'ai_bench') card = engine.ai.bench[cardIndex];
         else if (ownerType === 'hand') card = engine.player.hand[cardIndex];
-
         if (!card) return;
 
         document.getElementById("inspect-preview-box").innerText = card.icon;
         
-        /* 屬性標記綁定 */
         const attrInfo = Attributes[card.attribute];
         document.getElementById("inspect-preview-box").style.background = attrInfo.gradient;
         document.getElementById("inspect-preview-box").style.borderColor = attrInfo.color;
@@ -2611,37 +2413,33 @@
         document.getElementById("inspect-card-name").innerText = `${card.name} [${attrInfo.name.split(" ")[0]}屬性]`;
         document.getElementById("inspect-card-hp").innerText = `生命值 HP: ${card.hp}/${card.maxHp}`;
         
-        /* 🚀 渲染出當前卡片精細載入的能量池類別 */
         let energyDetailText = "";
         for (let type in card.attachedEnergies) {
-          if (card.attachedEnergies[type] > 0) {
+          if (card.attachedEnergies[type] > 0 && Attributes[type]) {
             energyDetailText += ` [${Attributes[type].icon} ${Attributes[type].name.split(" ")[0]}x${card.attachedEnergies[type]}]`;
           }
         }
         document.getElementById("inspect-card-energy").innerText = `累積數學能量: ${card.energyAttached} 點 ${energyDetailText || '(空)'}`;
         document.getElementById("inspect-math-desc").innerText = card.mathDesc;
-
         const skillContainer = document.getElementById("inspect-skills-container");
         skillContainer.innerHTML = "";
-
         card.skills.forEach(s => {
           const isAttackRestricted = (engine.turnNumber === 1);
-
-          /* 🚀 升級萬用百搭判定 */
           const hasEnoughEnergy = engine.canPayForSkill(card, s);
-
           const canUse = (ownerType === 'player') && 
                        (engine.currentState === BattleState.PLAYER_PREPARATION) && 
                        (engine.isMyTurn) &&
                        (!isAttackRestricted) &&
                        (hasEnoughEnergy);
 
-          /* 解析技能特定能量需求 */
           let costText = "";
           for (let type in s.energyCost) {
-            costText += ` ${Attributes[type].icon}x${s.energyCost[type]}`;
+            if (Attributes[type]) {
+              costText += ` ${Attributes[type].icon}x${s.energyCost[type]}`;
+            } else if (type === 'ANY') {
+              costText += ` ⚪x${s.energyCost[type]}`;
+            }
           }
-
           const skillItem = document.createElement("div");
           skillItem.className = "inspect-skill-item";
           skillItem.innerHTML = `
@@ -2657,7 +2455,6 @@
           `;
           skillContainer.appendChild(skillItem);
         });
-
         document.getElementById("inspect-modal").style.display = "flex";
       } catch (err) {
         console.error(err);
@@ -2675,7 +2472,6 @@
       document.getElementById("inspect-modal").style.display = "none";
     }
 
-    /* 🚀 渲染立體 3D 能量核 */
     function render3DEnergyCores(containerId, attachedEnergies) {
       const container = document.getElementById(containerId);
       if (!container) return;
@@ -2683,44 +2479,44 @@
       
       for (let type in attachedEnergies) {
         const count = attachedEnergies[type] || 0;
+        if (count <= 0 || !Attributes[type]) continue; 
         const attrInfo = Attributes[type];
         for (let i = 0; i < count; i++) {
           const core = document.createElement("div");
           core.className = "energy-core-3d";
           core.style.cssText = attrInfo.coreStyle;
-          core.innerText = attrInfo.icon; /* 💥 精細更新：嵌入多屬性微光圖案 */
+          core.innerText = attrInfo.icon; 
           container.appendChild(core);
         }
       }
     }
 
-    /* 🎨 UI 局部刷新 (100% 杜絕任何未定義 DOM 節點引用錯誤，完全修復 player-icon 崩潰！) */
     function updateUI() {
       try {
+        if (!engine || !engine.player || !engine.ai) {
+          const btnEndTurn = document.getElementById("btn-end-turn");
+          if (btnEndTurn) btnEndTurn.disabled = true;
+          return;
+        }
+
         const pActive = engine.player.activeCard;
         if (pActive) {
           const attrInfo = Attributes[pActive.attribute];
-          /* 屬性動態渲染背景及邊框 */
           const cardEl = document.getElementById("player-active-card");
           cardEl.style.background = attrInfo.gradient;
           cardEl.style.borderColor = attrInfo.color;
-
           document.getElementById("player-name").innerText = pActive.name;
           document.getElementById("player-hp").innerText = `HP ${pActive.hp}/${pActive.maxHp}`;
           
-          /* 💥 自定義怪獸美術雙重防爆 */
           const imgEl = document.getElementById("player-img-src");
           const fallbackEl = document.getElementById("player-icon-fallback");
           imgEl.src = `assets/cards/${pActive.id}.png`;
           imgEl.style.display = "block";
           fallbackEl.innerText = pActive.icon;
           fallbackEl.style.display = "none";
-
           document.getElementById("player-hp-bar").style.width = `${(pActive.hp / pActive.maxHp) * 100}%`;
           
-          /* 更新出戰怪底部的多屬性立體 3D 能量核 */
           render3DEnergyCores("player-energy-cores", pActive.attachedEnergies);
-
           const skillsControl = document.getElementById("active-skills-control");
           skillsControl.innerHTML = "";
           
@@ -2735,12 +2531,14 @@
             
             const isAttackRestricted = (engine.turnNumber === 1);
             const hasEnoughEnergy = engine.canPayForSkill(pActive, s);
-
             let costDesc = "";
             for (let type in s.energyCost) {
-              costDesc += ` ${Attributes[type].icon}x${s.energyCost[type]}`;
+              if (Attributes[type]) {
+                costDesc += ` ${Attributes[type].icon}x${s.energyCost[type]}`;
+              } else if (type === 'ANY') {
+                costDesc += ` ⚪x${s.energyCost[type]}`;
+              }
             }
-
             if (isAttackRestricted) {
               btn.innerHTML = `⚔️ ${s.name} (先攻限制)`;
               btn.disabled = true;
@@ -2774,21 +2572,17 @@
           const cardEl = document.getElementById("ai-active-card");
           cardEl.style.background = attrInfo.gradient;
           cardEl.style.borderColor = attrInfo.color;
-
           document.getElementById("ai-name").innerText = aActive.name;
           document.getElementById("ai-hp").innerText = `HP ${aActive.hp}/${aActive.maxHp}`;
           
-          /* 對手自訂怪獸防爆 Fallback 載入 */
           const imgEl = document.getElementById("ai-img-src");
           const fallbackEl = document.getElementById("ai-icon-fallback");
           imgEl.src = `assets/cards/${aActive.id}.png`;
           imgEl.style.display = "block";
           fallbackEl.innerText = aActive.icon;
           fallbackEl.style.display = "none";
-
           document.getElementById("ai-hp-bar").style.width = `${(aActive.hp / aActive.maxHp) * 100}%`;
           
-          /* 更新對手怪底部的多屬性 3D 能量核 */
           render3DEnergyCores("ai-energy-cores", aActive.attachedEnergies);
         } else {
           document.getElementById("ai-name").innerText = "戰區空缺";
@@ -2807,36 +2601,30 @@
           cardBox.className = "hand-card";
           cardBox.draggable = true;
           
-          /* 屬性色彩動態綁定 */
           const attrInfo = Attributes[c.attribute];
           cardBox.style.borderColor = attrInfo.color;
           cardBox.style.background = attrInfo.gradient;
-
           cardBox.addEventListener('dragstart', (e) => handleHandCardDragStart(e, c.id));
           
-          /* 🎴 2.5D/3D 卡牌物理陀螺儀傾斜特效事件精準綁定 */
           cardBox.addEventListener('mousemove', (e) => {
             const rect = cardBox.getBoundingClientRect();
             const x = e.clientX - rect.left; 
             const y = e.clientY - rect.top;  
             const xc = rect.width / 2;
             const yc = rect.height / 2;
-            const rotateY = ((x - xc) / xc) * 16; /* 最大傾斜 16 度 */
+            const rotateY = ((x - xc) / xc) * 16; 
             const rotateX = -((y - yc) / yc) * 16;
             cardBox.style.transform = `perspective(300px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.05)`;
             cardBox.style.boxShadow = `0 10px 20px rgba(${rotateY > 0 ? '102,252,241,0.4' : '255,0,127,0.4'})`;
           });
-
           cardBox.addEventListener('mouseleave', () => {
             cardBox.style.transform = 'perspective(300px) rotateX(0deg) rotateY(0deg) translateY(0deg) scale(1)';
             cardBox.style.boxShadow = 'none';
           });
-
           cardBox.onclick = (e) => {
             e.stopPropagation();
             inspectCard('hand', idx);
           };
-
           cardBox.innerHTML = `
             <div style="font-weight:bold; color:#fff;">${c.name}</div>
             <div style="font-size:1.5rem; text-align:center;">${c.icon}</div>
@@ -2852,7 +2640,6 @@
           spot.className = "bench-spot";
           spot.addEventListener('dragover', allowDrop);
           spot.addEventListener('drop', (e) => handleDropOnBench(e, i));
-
           const card = engine.player.bench[i];
           if (card) {
             const cardEl = document.createElement("div");
@@ -2862,23 +2649,21 @@
             const attrInfo = Attributes[card.attribute];
             cardEl.style.borderColor = attrInfo.color;
             cardEl.style.background = attrInfo.gradient;
-
             cardEl.addEventListener('dragstart', (e) => handleBenchCardDragStart(e, i));
             cardEl.onclick = (e) => {
               e.stopPropagation();
               inspectCard('player_bench', i);
             };
             
-            /* 後備怪獸生成 3D 多屬性能量核 */
             let miniCores = "";
             for (let type in card.attachedEnergies) {
               const miniCount = card.attachedEnergies[type] || 0;
+              if (miniCount <= 0 || !Attributes[type]) continue;
               const miniAttr = Attributes[type];
               for (let j = 0; j < miniCount; j++) {
                 miniCores += `<div class="energy-core-3d" style="${miniAttr.coreStyle} width:10px; height:10px;"></div>`;
               }
             }
-
             cardEl.innerHTML = `
               <span style="font-weight:bold; font-size:0.55rem; color:#fff;">${card.name}</span>
               <span style="text-align:center; font-size:1.1rem;">${card.icon}</span>
@@ -2907,21 +2692,19 @@
             const attrInfo = Attributes[card.attribute];
             cardEl.style.borderColor = attrInfo.color;
             cardEl.style.background = attrInfo.gradient;
-
             cardEl.onclick = (e) => {
               e.stopPropagation();
               inspectCard('ai_bench', i);
             };
-
             let miniCores = "";
             for (let type in card.attachedEnergies) {
               const miniCount = card.attachedEnergies[type] || 0;
+              if (miniCount <= 0 || !Attributes[type]) continue;
               const miniAttr = Attributes[type];
               for (let j = 0; j < miniCount; j++) {
                 miniCores += `<div class="energy-core-3d" style="${miniAttr.coreStyle} width:10px; height:10px;"></div>`;
               }
             }
-
             cardEl.innerHTML = `
               <span style="font-weight:bold; font-size:0.55rem; color:#fff;">${card.name}</span>
               <span style="text-align:center; font-size:1.1rem;">${card.icon}</span>
@@ -2942,7 +2725,6 @@
         document.getElementById("player-life-hearts").innerText = pHPs;
         document.getElementById("ai-life-hearts").innerText = aHPs;
 
-        /* 實體化廢棄區渲染 */
         const pDiscardEl = document.getElementById("player-discard-pile");
         if (engine.player.discardPile && engine.player.discardPile.length > 0) {
           const topCard = engine.player.discardPile[engine.player.discardPile.length - 1];
@@ -2981,21 +2763,18 @@
           aDiscardEl.style.background = "rgba(0,0,0,0.5)";
         }
 
-        /* 🎰 渲染與調度：當前可用拖拉能量核、下回合預告核 */
         const currentSlot = document.getElementById("current-energy-slot");
         const nextSlot = document.getElementById("next-energy-slot");
         const isEnergyDisabled = engine.currentState !== BattleState.PLAYER_PREPARATION || 
                                  engine.player.hasAttachedEnergyThisTurn || 
                                  (!engine.isMyTurn);
 
-        /* 渲染下回合預報 */
         const nextAttr = Attributes[engine.nextTurnEnergy];
         nextSlot.innerText = nextAttr.icon;
         nextSlot.style.background = nextAttr.gradient;
         nextSlot.style.borderColor = nextAttr.color;
         nextSlot.style.boxShadow = `0 0 10px ${nextAttr.color}`;
 
-        /* 渲染當前回合拖拉核 */
         currentSlot.innerHTML = "";
         const currAttr = Attributes[engine.currentTurnEnergy];
         const token = document.createElement("div");
@@ -3014,16 +2793,186 @@
         }
         currentSlot.appendChild(token);
 
-        /* 🛑 更新手動結束回合按鈕可用狀態 */
         const btnEndTurn = document.getElementById("btn-end-turn");
         btnEndTurn.disabled = engine.currentState !== BattleState.PLAYER_PREPARATION || !engine.isMyTurn;
       } catch (err) {
-        console.error("[updateUI Error]", err);
+        console.error("[updateUI Error Logged]", err);
       }
     }
 
-    /* 解鎖音訊限制 */
-    document.addEventListener('click', () => SoundEffects.init(), { once: false });
+    document.getElementById("btn-end-turn").onclick = () => {
+      if (engine.currentState === BattleState.PLAYER_PREPARATION && engine.isMyTurn) {
+        SoundEffects.play(180, 'sawtooth', 0.25);
+        logConsole("🛑 [操作] 您主動結束了您的準備回合。");
+        if (engine.isMultiplayer) {
+          engine.isMyTurn = false;
+          sendNetData({ type: 'END_TURN' });
+          engine.transitionTo(BattleState.AI_TURN_START);
+        } else {
+          engine.transitionTo(BattleState.AI_TURN_START);
+        }
+      }
+    };
+
+    // ==========================================
+    // 🏠 TCG 級別大廳功能：3D看板怪與每日 Quests
+    // ==========================================
+    let dailyQuests = [];
+    let checkInHistory = [];
+    const checkInRewards = [
+      { day: 1, text: "50 MP", claimed: false },
+      { day: 2, text: "100 MP", claimed: false },
+      { day: 3, text: "抽卡券x1", claimed: false },
+      { day: 4, text: "150 MP", claimed: false },
+      { day: 5, text: "自訂卡套", claimed: false },
+      { day: 6, text: "抽卡券x2", claimed: false },
+      { day: 7, text: "SSR卡包", claimed: false }
+    ];
+
+    function getHongKongDateString() {
+      const d = new Date();
+      const utc = d.getTime() + (d.getTimezoneOffset() * 60000);
+      const hkt = new Date(utc + (3600000 * 8));
+      return hkt.toISOString().split('T')[0];
+    }
+
+    const mascotBox = document.getElementById("mascot-view-box");
+    document.getElementById("mascot-touch-zone").onclick = () => {
+      SoundEffects.play(800, 'sine', 0.1, 0.01);
+      const bubble = document.getElementById("mascot-bubble");
+      const randomSpeech = mascotSpeeches[Math.floor(Math.random() * mascotSpeeches.length)];
+      bubble.innerText = randomSpeech;
+      
+      mascotBox.style.transform = "perspective(600px) rotateY(30deg) rotateX(15deg) scale(1.05)";
+      setTimeout(() => {
+        mascotBox.style.transform = "perspective(600px) rotateY(0deg) rotateX(0deg) scale(1)";
+      }, 500);
+      handleQuestProgress("quest_05", 3);
+    };
+
+    function handleQuestProgress(questId, targetMax = 2) {
+      dailyQuests.forEach(q => {
+        if (q.id === questId && !q.completed) {
+          q.progress += 1;
+          if (q.progress >= targetMax) {
+            q.completed = true;
+            logConsole(`🏆 每日任務已完成：${q.desc}！`);
+          }
+          saveGameProgressToStorage();
+          updateDailyQuestUI();
+        }
+      });
+    }
+
+    function loadGameProgressFromStorage() {
+      const savedDate = localStorage.getItem("math_realm_last_date");
+      const todayHkt = getHongKongDateString();
+      const savedQuests = localStorage.getItem("math_realm_quests");
+
+      if (savedDate !== todayHkt || !savedQuests || savedQuests === "[]") {
+        localStorage.setItem("math_realm_last_date", todayHkt);
+        const shuffled = [...DailyQuestDatabase].sort(() => 0.5 - Math.random());
+        dailyQuests = [
+          { ...shuffled[0], progress: 0, completed: false },
+          { ...shuffled[1], progress: 0, completed: false },
+          { id: "quest_05", desc: "手動點擊看板怪獸，學習 3 條數學核心公式", progress: 0, completed: false }
+        ];
+        localStorage.setItem("math_realm_quests", JSON.stringify(dailyQuests));
+        localStorage.setItem("math_realm_checked_today", "false");
+      } else {
+        dailyQuests = JSON.parse(savedQuests) || [];
+      }
+      checkInHistory = JSON.parse(localStorage.getItem("math_realm_checkin_history")) || [false, false, false, false, false, false, false];
+      
+      updateDailyQuestUI();
+      renderCheckInBoard();
+    }
+
+    function saveGameProgressToStorage() {
+      localStorage.setItem("math_realm_quests", JSON.stringify(dailyQuests));
+      localStorage.setItem("math_realm_checkin_history", JSON.stringify(checkInHistory));
+    }
+
+    function renderCheckInBoard() {
+      const container = document.getElementById("checkin-board-container");
+      container.innerHTML = "";
+      
+      const checkedToday = localStorage.getItem("math_realm_checked_today") === "true";
+      let currentActiveDayIdx = checkInHistory.indexOf(false);
+      if (currentActiveDayIdx === -1) currentActiveDayIdx = 6; 
+      checkInRewards.forEach((r, idx) => {
+        const claimed = checkInHistory[idx];
+        const isToday = (idx === currentActiveDayIdx) && !checkedToday;
+        const dayCard = document.createElement("div");
+        dayCard.className = `checkin-day-card ${claimed ? 'claimed' : ''} ${isToday ? 'active-today' : ''}`;
+        dayCard.innerHTML = `
+          <div style="font-weight:bold;">第${r.day}天</div>
+          <div style="font-size:0.55rem; margin-top:2px;">${r.text}</div>
+          <div style="font-size:0.6rem; color:var(--accent-cyan); margin-top:2px;">${claimed ? '✔' : (isToday ? '簽到' : '待簽')}</div>
+        `;
+        if (isToday) {
+          dayCard.onclick = () => claimDailyCheckIn(idx, r.text);
+        }
+        container.appendChild(dayCard);
+      });
+    }
+
+    function claimDailyCheckIn(dayIdx, rewardText) {
+      SoundEffects.correct();
+      checkInHistory[dayIdx] = true;
+      localStorage.setItem("math_realm_checked_today", "true");
+      saveGameProgressToStorage();
+      alert(`🎉 每日簽到成功！\n\n獲得獎勵：${rewardText}！`);
+      renderCheckInBoard();
+    }
+
+    function updateDailyQuestUI() {
+      const container = document.getElementById("daily-quests-container");
+      container.innerHTML = "";
+      
+      let allDone = true;
+      dailyQuests.forEach(q => {
+        const questEl = document.createElement("div");
+        questEl.style.background = q.completed ? "rgba(46,204,113,0.15)" : "rgba(255,255,255,0.02)";
+        questEl.style.border = q.completed ? "1px solid #2ecc71" : "1px solid rgba(255,255,255,0.08)";
+        questEl.style.padding = "6px 8px";
+        questEl.style.borderRadius = "6px";
+        
+        let progressText = "";
+        if (q.id === "quest_05") {
+          progressText = ` (${q.progress}/3)`;
+        } else if (q.completed) {
+          progressText = " (已完成)";
+        } else {
+          progressText = " (未完成)";
+        }
+        questEl.innerHTML = `
+          <div style="font-weight:bold; color:${q.completed ? '#2ecc71' : '#fff'};">${q.desc}${progressText}</div>
+          <div style="font-size:0.7rem; color:var(--accent-gold); margin-top:1.5px;">獎勵: ${q.points} MP 積分</div>
+        `;
+        container.appendChild(questEl);
+        if (!q.completed) allDone = false;
+      });
+      const claimBtn = document.getElementById("btn-claim-pack");
+      if (allDone) {
+        claimBtn.disabled = false;
+        claimBtn.innerText = "🎁 領取 20張備考限定卡包！";
+        claimBtn.style.boxShadow = "0 0 15px var(--accent-gold)";
+      } else {
+        claimBtn.disabled = true;
+        claimBtn.innerText = "🔒 完成全部任務領取卡包";
+        claimBtn.style.boxShadow = "none";
+      }
+    }
+
+    function claimQuestBundle() {
+      SoundEffects.win();
+      alert("🎉 恭喜完成今日所有的備戰任務！\n\n獲得額外大禮包：\n解鎖 20 張自訂 SSR 先攻王牌卡包！");
+      document.getElementById("btn-claim-pack").disabled = true;
+      document.getElementById("btn-claim-pack").innerText = "🎁 已成功領取備考卡包！";
+    }
+
+    loadGameProgressFromStorage();
   </script>
 </body>
 </html>
