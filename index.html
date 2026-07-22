@@ -899,6 +899,22 @@
 
     <!-- 中欄：玩法大廳對戰接口 & 雷達學情分析 -->
     <div class="lobby-center">
+      <!-- 🌐 霓虹雲端學情登入同步面板 -->
+      <div style="background: rgba(102,252,241,0.05); border: 1px solid var(--accent-cyan); padding: 12px; border-radius: 8px; box-shadow: 0 0 10px rgba(102,252,241,0.15);">
+        <div style="font-size: 0.85rem; font-weight: bold; color: var(--accent-cyan); margin-bottom: 8px; display:flex; justify-content:space-between;">
+          <span>🌐 雲端學情同步系統</span>
+          <span id="sync-status" style="color:var(--accent-gold);">[未登入/本地模式]</span>
+        </div>
+        <div style="display: flex; gap: 6px; margin-bottom: 6px;">
+          <input type="text" id="input-student-id" placeholder="輸入學號 (e.g., S101)" style="flex:1; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-cyan); background:#000; color:#fff; font-size: 0.85rem;" />
+          <input type="text" id="input-student-name" placeholder="姓名" style="width:70px; padding: 8px; border-radius: 6px; border: 1px solid var(--accent-cyan); background:#000; color:#fff; font-size: 0.85rem;" />
+        </div>
+        <div style="display:flex; gap:6px;">
+          <button class="lobby-btn" style="padding: 6px 12px; font-size:0.8rem; width: auto; flex: 1;" onclick="syncLoginFromCloud()">🔐 登入/讀取雲端</button>
+          <button class="lobby-btn" id="btn-force-save" style="padding: 6px 12px; font-size:0.8rem; border-color:var(--accent-gold); display:none; flex: 1;" onclick="saveGameToCloud()">💾 手動上傳存檔</button>
+        </div>
+      </div>
+
       <div class="lobby-panel-card" style="flex:0.8; justify-content: center; gap: 10px; border-color: var(--accent-cyan);">
         <h2 style="color: var(--accent-cyan); margin: 0; text-shadow: 0 0 8px var(--accent-cyan);">數域戰記 - 戰鬥端</h2>
         <button class="lobby-btn" onclick="startLocalVsAi()">🤖 挑戰 AI (單人練習)</button>
@@ -1095,6 +1111,17 @@
    * 戰鬥狀態機與核心邏輯引擎 (JavaScript)
    * ========================================== -->
   <script>
+    // ==========================================
+    // 🌐 雲端 Google 試算表同步引擎配置
+    // ==========================================
+    // ⚠️ 請在此處貼上您從 Google 試算表部署獲得的網頁應用程式 URL
+    const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbxRFwm7H9MBsE5ZnwuAXQPk6B6oyodWXhtGVIQdOXyyaXwaZ7eUmFg9u5UQ6Zn8IBOD/exec"; 
+
+    let currentStudentId = "";
+    let currentStudentName = "";
+    let playerExp = 0;       // 學生累積經驗值
+    let playerLevel = 1;     // 學生數域等級
+
     /* ==========================================
      * 🎵 Web Audio API 復古合成器音效系統
      * ========================================== */
@@ -1912,6 +1939,14 @@
               target.discardCount += 1;
               target.lifePoints -= 1;
               logConsole(`💔 ${targetName} 生命值減一！賸餘生命值: ${target.lifePoints}/3`);
+              
+              // 實施經驗值累加：擊殺對手可獲得額外經驗值
+              if (targetName.includes("AI") || targetName.includes("對手")) {
+                playerExp += 100;
+                logConsole(`📈 您獲得了 100 經驗值！(當前經驗值: ${playerExp})`);
+                checkLevelUp();
+              }
+
               if (target.lifePoints <= 0) {
                 this.winner = enemy.type;
                 this.gameOverReason = `${targetName} 的生命值歸零！`;
@@ -2010,6 +2045,10 @@
           
           if (correct) {
             SoundEffects.correct();
+            // 答對給予學情經驗值獎勵
+            playerExp += 50;
+            logConsole(`📈 答對題目，獲得 +50 經驗值！(目前經驗值: ${playerExp})`);
+            checkLevelUp();
             handleQuestProgress("quest_01");
           } else {
             SoundEffects.wrong();
@@ -2038,6 +2077,11 @@
           bannerText.className = "endgame-title winner-rainbow-text";
           overlay.style.background = "radial-gradient(circle, rgba(102,252,241,0.2) 0%, rgba(255,0,127,0.2) 50%, rgba(0,0,0,0.95) 100%)";
           document.body.classList.remove("game-lost-filter");
+          
+          // 贏得對決獲取大量經驗
+          playerExp += 250;
+          logConsole(`🏆 贏得戰決勝利！額外斬獲 +250 經驗值！`);
+          checkLevelUp();
         } else {
           bannerText.innerText = "Game Over";
           bannerText.className = "endgame-title";
@@ -2046,6 +2090,20 @@
           overlay.style.background = "radial-gradient(circle, #222 0%, #000 100%)";
           document.body.classList.add("game-lost-filter");
         }
+        // 遊戲結束自動存檔備份
+        saveGameProgressToStorage();
+      }
+    }
+
+    function checkLevelUp() {
+      const requiredExp = playerLevel * 500; // 每級所需經驗：500, 1000, 1500...
+      if (playerExp >= requiredExp) {
+        playerExp -= requiredExp;
+        playerLevel += 1;
+        SoundEffects.correct();
+        logConsole(`🎉🎉 恭喜升級！您已晉升到數域 Lvl.${playerLevel}！`);
+        alert(`🎉 恭喜升級！\n\n您在數域戰記中達到了【 Lvl. ${playerLevel} 】級！`);
+        checkLevelUp(); // 循環檢測是否能連續升級
       }
     }
 
@@ -2857,11 +2915,124 @@
           if (q.progress >= targetMax) {
             q.completed = true;
             logConsole(`🏆 每日任務已完成：${q.desc}！`);
+            playerExp += q.points;
+            logConsole(`📈 獲得任務積分：+${q.points} 經驗值。`);
+            checkLevelUp();
           }
           saveGameProgressToStorage();
           updateDailyQuestUI();
         }
       });
+    }
+
+    // ==========================================
+    // 🌐 試算表雲端讀寫核心函數
+    // ==========================================
+    async function syncLoginFromCloud() {
+      const idInput = document.getElementById("input-student-id").value.trim();
+      const nameInput = document.getElementById("input-student-name").value.trim();
+      
+      if (!idInput) {
+        alert("請輸入您的學號！");
+        return;
+      }
+      
+      if (CLOUD_API_URL.includes("您的_GOOGLE_APPS_SCRIPT")) {
+        alert("⚠️ 教師尚未配置 Google 試算表 API 網址！\n目前將會運行【本地存檔模擬模式】。");
+        currentStudentId = idInput;
+        currentStudentName = nameInput || "新召喚師";
+        document.getElementById("sync-status").innerText = "[離線/本地模式]";
+        document.getElementById("input-student-id").disabled = true;
+        document.getElementById("input-student-name").disabled = true;
+        loadGameProgressFromStorage();
+        return;
+      }
+
+      SoundEffects.init();
+      SoundEffects.click();
+      document.getElementById("sync-status").innerText = "⏳ 雲端同步中...";
+      
+      try {
+        const response = await fetch(`${CLOUD_API_URL}?studentId=${encodeURIComponent(idInput)}`);
+        const result = await response.json();
+        
+        if (result.status === "success") {
+          currentStudentId = result.studentId;
+          currentStudentName = result.playerName;
+          playerLevel = result.playerLevel || 1;
+          playerExp = result.playerExp || 0;
+          dailyQuests = result.questProgress || [];
+          checkInHistory = result.unlockedCards || [false, false, false, false, false, false, false];
+          
+          document.getElementById("input-student-id").value = currentStudentId;
+          document.getElementById("input-student-name").value = currentStudentName;
+          document.getElementById("input-student-id").disabled = true;
+          document.getElementById("input-student-name").disabled = true;
+          
+          document.getElementById("sync-status").innerText = `✅ [雲端: ${currentStudentName}]`;
+          document.getElementById("btn-force-save").style.display = "block";
+          
+          alert(`🎉 歡迎回來，${currentStudentName}！\n\n已成功從雲端讀取您的存檔！\n當前等級: Lvl.${playerLevel} | 經驗值: ${playerExp}`);
+        } else {
+          if (!nameInput) {
+            alert("在雲端未找到此學號！若您是第一次登入的新同學，請在右邊填寫「姓名」後再次點擊讀取，以建立全新角色檔！");
+            document.getElementById("sync-status").innerText = "[查無學號]";
+            return;
+          }
+          currentStudentId = idInput;
+          currentStudentName = nameInput;
+          playerLevel = 1;
+          playerExp = 0;
+          
+          document.getElementById("input-student-id").disabled = true;
+          document.getElementById("input-student-name").disabled = true;
+          document.getElementById("sync-status").innerText = `✅ [新玩家: ${currentStudentName}]`;
+          document.getElementById("btn-force-save").style.display = "block";
+          
+          await saveGameToCloud();
+          alert(`🆕 歡迎！已成功在雲端試算表為 [${currentStudentName}] 註冊新帳號！開始遊玩吧！`);
+        }
+        
+        saveGameProgressToStorage(); 
+        updateDailyQuestUI();
+        renderCheckInBoard();
+      } catch (err) {
+        console.error(err);
+        document.getElementById("sync-status").innerText = "❌ 連線失敗 (本地運作)";
+        alert("⚠️ 雲端連線失敗！目前將維持「本地離線遊玩」模式（不影響遊玩）。");
+        loadGameProgressFromStorage();
+      }
+    }
+
+    async function saveGameToCloud() {
+      if (!currentStudentId || CLOUD_API_URL.includes("您的_GOOGLE_APPS_SCRIPT")) return;
+      
+      const payload = {
+        studentId: currentStudentId,
+        playerName: currentStudentName,
+        playerLevel: playerLevel,
+        playerExp: playerExp,
+        unlockedCards: checkInHistory, 
+        questProgress: dailyQuests,
+        correctRate: {
+          "Probability": 90, 
+          "Geometry": 75,
+          "Advanced": 65,
+          "Algebra": 45
+        }
+      };
+      
+      try {
+        await fetch(CLOUD_API_URL, {
+          method: "POST",
+          mode: "no-cors", 
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        console.log("💾 進度已自動背景同步上傳至 Google 試算表！");
+      } catch (err) {
+        console.warn("自動上傳失敗:", err);
+      }
     }
 
     function loadGameProgressFromStorage() {
@@ -2891,6 +3062,9 @@
     function saveGameProgressToStorage() {
       localStorage.setItem("math_realm_quests", JSON.stringify(dailyQuests));
       localStorage.setItem("math_realm_checkin_history", JSON.stringify(checkInHistory));
+      
+      // 只要觸發本地儲存，同步呼叫雲端試算表自動存檔！
+      saveGameToCloud();
     }
 
     function renderCheckInBoard() {
@@ -2921,6 +3095,12 @@
       SoundEffects.correct();
       checkInHistory[dayIdx] = true;
       localStorage.setItem("math_realm_checked_today", "true");
+      
+      // 簽到贈送大廳經驗值獎勵
+      playerExp += 150;
+      logConsole(`📈 每日簽到，獲得 +150 經驗值！`);
+      checkLevelUp();
+
       saveGameProgressToStorage();
       alert(`🎉 每日簽到成功！\n\n獲得獎勵：${rewardText}！`);
       renderCheckInBoard();
