@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>《機率召喚對決：數域戰記》</title>
-  <!-- 引入 PeerJS 用於無伺服器 P2P 聯機 -->
-  <script src="https://unpkg.com/peerjs@1.4.7/dist/peerjs.min.js"></script>
+  <!-- ⚡ 升級至 PeerJS 1.5.4 穩定版，確保支援現代瀏覽器 WebRTC 協定 -->
+  <script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
   <style>
     /* ==========================================
      * Cyberpunk 霓虹風格樣式 (CSS)
@@ -1123,6 +1123,23 @@
     let playerLevel = 1;     // 學生數域等級
 
     /* ==========================================
+     * 🌐 WebRTC 聯網連線核心配置
+     * 加入高可靠度 Google STUN 伺服器，強制解決對手連線卡死、穿透防火牆失敗之問題
+     * ========================================== */
+    const PEER_CONFIG = {
+      debug: 3, // 開啟最詳細 debug 紀錄（可按 F12 打開控制台查看）
+      config: {
+        iceServers: [
+          { urls: 'stun:stun.l.google.com:19302' },
+          { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
+          { urls: 'stun:stun3.l.google.com:19302' },
+          { urls: 'stun:stun4.l.google.com:19302' }
+        ]
+      }
+    };
+
+    /* ==========================================
      * 🎵 Web Audio API 復古合成器音效系統
      * ========================================== */
     const SoundEffects = {
@@ -2149,17 +2166,11 @@
     }
 
     /* ==========================================
-     * 🌐 WebRTC 聯網連線核心
+     * 🌐 WebRTC 聯網連線核心方法重構
      * ========================================== */
     let peer = null;
     let conn = null;
     let role = ''; 
-    const PEER_CONFIG = {
-      host: '0.peerjs.com',
-      port: 443,
-      secure: true,
-      debug: 1
-    };
 
     function hostPvPGame() {
       if (typeof Peer === 'undefined') {
@@ -2169,24 +2180,39 @@
       SoundEffects.init();
       SoundEffects.click();
       
+      // 生成 4 位隨機金鑰
       const pin = Math.floor(1000 + Math.random() * 9000).toString(); 
-      document.getElementById("connection-status").innerText = "⏳ 正在向對戰主機註冊密鑰...";
+      document.getElementById("connection-status").innerHTML = "⏳ 正在向對戰主機註冊專屬金鑰...";
+      
+      // 銷毀舊連接
+      if (peer) {
+        try { peer.destroy(); } catch(e) {}
+      }
+
       peer = new Peer(`dse-realm-${pin}`, PEER_CONFIG);
-      peer.on('open', () => {
+      
+      peer.on('open', (id) => {
         document.getElementById("connection-status").innerHTML = `
           🏠 房間創建成功！<br/>
           🔑 您的對戰密鑰為: <strong style="font-size:1.4rem; color:var(--accent-gold);">${pin}</strong><br/>
           <span style="font-size:0.8rem; color:#888;">請讓另一位玩家在網頁輸入此密鑰連線加入...</span>
         `;
       });
+
       peer.on('connection', (connection) => {
         conn = connection;
         role = 'host';
         setupConnectionListeners();
       });
+
+      // 錯誤捕獲：若金鑰被佔用或伺服器掛掉時給予清晰提示
       peer.on('error', (err) => {
-        alert("密鑰已被佔用或連線受阻，請重新創建！");
-        window.location.reload();
+        console.error("PeerJS Host Error:", err);
+        let errMsg = "連線初始化失敗，請稍後重試！";
+        if (err.type === 'unavailable-id') {
+          errMsg = "❌ 密鑰已被佔用！請再次點擊「建立房間」重新嘗試。";
+        }
+        document.getElementById("connection-status").innerHTML = `<span style="color:var(--accent-magenta); font-weight:bold;">${errMsg}</span>`;
       });
     }
 
@@ -2203,24 +2229,60 @@
         alert("請輸入有效的房間密鑰！");
         return;
       }
-      document.getElementById("connection-status").innerText = `⏳ 正在憑密鑰 [${pin}] 連線中...`;
+      
+      document.getElementById("connection-status").innerHTML = `⏳ 正在憑密鑰 【${pin}】 穿透防火牆連線中...`;
+      
+      if (peer) {
+        try { peer.destroy(); } catch(e) {}
+      }
+
       peer = new Peer(PEER_CONFIG);
-      peer.on('open', () => {
+      
+      peer.on('open', (id) => {
+        // 向 Host 發起 WebRTC 連線
         conn = peer.connect(`dse-realm-${pin}`);
         role = 'guest';
         setupConnectionListeners();
       });
+
+      // 錯誤捕獲：找不到房間時主動提示，避免死等
+      peer.on('error', (err) => {
+        console.error("PeerJS Guest Error:", err);
+        let errMsg = "連線失敗！";
+        if (err.type === 'peer-unavailable') {
+          errMsg = `❌ 找不到密鑰為 [${pin}] 的房間！請確保房主已在大廳建立房間，且雙方輸入的金鑰一致。`;
+        }
+        document.getElementById("connection-status").innerHTML = `<span style="color:var(--accent-magenta); font-weight:bold;">${errMsg}</span>`;
+      });
     }
 
     function setupConnectionListeners() {
-      conn.on('open', () => {
-        document.getElementById("connection-status").innerText = "✅ 連線成功！正在投擲硬幣決定先攻...";
+      if (!conn) return;
+
+      // 1. 斷線重連與錯誤偵測
+      conn.on('error', (err) => {
+        console.error("Connection Error:", err);
+        document.getElementById("connection-status").innerHTML = `<span style="color:var(--accent-magenta);">⚠️ 連接錯誤: ${err.message}</span>`;
+      });
+
+      // 2. 雙向開路即時補償機制，防止 missed 'open' 事件
+      const handleOpenAction = () => {
+        document.getElementById("connection-status").innerHTML = "✅ 連線成功！正在投擲硬幣決定先攻...";
         setTimeout(() => {
           document.getElementById("lobby-screen").style.display = "none";
           engine.isMultiplayer = true;
           engine.startGame();
         }, 1200);
-      });
+      };
+
+      if (conn.open) {
+        handleOpenAction();
+      } else {
+        conn.on('open', () => {
+          handleOpenAction();
+        });
+      }
+
       conn.on('data', (data) => handleNetworkData(data));
       conn.on('close', () => {
         alert("對手斷開連線！");
