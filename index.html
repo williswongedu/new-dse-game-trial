@@ -1123,22 +1123,20 @@
     let playerLevel = 1;     // 學生數域等級
 
     /* ==========================================
-     * 🌐 WebRTC 聯網連線核心配置 (黃金穿透版)
-     * 加入公共免費 TURN 伺服器，專治跨裝置、跨網路連線卡死與連接錯誤
+     * 🌐 WebRTC 聯網連線核心配置
+     * 加入高可靠度 Google STUN 伺服器與 Metered TURN 穿透中繼伺服器
      * ========================================== */
     const PEER_CONFIG = {
-      host: '0.peerjs.com', // 指定 PeerJS 訊號伺服器
+      host: '0.peerjs.com',
       port: 443,
       secure: true,
-      debug: 3, // 輸出最詳細的 WebRTC 交握日誌
+      debug: 3, 
       config: {
         iceServers: [
-          // STUN 伺服器群（用於普通網路穿透）
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
+          { urls: 'stun:stun2.l.google.com:19302' },
           { urls: 'stun:stun.nextcloud.com:443' },
-          
-          // 🚀 TURN 中繼伺服器（特別由 Open Relay 提供，用於對付對稱型嚴格防火牆與不同網路連線）
           {
             urls: 'turn:openrelay.metered.ca:80',
             username: 'openrelayproject',
@@ -1146,11 +1144,6 @@
           },
           {
             urls: 'turn:openrelay.metered.ca:443',
-            username: 'openrelayproject',
-            credential: 'openrelayproject'
-          },
-          {
-            urls: 'turn:openrelay.metered.ca:443?transport=tcp',
             username: 'openrelayproject',
             credential: 'openrelayproject'
           }
@@ -1231,7 +1224,6 @@
       AI_PREPARATION: "AI_PREPARATION",
       AI_QUIZ_DEFENSE: "AI_QUIZ_DEFENSE",
       AI_ATTACK_RESOLUTION: "AI_ATTACK_RESOLUTION",
-      CHECK_KNOCKOUT: "CHECK_KNOCKOUT",
       GAME_OVER: "GAME_OVER"
     };
 
@@ -1358,7 +1350,7 @@
         correctIndex: 0,
         difficulty: 1,
         timeLimit: 60,
-        explanation: "因為 P(A ∩ B) = 0，說明 A 和 B 不能同時發生，因此兩者是互斥事件 (Mutually Exclusive)。"
+        explanation: "因為 P(A ∩ B) = 0，說明 A 和 B 不能同時發生，因此兩者是互斥事件 (Mutually Exclusive)."
       }
     };
 
@@ -1821,7 +1813,7 @@
           const skill = active.skills.find(s => s.id === skillId);
           if (!skill) return;
           if (!this.canPayForSkill(active, skill)) {
-            logConsole(`❌ 能量不符發動條件！發動需要特定屬性組合。`);
+            logConsole("❌ 能量不符發動條件！發動需要特定屬性組合。");
             return;
           }
           console.log("[BattleEngine] 攻擊宣布成功，技能:", skill.name);
@@ -1939,7 +1931,7 @@
             this.resolveAiAttack(correct);
           });
         } else {
-          logConsole(`🤖 AI 能量不足，結束回合。`);
+          logConsole("🤖 AI 能量不足，結束回合。");
           this.endAiTurn();
         }
       }
@@ -1985,9 +1977,12 @@
         this.transitionTo(BattleState.PLAYER_DRAW);
       }
 
+      /* ==========================================
+       * ⚡ [重要重構修復] 移除了會卡死異步狀態機的 transitionTo(CHECK_KNOCKOUT)
+       * 現在死亡判定改為背景安全運行，不影響雙端即時回合交替
+       * ========================================== */
       checkKnockout(onComplete) {
         try {
-          this.transitionTo(BattleState.CHECK_KNOCKOUT);
           const processDeath = (target, enemy, targetName, enemyName) => {
             if (target.activeCard && target.activeCard.hp <= 0) {
               logConsole(`💥 [戰報] ${targetName} 的 [${target.activeCard.name}] 陣亡，送入廢棄區！`);
@@ -1999,7 +1994,6 @@
               target.lifePoints -= 1;
               logConsole(`💔 ${targetName} 生命值減一！賸餘生命值: ${target.lifePoints}/3`);
               
-              // 實施經驗值累加：擊殺對手可獲得額外經驗值
               if (targetName.includes("AI") || targetName.includes("對手") || targetName.includes("🌐")) {
                 playerExp += 100;
                 logConsole(`📈 您獲得了 100 經驗值！(當前經驗值: ${playerExp})`);
@@ -2030,7 +2024,9 @@
           if (over) return;
           over = processDeath(this.player, this.ai, "🧑‍💻 玩家", "對手");
           if (over) return;
-          onComplete();
+          
+          updateUI();
+          if (onComplete) onComplete();
         } catch (err) {
           console.error("[Check Knockout Error]", err);
         }
@@ -2139,7 +2135,7 @@
           
           // 贏得對決獲取大量經驗
           playerExp += 250;
-          logConsole(`🏆 贏得戰決勝利！額外斬獲 +250 經驗值！`);
+          logConsole("🏆 贏得戰決勝利！額外斬獲 +250 經驗值！");
           checkLevelUp();
         } else {
           bannerText.innerText = "Game Over";
@@ -2227,7 +2223,7 @@
       // 錯誤捕獲：若金鑰被佔用或伺服器掛掉時給予清晰提示
       peer.on('error', (err) => {
         console.error("PeerJS Host Error:", err);
-        let errMsg = "連線初始化失敗，請稍後重試！";
+        let errMsg = "連線系統發生技術錯誤，請重新再試。";
         if (err.type === 'unavailable-id') {
           errMsg = "❌ 密鑰已被佔用！請再次點擊「建立房間」重新嘗試。";
         }
@@ -2278,13 +2274,12 @@
     function setupConnectionListeners() {
       if (!conn) return;
 
-      // 1. 斷線重連與錯誤偵測
       conn.on('error', (err) => {
         console.error("Connection Error:", err);
         document.getElementById("connection-status").innerHTML = `<span style="color:var(--accent-magenta);">⚠️ 連接錯誤: ${err.message}</span>`;
       });
 
-      // 2. 雙向開路即時補償機制，防止 missed 'open' 事件
+      // 雙向開路即時補償機制，防止 missed 'open' 事件
       const handleOpenAction = () => {
         document.getElementById("connection-status").innerHTML = "✅ 連線成功！正在投擲硬幣決定先攻...";
         setTimeout(() => {
@@ -2318,7 +2313,7 @@
       try {
         switch(data.type) {
           case 'INIT_SYNC': {
-            // 🌐 [核心同步修復] 接收對手真正的出戰卡與後備卡，徹底告別掛機 Dummy 角色！
+            // 接收對手真正的出戰卡與後備卡，徹底告別掛機 Dummy 角色！
             engine.ai.activeCard = data.activeCard;
             engine.ai.bench = data.bench;
             logConsole("🌐 [系統] 已成功與對手同步初始卡牌陣容！戰鬥開始！");
