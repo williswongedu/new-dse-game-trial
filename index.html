@@ -1115,7 +1115,7 @@
     // 🌐 雲端 Google 試算表同步引擎配置
     // ==========================================
     // ⚠️ 請在此處貼上您從 Google 試算表部署獲得的網頁應用程式 URL
-    const CLOUD_API_URL = "https://script.google.com/macros/s/AKfycbxRFwm7H9MBsE5ZnwuAXQPk6B6oyodWXhtGVIQdOXyyaXwaZ7eUmFg9u5UQ6Zn8IBOD/exec"; 
+    const CLOUD_API_URL = "您的_GOOGLE_APPS_SCRIPT_網頁應用程式_URL"; 
 
     let currentStudentId = "";
     let currentStudentName = "";
@@ -1277,7 +1277,7 @@
       "Q_COMB_02": {
         id: "Q_COMB_02",
         topic: "組合數 (⭐⭐ 中等)",
-        question: "從 7 名男生和 5 名女生中選出 4 人組成備考小組，若小組中必須包含最少 3 名男生，求有多少種不同的選派方法？",
+        question: "從 7 名男生 and 5 名女生中選出 4 人組成備考小組，若小組中必須包含最少 3 名男生，求有多少種不同的選派方法？",
         options: ["210種", "245種", "315種", "350種"],
         correctIndex: 0,
         difficulty: 2,
@@ -1513,28 +1513,49 @@
         this.currentState = BattleState.INITIALIZING;
         this.turnNumber = 0; 
 
+        // 建立牌組屬性庫
         this.playerDeckAttributes = [...new Set(this.player.deck.map(c => c.attribute))];
         if (this.player.activeCard) this.playerDeckAttributes.push(this.player.activeCard.attribute);
         this.player.bench.forEach(c => { if(c) this.playerDeckAttributes.push(c.attribute); });
         this.playerDeckAttributes = [...new Set(this.playerDeckAttributes)];
 
-        this.aiDeckAttributes = [...new Set(this.ai.deck.map(c => c.attribute))];
-        if (this.ai.activeCard) this.aiDeckAttributes.push(this.ai.activeCard.attribute);
-        this.ai.bench.forEach(c => { if(c) this.aiDeckAttributes.push(c.attribute); });
-        this.aiDeckAttributes = [...new Set(this.aiDeckAttributes)];
-
         this.currentTurnEnergy = this.rollEnergyType(this.playerDeckAttributes);
         this.nextTurnEnergy = this.rollEnergyType(this.playerDeckAttributes);
 
+        // 抽取初始手牌
         for (let i = 0; i < 4; i++) {
           this.drawCard(this.player);
-          this.drawCard(this.ai);
         }
 
+        // 設置玩家自己的初始出戰與後備怪
         this.player.activeCard = this.player.deck.pop();
-        this.ai.activeCard = this.ai.deck.pop();
         this.player.bench[0] = this.player.deck.pop();
-        this.ai.bench[0] = this.ai.deck.pop();
+
+        if (this.isMultiplayer) {
+          // 🌐 聯網對戰模式：對手角色將由網絡初始化同步，拒絕本地隨機亂產！
+          this.ai.activeCard = null;
+          this.ai.bench = [null, null, null];
+          this.ai.hand = [];
+
+          // 立刻將自己的初始陣容發送給對手同步
+          sendNetData({
+            type: 'INIT_SYNC',
+            activeCard: this.player.activeCard,
+            bench: this.player.bench
+          });
+        } else {
+          // 🤖 本地單人模式：由 AI 隨機產生陣容
+          this.aiDeckAttributes = [...new Set(this.ai.deck.map(c => c.attribute))];
+          if (this.ai.activeCard) this.aiDeckAttributes.push(this.ai.activeCard.attribute);
+          this.ai.bench.forEach(c => { if(c) this.aiDeckAttributes.push(c.attribute); });
+          this.aiDeckAttributes = [...new Set(this.aiDeckAttributes)];
+
+          for (let i = 0; i < 4; i++) {
+            this.drawCard(this.ai);
+          }
+          this.ai.activeCard = this.ai.deck.pop();
+          this.ai.bench[0] = this.ai.deck.pop();
+        }
 
         if (this.isMultiplayer && role === 'guest') {
           document.getElementById("connection-status").innerText = "⏳ 等待房主投擲先攻硬幣...";
@@ -1723,7 +1744,8 @@
           logConsole(`🔄 [出牌] 將 [${card.name}] 放至後備區第 ${targetBenchIdx + 1} 號位。`);
           
           if (this.isMultiplayer) {
-            sendNetData({ type: 'PLAY_BENCH', cardId: handCardId, benchIndex: targetBenchIdx });
+            // 🌐 傳輸完整實體卡牌物件，避免 desync
+            sendNetData({ type: 'PLAY_BENCH', card: card, benchIndex: targetBenchIdx });
           }
           updateUI();
         }
@@ -1743,7 +1765,8 @@
           logConsole(`🔄 [出牌] 將 [${card.name}] 直接放置到出戰區！`);
           
           if (this.isMultiplayer) {
-            sendNetData({ type: 'PLAY_ACTIVE', cardId: handCardId });
+            // 🌐 傳輸完整實體卡牌物件，避免 desync
+            sendNetData({ type: 'PLAY_ACTIVE', card: card });
           }
           updateUI();
         }
@@ -1941,7 +1964,7 @@
               logConsole(`💔 ${targetName} 生命值減一！賸餘生命值: ${target.lifePoints}/3`);
               
               // 實施經驗值累加：擊殺對手可獲得額外經驗值
-              if (targetName.includes("AI") || targetName.includes("對手")) {
+              if (targetName.includes("AI") || targetName.includes("對手") || targetName.includes("🌐")) {
                 playerExp += 100;
                 logConsole(`📈 您獲得了 100 經驗值！(當前經驗值: ${playerExp})`);
                 checkLevelUp();
@@ -2209,9 +2232,18 @@
       if (conn && conn.open) conn.send(data);
     }
 
+    /* 🌐 P2P 聯機數據接收與即時 Playback 處理 */
     function handleNetworkData(data) {
       try {
         switch(data.type) {
+          case 'INIT_SYNC': {
+            // 🌐 [核心同步修復] 接收對手真正的出戰卡與後備卡，徹底告別掛機 Dummy 角色！
+            engine.ai.activeCard = data.activeCard;
+            engine.ai.bench = data.bench;
+            logConsole("🌐 [系統] 已成功與對手同步初始卡牌陣容！戰鬥開始！");
+            updateUI();
+            break;
+          }
           case 'COIN_FLIP_RESULT': {
             const coinEl = document.getElementById("coin-graphic");
             const rotateValue = data.hostIsFirst ? 1980 : 1800; 
@@ -2227,38 +2259,40 @@
           }
           case 'ATTACH_ENERGY': {
             flashBorderHighlight("opponent-battle-row", "highlight-flash-gold");
-            engine.ai.activeCard.energyAttached += 1;
-            logConsole(`⚡ [對手行動] 為出戰怪 [${engine.ai.activeCard.name}] 附加了 1 點能量。`);
+            const active = engine.ai.activeCard;
+            if (active) {
+              active.attachedEnergies[data.energyType] = (active.attachedEnergies[data.energyType] || 0) + 1;
+              active.energyAttached = Object.values(active.attachedEnergies).reduce((sum, val) => sum + val, 0);
+              logConsole(`⚡ [對手行動] 為出戰怪 [${active.name}] 附加了 1 點 ${Attributes[data.energyType].name} 能量。`);
+            }
             updateUI();
             break;
           }
           case 'ATTACH_ENERGY_BENCH': {
-            if (engine.ai.bench[data.benchIndex]) {
+            const benchCard = engine.ai.bench[data.benchIndex];
+            if (benchCard) {
               flashBorderHighlight("opponent-battle-row", "highlight-flash-gold");
-              engine.ai.bench[data.benchIndex].energyAttached += 1;
-              logConsole(`⚡ [對手行動] 為後備怪 [${engine.ai.bench[data.benchIndex].name}] 附加了 1 點能量。`);
+              benchCard.attachedEnergies[data.energyType] = (benchCard.attachedEnergies[data.energyType] || 0) + 1;
+              benchCard.energyAttached = Object.values(benchCard.attachedEnergies).reduce((sum, val) => sum + val, 0);
+              logConsole(`⚡ [對手行動] 為後備怪 [${benchCard.name}] 附加了 1 點 ${Attributes[data.energyType].name} 能量。`);
               updateUI();
             }
             break;
           }
           case 'PLAY_BENCH': {
-            if (engine.ai.hand.length > 0) {
-              const card = engine.ai.hand.shift();
-              engine.ai.bench[data.benchIndex] = card;
-              flashBorderHighlight("opponent-battle-row", "highlight-flash-magenta");
-              logConsole(`🔄 [對手行動] 將 [${card.name}] 放至後備區 ${data.benchIndex + 1} 號位。`);
-              updateUI();
-            }
+            // 接收對手實體卡牌並渲染至後備區，不使用本地 shift 盲抽！
+            engine.ai.bench[data.benchIndex] = data.card;
+            flashBorderHighlight("opponent-battle-row", "highlight-flash-magenta");
+            logConsole(`🔄 [對手行動] 將 [${data.card.name}] 放至後備區 ${data.benchIndex + 1} 號位。`);
+            updateUI();
             break;
           }
           case 'PLAY_ACTIVE': {
-            if (engine.ai.hand.length > 0) {
-              const card = engine.ai.hand.shift();
-              engine.ai.activeCard = card;
-              flashBorderHighlight("opponent-battle-row", "highlight-flash-magenta");
-              logConsole(`🔄 [對手行動] 將 [${card.name}] 直接放置到出戰區！`);
-              updateUI();
-            }
+            // 接收對手實體卡牌並渲染至戰場
+            engine.ai.activeCard = data.card;
+            flashBorderHighlight("opponent-battle-row", "highlight-flash-magenta");
+            logConsole(`🔄 [對手行動] 將 [${data.card.name}] 直接放置到出戰區！`);
+            updateUI();
             break;
           }
           case 'SWAP_ACTIVE_BENCH': {
@@ -2272,8 +2306,8 @@
             break; 
           }
           case 'ATTACK_RESOLVED': {
-            const enemyActive = engine.ai.activeCard;
-            const myActive = engine.player.activeCard;
+            const enemyActive = engine.ai.activeCard; // 攻擊者
+            const myActive = engine.player.activeCard;   // 受擊者（我方）
             if (!enemyActive || !myActive) return;
             
             const enemySkill = enemyActive.skills.find(s => s.id === data.skillId);
@@ -3098,7 +3132,7 @@
       
       // 簽到贈送大廳經驗值獎勵
       playerExp += 150;
-      logConsole(`📈 每日簽到，獲得 +150 經驗值！`);
+      logConsole("📈 每日簽到，獲得 +150 經驗值！");
       checkLevelUp();
 
       saveGameProgressToStorage();
