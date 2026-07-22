@@ -1123,18 +1123,37 @@
     let playerLevel = 1;     // 學生數域等級
 
     /* ==========================================
-     * 🌐 WebRTC 聯網連線核心配置
-     * 加入高可靠度 Google STUN 伺服器，強制解決對手連線卡死、穿透防火牆失敗之問題
+     * 🌐 WebRTC 聯網連線核心配置 (黃金穿透版)
+     * 加入公共免費 TURN 伺服器，專治跨裝置、跨網路連線卡死與連接錯誤
      * ========================================== */
     const PEER_CONFIG = {
-      debug: 3, // 開啟最詳細 debug 紀錄（可按 F12 打開控制台查看）
+      host: '0.peerjs.com', // 指定 PeerJS 訊號伺服器
+      port: 443,
+      secure: true,
+      debug: 3, // 輸出最詳細的 WebRTC 交握日誌
       config: {
         iceServers: [
+          // STUN 伺服器群（用於普通網路穿透）
           { urls: 'stun:stun.l.google.com:19302' },
           { urls: 'stun:stun1.l.google.com:19302' },
-          { urls: 'stun:stun2.l.google.com:19302' },
-          { urls: 'stun:stun3.l.google.com:19302' },
-          { urls: 'stun:stun4.l.google.com:19302' }
+          { urls: 'stun:stun.nextcloud.com:443' },
+          
+          // 🚀 TURN 中繼伺服器（特別由 Open Relay 提供，用於對付對稱型嚴格防火牆與不同網路連線）
+          {
+            urls: 'turn:openrelay.metered.ca:80',
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
+          },
+          {
+            urls: 'turn:openrelay.metered.ca:443',
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
+          },
+          {
+            urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+            username: 'openrelayproject',
+            credential: 'openrelayproject'
+          }
         ]
       }
     };
